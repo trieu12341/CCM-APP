@@ -1,0 +1,68 @@
+{
+  "Contracts": [
+    {
+      "contract_id": "C001",
+      "project_id": "P001",
+      "contract_name": "Main Construction Works",
+      "vendor_name": "Alpha Builders Co.",
+      "original_value": 30000000,
+      "advance_rate": 0.1,
+      "retention_rate": 0.05
+    },
+    {
+      "contract_id": "C002",
+      "project_id": "P001",
+      "contract_name": "MEP Installation",
+      "vendor_name": "Beta Engineering",
+      "original_value": 15000000,
+      "advance_rate": 0.15,
+      "retention_rate": 0.05
+    },
+    {
+      "contract_id": "C003",
+      "project_id": "P001",
+      "contract_name": "Piling & Struture work",
+      "vendor_name": "TBD",
+      "original_value": 50000000,
+      "advance_rate": 0,
+      "retention_rate": 0
+    }
+  ],
+  "Payment_Claims": [
+    {
+      "claim_id": "PC001",
+      "contract_id": "C001",
+      "period_number": 1,
+      "claimed_amount": 2000000,
+      "advance_deduction": 200000,
+      "retention_amount": 100000,
+      "status": "Approved"
+    },
+    {
+      "claim_id": "PC002",
+      "contract_id": "C002",
+      "period_number": 1,
+      "claimed_amount": 1000000,
+      "advance_deduction": 150000,
+      "retention_amount": 50000,
+      "status": "Pending"
+    }
+  ],
+  "Variations": [
+    {
+      "vo_id": "VO001",
+      "contract_id": "C001",
+      "vo_name": "Additional Seating Area",
+      "vo_amount": 500000,
+      "status": "Approved"
+    }
+  ],
+  "Documents": [
+    {
+      "doc_id": "D001",
+      "related_id": "C001",
+      "file_name": "Main_Contract_Signed.pdf",
+      "drive_url": "https://drive.google.com/..."
+    }
+  ]
+}

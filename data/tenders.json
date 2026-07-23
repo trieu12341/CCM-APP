@@ -1,0 +1,37 @@
+{
+  "Tenders": [
+    {
+      "tender_id": "T001",
+      "project_id": "P001",
+      "tender_name": "Main Construction Works - Package 1",
+      "approved_budget": 35000000,
+      "status": "Awarded",
+      "deadline": "2024-03-15"
+    },
+    {
+      "tender_id": "T002",
+      "project_id": "P001",
+      "tender_name": "MEP Installation - Package 2",
+      "approved_budget": 18000000,
+      "status": "Bidding",
+      "deadline": "2024-05-20"
+    },
+    {
+      "tender_id": "T003",
+      "project_id": "P001",
+      "tender_name": "Landscaping & External Works",
+      "approved_budget": 5000000,
+      "status": "Floating",
+      "deadline": "2024-07-10"
+    },
+    {
+      "tender_id": "C03",
+      "project_id": "P001",
+      "tender_name": "Fiting Out",
+      "approved_budget": 30000000,
+      "status": "Evaluating",
+      "deadline": "2026-07-13",
+      "winner": ""
+    }
+  ]
+}

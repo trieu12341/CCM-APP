@@ -1,0 +1,120 @@
+{
+  "Projects": [
+    {
+      "project_id": "P001",
+      "project_name": "Olimpic Stadium",
+      "total_budget": 50000000,
+      "contingency_budget": 5000000
+    },
+    {
+      "project_id": "P002",
+      "project_name": "1111",
+      "location": "111",
+      "start_date": "2025-08-08",
+      "end_date": "2026-08-08",
+      "total_budget": 20000000,
+      "contingency_budget": 1000000
+    }
+  ],
+  "Contracts": [
+    {
+      "contract_id": "C001",
+      "project_id": "P001",
+      "contract_name": "Main Construction Works",
+      "vendor_name": "Alpha Builders Co.",
+      "original_value": 30000000,
+      "advance_rate": 0.1,
+      "retention_rate": 0.05
+    },
+    {
+      "contract_id": "C002",
+      "project_id": "P001",
+      "contract_name": "MEP Installation",
+      "vendor_name": "Beta Engineering",
+      "original_value": 15000000,
+      "advance_rate": 0.15,
+      "retention_rate": 0.05
+    },
+    {
+      "contract_id": "C003",
+      "project_id": "P001",
+      "contract_name": "Piling & Struture work",
+      "vendor_name": "TBD",
+      "original_value": 50000000,
+      "advance_rate": 0,
+      "retention_rate": 0
+    }
+  ],
+  "Payment_Claims": [
+    {
+      "claim_id": "PC001",
+      "contract_id": "C001",
+      "period_number": 1,
+      "claimed_amount": 2000000,
+      "advance_deduction": 200000,
+      "retention_amount": 100000,
+      "status": "Approved"
+    },
+    {
+      "claim_id": "PC002",
+      "contract_id": "C002",
+      "period_number": 1,
+      "claimed_amount": 1000000,
+      "advance_deduction": 150000,
+      "retention_amount": 50000,
+      "status": "Pending"
+    }
+  ],
+  "Variations": [
+    {
+      "vo_id": "VO001",
+      "contract_id": "C001",
+      "vo_name": "Additional Seating Area",
+      "vo_amount": 500000,
+      "status": "Approved"
+    }
+  ],
+  "Documents": [
+    {
+      "doc_id": "D001",
+      "related_id": "C001",
+      "file_name": "Main_Contract_Signed.pdf",
+      "drive_url": "https://drive.google.com/..."
+    }
+  ],
+  "Tenders": [
+    {
+      "tender_id": "T001",
+      "project_id": "P001",
+      "tender_name": "Main Construction Works - Package 1",
+      "approved_budget": 35000000,
+      "status": "Awarded",
+      "deadline": "2024-03-15"
+    },
+    {
+      "tender_id": "T002",
+      "project_id": "P001",
+      "tender_name": "MEP Installation - Package 2",
+      "approved_budget": 18000000,
+      "status": "Bidding",
+      "deadline": "2024-05-20"
+    },
+    {
+      "tender_id": "T003",
+      "project_id": "P001",
+      "tender_name": "Landscaping & External Works",
+      "approved_budget": 5000000,
+      "status": "Floating",
+      "deadline": "2024-07-10"
+    },
+    {
+      "tender_id": "C03",
+      "project_id": "P001",
+      "tender_name": "Fiting Out",
+      "approved_budget": 30000000,
+      "status": "Evaluating",
+      "deadline": "2026-07-13",
+      "winner": ""
+    }
+  ]
+}
