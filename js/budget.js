@@ -58,8 +58,7 @@ export function renderDashboard() {
     document.getElementById('metric-total-budget').textContent = formatCurrency(totalBudget);
     
     let allocatedBudget = 0;
-    // Tạm thời clear khu vực budget theo yêu cầu của user
-    const projectContracts = []; // state.appData.Contracts.filter(c => c.project_id === state.currentProjectId);
+    const projectContracts = state.appData.Contracts.filter(c => c.project_id === state.currentProjectId);
 
     projectContracts.forEach(contract => {
         allocatedBudget += (contract.total_value || contract.original_value || 0);

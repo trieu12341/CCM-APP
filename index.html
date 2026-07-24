@@ -66,9 +66,16 @@
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" placeholder="Search">
                 </div>
-                <div class="topbar-actions">
+                <div class="topbar-actions" style="display: flex; align-items: center; gap: 15px;">
                     <i class="fa-regular fa-bell"></i>
-                    <img src="https://i.pravatar.cc/150?img=68" alt="Profile" class="avatar-small">
+                    <div id="user-info" style="display: flex; align-items: center; gap: 10px;">
+                        <div style="text-align: right;">
+                            <div id="user-name" style="font-weight: 600; font-size: 0.9rem;">-</div>
+                            <div id="user-role" style="font-size: 0.75rem; color: var(--text-muted); text-transform: capitalize;">-</div>
+                        </div>
+                        <img src="https://i.pravatar.cc/150?img=68" alt="Profile" class="avatar-small">
+                        <button id="btn-logout" class="btn btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button>
+                    </div>
                 </div>
             </header>
 
@@ -90,7 +97,7 @@
                             <p class="project-meta">1 January - 1 December 2024 • Belgrade, Serbia</p>
                         </div>
                     </div>
-                    <div class="project-actions">
+                    <div class="project-actions manager-hide">
                         <button class="btn btn-primary" id="btn-new-entry">+ New Entry</button>
                         <button class="btn btn-primary">+ Create Report</button>
                         <button class="btn btn-secondary"><i class="fa-solid fa-right-left"></i> Currency Converter</button>
@@ -167,10 +174,10 @@
                     <!-- Bottom Section Layout -->
                     <div class="bottom-grid">
                         <div class="documents-section">
-                            <div class="section-title">Key Project Documents <span class="add-icon">+</span></div>
+                            <div class="section-title">Key Project Documents <span class="add-icon manager-hide">+</span></div>
                             <div class="documents-grid" id="documents-grid">
                                 <!-- JS injected -->
-                                <div class="document-upload">
+                                <div class="document-upload manager-hide">
                                     <i class="fa-solid fa-arrow-up-from-bracket"></i> Uploader
                                 </div>
                             </div>
@@ -178,7 +185,7 @@
                         
                         <div class="quick-actions-section">
                             <div class="section-title">Quick Actions Sidebar</div>
-                            <div class="quick-actions-list">
+                            <div class="quick-actions-list manager-hide">
                                 <button id="btn-initiate-payment"><i class="fa-regular fa-file-lines"></i> Initiate Payment Claim</button>
                                 <button><i class="fa-regular fa-pen-to-square"></i> Log VO Request</button>
                                 <button><i class="fa-solid fa-list-check"></i> Log VO Request</button>
@@ -198,7 +205,7 @@
                     <div id="tender-list-view">
                         <div class="section-title" style="display: flex; justify-content: space-between; width: 100%;">
                             Tender Management
-                            <button class="btn btn-primary" id="btn-new-tender">+ Tạo Gói thầu mới</button>
+                            <button class="btn btn-primary manager-hide" id="btn-new-tender">+ Tạo Gói thầu mới</button>
                         </div>
                         <!-- KPI Cards for Tender -->
                         <div class="metrics-grid">
@@ -244,7 +251,7 @@
                     <div id="tender-detail-view" class="hidden">
                         <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
                             <button class="btn btn-secondary" id="btn-back-tender"><i class="fa-solid fa-arrow-left"></i> Quay lại Danh sách Gói thầu</button>
-                            <div style="display: flex; gap: 1rem;">
+                            <div style="display: flex; gap: 1rem;" class="manager-hide">
                                 <button class="btn btn-primary" id="btn-award-tender" style="background-color: var(--primary-green); border-color: var(--primary-green);">🏆 Chốt Chọn Nhà Thầu</button>
                                 <button class="btn btn-primary" id="btn-save-cba"><i class="fa-solid fa-floppy-disk"></i> Lưu Cập Nhật</button>
                             </div>
@@ -274,7 +281,7 @@
                             <div class="tabs" id="tender-rounds-tabs" style="border-bottom: none; margin-bottom: 0;">
                                 <!-- JS injected -->
                             </div>
-                            <button class="btn btn-secondary" id="btn-add-round" style="height: 36px; padding: 0 1rem; font-size: 0.8rem;">+ Thêm Đợt Nộp Thầu</button>
+                            <button class="btn btn-secondary manager-hide" id="btn-add-round" style="height: 36px; padding: 0 1rem; font-size: 0.8rem;">+ Thêm Đợt Nộp Thầu</button>
                         </div>
 
                         <!-- CBA Empty State -->
@@ -282,12 +289,12 @@
                             <i class="fa-solid fa-file-invoice-dollar" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
                             <h3 style="margin-bottom: 0.5rem;">Chưa có dữ liệu Bảng So Sánh Giá</h3>
                             <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Khởi tạo bảng CBA để bắt đầu phân tích giá thầu.</p>
-                            <button class="btn btn-primary" id="btn-init-cba" style="margin: 0 auto;">+ Khởi tạo Bảng So Sánh Giá (CBA)</button>
+                            <button class="btn btn-primary manager-hide" id="btn-init-cba" style="margin: 0 auto;">+ Khởi tạo Bảng So Sánh Giá (CBA)</button>
                         </div>
 
                         <!-- CBA Table View -->
                         <div id="cba-table-view" class="hidden">
-                            <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="display: flex; gap: 1rem; margin-bottom: 1rem;" class="manager-hide">
                                 <button class="btn btn-secondary" id="btn-add-bidder">+ Thêm Nhà thầu</button>
                                 <button class="btn btn-secondary" id="btn-add-item">+ Thêm Hạng mục</button>
                                 <div style="width: 1px; background: #e2e8f0; margin: 0 0.5rem;"></div>
@@ -319,7 +326,7 @@
                 <div id="contract-view" class="hidden">
                     <div class="section-title" style="display: flex; justify-content: space-between; width: 100%;">
                         Contract Management
-                        <div style="display: flex; gap: 1rem;">
+                        <div style="display: flex; gap: 1rem;" class="manager-hide">
                             <button class="btn btn-secondary hidden" id="btn-bulk-delete-contract" style="color: var(--danger-color); border-color: var(--danger-color);"><i class="fa-solid fa-trash"></i> Xóa HĐ đã chọn</button>
                             <input type="file" id="contract-excel-import" accept=".xlsx, .xls, .csv" hidden>
                             <button class="btn btn-secondary" id="btn-import-contract" style="color: #10b981; border-color: #10b981;" onclick="document.getElementById('contract-excel-import').click()"><i class="fa-solid fa-file-excel"></i> Import Hợp đồng</button>
@@ -452,6 +459,39 @@
 
             </div>
         </main>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal-overlay" style="z-index: 9999; background-color: #f8fafc; display: flex; align-items: center; justify-content: center;">
+        <div class="modal-content" style="max-width: 400px; width: 90%; padding: 2rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 12px; text-align: center;">
+            <div style="margin-bottom: 2rem;">
+                <div style="display: flex; justify-content: center; gap: 4px; margin-bottom: 1rem;">
+                    <div style="background-color: var(--primary-blue); color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem; border-radius: 4px;">V</div>
+                    <div style="background-color: var(--primary-blue); color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem; border-radius: 4px;">C</div>
+                    <div style="background-color: var(--primary-blue); color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem; border-radius: 4px;">R</div>
+                    <div style="background-color: var(--primary-blue); color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem; border-radius: 4px;">E</div>
+                </div>
+                <h2 style="color: var(--primary-blue); margin-bottom: 0.5rem;">Đăng nhập Hệ thống</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Cost & Contract Management</p>
+            </div>
+            
+            <form id="login-form" style="text-align: left;">
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label for="login-username" style="font-weight: 500;">Tên đăng nhập</label>
+                    <input type="text" id="login-username" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px;" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label for="login-password" style="font-weight: 500;">Mật khẩu</label>
+                    <input type="password" id="login-password" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px;" required>
+                </div>
+                <div id="login-error" style="color: var(--danger-color); font-size: 0.85rem; margin-bottom: 1rem; text-align: center; display: none;">Tên đăng nhập hoặc mật khẩu không đúng</div>
+                <button type="submit" class="btn btn-primary" id="btn-login-submit" style="width: 100%; padding: 0.75rem; font-size: 1rem; justify-content: center;">Đăng nhập</button>
+            </form>
+            
+            <div style="margin-top: 2rem; font-size: 0.8rem; color: var(--text-muted);">
+                &copy; 2024 Viet Capital Real Estate
+            </div>
+        </div>
     </div>
 
     <!-- Modal -->

@@ -205,7 +205,7 @@ function openContractModal(contract = null) {
         document.getElementById('contract-scope-input').value = contract.scope_of_work || '';
         
         deleteBtn.classList.remove('hidden');
-        toggleDynamicFields(contract.contract_type || 'Construction');
+        toggleDynamicFields(contract.type || 'Construction');
     } else {
         document.getElementById('contract-modal-title').textContent = `Thêm mới Hợp đồng`;
         document.getElementById('contract-id-hidden').value = '';

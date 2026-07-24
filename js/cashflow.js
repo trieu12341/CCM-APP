@@ -173,6 +173,17 @@ export function renderCashflow() {
     // 2. Read real data from vcre_cashflow
     let cashflows = getLocalCashflow();
     
+    // Run Forecast Engine for Construction Contracts so that is_construction and total_cert are calculated
+    const allContracts = state.appData.Contracts || [];
+    const constructionPackages = allContracts.filter(c => c.project_id === state.currentProjectId && c.type === 'Construction');
+    
+    constructionPackages.forEach(contract => {
+        const contractCashflows = cashflows.filter(c => c.package_name === contract.package_name && c.project_id === state.currentProjectId);
+        if (contractCashflows.length > 0) {
+            calculateForecastEngine(contractCashflows, contract);
+        }
+    });
+
     let totalCertified = 0;
     let totalPaid = 0;
     
@@ -465,10 +476,18 @@ function renderCashflowTable() {
     const grouped = items.reduce((acc, item) => {
         const pkg = item.package_name || 'Khác';
         if (!acc[pkg]) {
-            acc[pkg] = { items: [], totalPlan: 0 };
+            const allContracts = state.appData.Contracts || [];
+            const matchedContract = allContracts.find(c => c.package_name === pkg && c.project_id === state.currentProjectId);
+            const contractTotal = matchedContract ? (Number(matchedContract.total_value) || Number(matchedContract.budget_value) || 0) : 0;
+            
+            acc[pkg] = { items: [], totalPlan: contractTotal };
         }
         acc[pkg].items.push(item);
-        acc[pkg].totalPlan += (Number(item.value) || 0);
+        // If there's no matching contract, we might want to sum non-duplicate items, but it's safer to not duplicate.
+        // If it's a loosely created item without a contract, fallback to summing its value.
+        if (acc[pkg].totalPlan === 0 && (!state.appData.Contracts || !state.appData.Contracts.some(c => c.package_name === pkg && c.project_id === state.currentProjectId))) {
+             acc[pkg].totalPlan += (Number(item.value) || 0);
+        }
         return acc;
     }, {});
 
@@ -593,8 +612,8 @@ function createCashflowRowNode(item, isEditMode = false) {
             <td class="col-synced">${formatToMonthYear(item.paid_date)}</td>
             <td class="col-synced"><span class="badge ${item.status==='Paid'?'bg-blue':item.status==='Certified'?'bg-purple':'bg-gray'}" style="padding:4px 8px; font-size:0.8rem;">${item.status || 'Planned'}</span></td>
             <td style="text-align: center; white-space: nowrap;">
-                <button type="button" class="btn btn-secondary cf-edit-btn" style="color:var(--primary-blue); padding: 0.25rem 0.5rem;" title="Sửa"><i class="fa-solid fa-pencil"></i></button>
-                <button type="button" class="btn btn-secondary cf-del-btn" style="color:var(--danger-color); padding: 0.25rem 0.5rem;" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+                <button type="button" class="btn btn-secondary cf-edit-btn manager-hide" style="color:var(--primary-blue); padding: 0.25rem 0.5rem;" title="Sửa"><i class="fa-solid fa-pencil"></i></button>
+                <button type="button" class="btn btn-secondary cf-del-btn manager-hide" style="color:var(--danger-color); padding: 0.25rem 0.5rem;" title="Xóa"><i class="fa-solid fa-trash"></i></button>
             </td>
         `;
         

@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: ccm-app
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 18.17.0
+      - key: PORT
+        value: 3000
+      - key: JWT_SECRET
+        value: generate-a-secure-secret-here

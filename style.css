@@ -925,3 +925,7 @@ body {
     color: #9a3412;
     border: 1px solid #fed7aa;
 }
+
+
+/* RBAC */
+body.is-manager .manager-hide { display: none !important; }

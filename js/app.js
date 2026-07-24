@@ -1,4 +1,4 @@
-import { fetchProjects, fetchBudget, fetchTenders, fetchContracts, fetchCashflow, fetchPayments } from './api.js';
+import { fetchProjects, fetchBudget, fetchTenders, fetchContracts, fetchCashflow, fetchPayments, apiLogin, apiGetMe } from './api.js';
 import { setupBudgetEvents, renderProjectTabs, renderDashboard } from './budget.js';
 import { setupTenderEvents } from './tender.js';
 import { setupContractEvents } from './contract.js';
@@ -16,7 +16,8 @@ export const state = {
         Documents: [],
         Tenders: []
     },
-    currentProjectId: null
+    currentProjectId: null,
+    user: null
 };
 
 export const formatCurrency = (value) => {
@@ -37,6 +38,103 @@ export const mockActivities = [
 ];
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Check Auth
+    const loginModal = document.getElementById('login-modal');
+    
+    // Auth Event Listener
+    window.addEventListener('auth-unauthorized', () => {
+        loginModal.classList.remove('hidden');
+        document.body.classList.remove('is-manager');
+    });
+
+    const checkAuth = async () => {
+        if (!localStorage.getItem('jwt_token')) {
+            loginModal.classList.remove('hidden');
+            return false;
+        }
+        
+        try {
+            const res = await apiGetMe();
+            if (res.ok) {
+                const data = await res.json();
+                state.user = data.user;
+                loginModal.classList.add('hidden');
+                
+                // Update User Info in Header
+                document.getElementById('user-name').textContent = state.user.name || state.user.username;
+                document.getElementById('user-role').textContent = state.user.role;
+                
+                // RBAC Logic
+                if (state.user.role === 'manager') {
+                    document.body.classList.add('is-manager');
+                } else {
+                    document.body.classList.remove('is-manager');
+                }
+                return true;
+            } else {
+                loginModal.classList.remove('hidden');
+                return false;
+            }
+        } catch (error) {
+            loginModal.classList.remove('hidden');
+            return false;
+        }
+    };
+
+    // Setup Login Form
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            const errorMsg = document.getElementById('login-error');
+            const submitBtn = document.getElementById('btn-login-submit');
+            
+            try {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Đang đăng nhập...';
+                
+                const res = await apiLogin(username, password);
+                if (res.ok) {
+                    const data = await res.json();
+                    localStorage.setItem('jwt_token', data.token);
+                    errorMsg.style.display = 'none';
+                    loginForm.reset();
+                    if (await checkAuth()) {
+                        await loadAppData();
+                    }
+                } else {
+                    errorMsg.style.display = 'block';
+                }
+            } catch (err) {
+                errorMsg.style.display = 'block';
+                errorMsg.textContent = 'Lỗi kết nối máy chủ.';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Đăng nhập';
+            }
+        });
+    }
+
+    // Setup Logout
+    const btnLogout = document.getElementById('btn-logout');
+    if (btnLogout) {
+        btnLogout.addEventListener('click', () => {
+            localStorage.removeItem('jwt_token');
+            state.user = null;
+            loginModal.classList.remove('hidden');
+            document.body.classList.remove('is-manager');
+        });
+    }
+
+    const isAuthenticated = await checkAuth();
+    if (isAuthenticated) {
+        await loadAppData();
+    }
+});
+
+async function loadAppData() {
     try {
         const [projectsData, budgetData, tendersData, contractsData, cashflowData, paymentsData] = await Promise.all([
             fetchProjects(),
@@ -92,7 +190,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (error) {
         console.error('Error loading data:', error);
     }
-});
+}
 
 function setupSidebarEvents() {
     const modules = [
