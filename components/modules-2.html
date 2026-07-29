@@ -1,0 +1,102 @@
+﻿                <!-- Cashflow Module -->
+                <div id="cashflow-view" class="hidden">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <div class="section-title" style="margin-bottom: 0;">Cash Forecast Overview</div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <label for="cf-period-select" style="font-weight: 500; color: var(--text-muted);">Period View:</label>
+                            <select id="cf-period-select" class="form-control" style="padding: 0.4rem 0.8rem; border: 1px solid var(--border-color); border-radius: 4px; font-family: inherit;">
+                                <option value="month">Theo ThÃ¡ng (Monthly)</option>
+                                <option value="quarter">Theo QuÃ½ (Quarterly)</option>
+                                <option value="full">ToÃ n Dá»± Ãn (Full Project)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="cashflow-container">
+                        <!-- Left Sidebar for KPIs -->
+                        <div class="cashflow-kpi-sidebar">
+                            <div class="cf-kpi-box">
+                                <div class="cf-kpi-title">PROJECT BUDGET</div>
+                                <div class="cf-kpi-val" id="cf-kpi-budget">$0</div>
+                            </div>
+                            <div class="cf-kpi-box">
+                                <div class="cf-kpi-title">REVISED TOTAL CONTRACT</div>
+                                <div class="cf-kpi-val" id="cf-kpi-revised">$0</div>
+                            </div>
+                            <div class="cf-kpi-box">
+                                <div class="cf-kpi-title">TOTAL CERTIFIED TO DATE</div>
+                                <div class="cf-kpi-val" id="cf-kpi-certified">$0</div>
+                            </div>
+                            <div class="cf-kpi-box">
+                                <div class="cf-kpi-title">BALANCE (BUDGET - CERTIFIED)</div>
+                                <div class="cf-kpi-val" id="cf-kpi-balance">$0</div>
+                            </div>
+                            <div class="cf-kpi-box">
+                                <div class="cf-kpi-title">TOTAL PAID AMOUNT</div>
+                                <div class="cf-kpi-val" id="cf-kpi-paid">$0</div>
+                            </div>
+                            <div class="cf-kpi-box">
+                                <div class="cf-kpi-title">% PAID</div>
+                                <div class="cf-kpi-val" id="cf-kpi-pct-paid">0%</div>
+                            </div>
+                            <div class="cf-kpi-box">
+                                <div class="cf-kpi-title">% CERTIFIED</div>
+                                <div class="cf-kpi-val" id="cf-kpi-pct-certified">0%</div>
+                            </div>
+                            
+                            <button id="btn-cashflow-detail" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem; margin-top: 1rem; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);">
+                                ðŸ“‹ Báº£ng Chi Tiáº¿t
+                            </button>
+                        </div>
+                        
+                        <!-- Right Area for Charts -->
+                        <div class="cashflow-charts-grid">
+                            <div class="cf-chart-card">
+                                <h3>Budget vs. Revised Total Contract</h3>
+                                <div id="cf-chart-1"></div>
+                            </div>
+                            <div class="cf-chart-card">
+                                <h3>Remaining Certified Balance Breakdown</h3>
+                                <div id="cf-chart-2"></div>
+                            </div>
+                            <div class="cf-chart-card" style="grid-column: span 2; position: relative;">
+                                <h3 style="display: flex; justify-content: space-between; align-items: center;">
+                                    Certified to Date vs. Planned Certified (Cumulative)
+                                    <button class="btn-fullscreen" style="background: none; border: none; cursor: pointer; color: var(--text-muted);"><i class="fa-solid fa-expand"></i></button>
+                                </h3>
+                                <div id="cf-chart-3"></div>
+                            </div>
+                            <div class="cf-chart-card" style="grid-column: span 2; position: relative;">
+                                <h3 style="display: flex; justify-content: space-between; align-items: center;">
+                                    Paid vs. Planned Paid vs. Certified (Cumulative)
+                                    <button class="btn-fullscreen" style="background: none; border: none; cursor: pointer; color: var(--text-muted);"><i class="fa-solid fa-expand"></i></button>
+                                </h3>
+                                <div id="cf-chart-4"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="module-payment" class="hidden">
+                    <div class="section-title">Payment Management</div>
+                    <div class="metrics-grid">
+                        <div class="metric-card"><div class="metric-label">Payment Features</div><div class="metric-value">Coming Soon</div></div>
+                    </div>
+                </div>
+
+                <div id="module-vo" class="hidden">
+                    <div class="section-title">Variation Order</div>
+                    <div class="metrics-grid">
+                        <div class="metric-card"><div class="metric-label">Variation Features</div><div class="metric-value">Coming Soon</div></div>
+                    </div>
+                </div>
+
+                <div id="module-final" class="hidden">
+                    <div class="section-title">Final Statement</div>
+                    <div class="metrics-grid">
+                        <div class="metric-card"><div class="metric-label">Final Statement Features</div><div class="metric-value">Coming Soon</div></div>
+                    </div>
+                </div>
+
+            </div>
+        </main>

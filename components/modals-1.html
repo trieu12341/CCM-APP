@@ -1,0 +1,253 @@
+﻿    <div id="login-modal" class="modal-overlay" style="z-index: 9999; background-color: #f8fafc; display: flex; align-items: center; justify-content: center;">
+        <div class="modal-content" style="max-width: 400px; width: 90%; padding: 2rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 12px; text-align: center;">
+            <div style="margin-bottom: 2rem;">
+                <div style="display: flex; justify-content: center; gap: 4px; margin-bottom: 1rem;">
+                    <div style="background-color: var(--primary-blue); color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem; border-radius: 4px;">V</div>
+                    <div style="background-color: var(--primary-blue); color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem; border-radius: 4px;">C</div>
+                    <div style="background-color: var(--primary-blue); color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem; border-radius: 4px;">R</div>
+                    <div style="background-color: var(--primary-blue); color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem; border-radius: 4px;">E</div>
+                </div>
+                <h2 style="color: var(--primary-blue); margin-bottom: 0.5rem;">ÄÄƒng nháº­p Há»‡ thá»‘ng</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Cost & Contract Management</p>
+            </div>
+            
+            <form id="login-form" style="text-align: left;">
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label for="login-username" style="font-weight: 500;">TÃªn Ä‘Äƒng nháº­p</label>
+                    <input type="text" id="login-username" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px;" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label for="login-password" style="font-weight: 500;">Máº­t kháº©u</label>
+                    <input type="password" id="login-password" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px;" required>
+                </div>
+                <div id="login-error" style="color: var(--danger-color); font-size: 0.85rem; margin-bottom: 1rem; text-align: center; display: none;">TÃªn Ä‘Äƒng nháº­p hoáº·c máº­t kháº©u khÃ´ng Ä‘Ãºng</div>
+                <button type="submit" class="btn btn-primary" id="btn-login-submit" style="width: 100%; padding: 0.75rem; font-size: 1rem; justify-content: center;">ÄÄƒng nháº­p</button>
+            </form>
+            
+            <div style="margin-top: 2rem; font-size: 0.8rem; color: var(--text-muted);">
+                &copy; 2024 Viet Capital Real Estate
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="payment-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>New Payment Claim</h2>
+                <button id="close-modal" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="payment-form">
+                <div class="form-group">
+                    <label for="contract-select">Select Contract</label>
+                    <select id="contract-select" required>
+                        <!-- Options injected by JS -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="payment-amount">Claim Amount ($)</label>
+                    <input type="number" id="payment-amount" placeholder="e.g. 50000" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- New Entry Modal -->
+    <div id="new-entry-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>New Budget Entry</h2>
+                <button id="close-entry-modal" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="new-entry-form">
+                <div class="form-group">
+                    <label for="entry-category">Category Name</label>
+                    <input type="text" id="entry-category" placeholder="e.g. Foundation Works" required>
+                </div>
+                <div class="form-group">
+                    <label for="entry-amount">Budgeted Amount ($)</label>
+                    <input type="number" id="entry-amount" placeholder="e.g. 1500000" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-entry-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- New Project Modal -->
+    <div id="new-project-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>ThÃªm dá»± Ã¡n má»›i</h2>
+                <button id="close-project-modal" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="new-project-form">
+                <div class="form-group">
+                    <label for="proj-name">TÃªn dá»± Ã¡n</label>
+                    <input type="text" id="proj-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="proj-location">Äá»‹a Ä‘iá»ƒm</label>
+                    <input type="text" id="proj-location" required>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="proj-start">NgÃ y báº¯t Ä‘áº§u</label>
+                        <input type="date" id="proj-start" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="proj-end">NgÃ y káº¿t thÃºc</label>
+                        <input type="date" id="proj-end" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="proj-budget">Tá»•ng dá»± toÃ¡n ($)</label>
+                    <input type="number" id="proj-budget" required>
+                </div>
+                <div class="form-group">
+                    <label for="proj-contingency">Dá»± phÃ²ng phÃ­ ($)</label>
+                    <input type="number" id="proj-contingency" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-project-modal">Há»§y</button>
+                    <button type="submit" class="btn btn-primary">LÆ°u</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- New Tender Modal -->
+    <div id="new-tender-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Táº¡o GÃ³i tháº§u má»›i</h2>
+                <button id="close-tender-modal" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="new-tender-form">
+                <div class="form-group">
+                    <label for="tender-code">MÃ£ gÃ³i tháº§u</label>
+                    <input type="text" id="tender-code" required>
+                </div>
+                <div class="form-group">
+                    <label for="tender-name">TÃªn gÃ³i tháº§u</label>
+                    <input type="text" id="tender-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="tender-budget">GiÃ¡ dá»± toÃ¡n ($)</label>
+                    <input type="number" id="tender-budget" required>
+                </div>
+                <div class="form-group">
+                    <label for="tender-deadline">Háº¡n ná»™p HSÄX</label>
+                    <input type="date" id="tender-deadline" required>
+                </div>
+                <div class="form-group">
+                    <label for="tender-status">Tráº¡ng thÃ¡i</label>
+                    <select id="tender-status" required>
+                        <option value="Floating">Äang phÃ¡t hÃ nh HSMT (Floating)</option>
+                        <option value="Evaluating">Äang cháº¥m tháº§u (Evaluating)</option>
+                        <option value="Awarded">ÄÃ£ trao tháº§u (Awarded)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="tender-deadline">Háº¡n ná»™p HSÄX</label>
+                    <input type="date" id="tender-deadline" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-tender-modal">Há»§y</button>
+                    <button type="submit" class="btn btn-primary">LÆ°u</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Award Tender Modal -->
+    <div id="award-tender-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>ðŸ† Chá»‘t Chá»n NhÃ  Tháº§u</h2>
+                <button id="close-award-modal" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="award-tender-form">
+                <div class="form-group">
+                    <label for="award-winner">NhÃ  tháº§u trÃºng tháº§u</label>
+                    <select id="award-winner" required>
+                        <!-- Injected by JS -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="award-price">GiÃ¡ chá»‘t tháº§u ($)</label>
+                    <input type="text" id="award-price" placeholder="e.g. 50,000" onblur="window.formatInputNumber(this)" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-award-modal">Há»§y</button>
+                    <button type="submit" class="btn btn-primary" style="background-color: var(--primary-green);">XÃ¡c Nháº­n TrÃºng Tháº§u</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Project Summary Modal -->
+    <div id="project-summary-modal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 800px; width: 90%;">
+            <div class="modal-header">
+                <h2>TÃ³m táº¯t Dá»± Ã¡n (Project Profile)</h2>
+                <button id="close-summary-modal" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="summary-body" style="display: flex; gap: 2rem; padding: 1rem 0;">
+                <!-- Left Column: Image -->
+                <div class="summary-left" style="flex: 1; display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="width: 100%; height: 250px; background: #f1f5f9; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                        <img id="summary-img-view" src="" alt="Project Image" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                        <i id="summary-img-placeholder" class="fa-regular fa-image" style="font-size: 4rem; color: #cbd5e1;"></i>
+                    </div>
+                    
+                    <div id="summary-img-edit-wrap" class="hidden">
+                        <label style="font-size: 0.9rem; font-weight: 500; margin-bottom: 0.5rem; display: block;">áº¢nh dá»± Ã¡n:</label>
+                        
+                        <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                            <button type="button" class="btn btn-secondary" onclick="document.getElementById('summary-img-upload').click()" style="flex: 1; justify-content: center;"><i class="fa-solid fa-upload"></i> Táº£i áº£nh lÃªn</button>
+                            <input type="file" id="summary-img-upload" accept="image/*" style="display: none;">
+                        </div>
+                        
+                        <div style="text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">- HOáº¶C -</div>
+                        
+                        <input type="text" id="summary-img-input" placeholder="Nháº­p link áº£nh (URL)" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px;">
+                    </div>
+                </div>
+                
+                <!-- Right Column: Info -->
+                <div class="summary-right" style="flex: 1.5; display: flex; flex-direction: column; gap: 1rem;">
+                    <!-- View Mode -->
+                    <div id="summary-view-mode">
+                        <div style="margin-bottom: 1rem;">
+                            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">TÃªn dá»± Ã¡n</div>
+                            <div id="summary-name-view" style="font-size: 1.2rem; font-weight: 700;">-</div>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Quy mÃ´</div>
+                            <div id="summary-scale-view" style="font-weight: 500;">-</div>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Äá»‹a Ä‘iá»ƒm</div>
+                            <div id="summary-location-view" style="font-weight: 500;">-</div>
+                        </div>
+                        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">NgÃ y báº¯t Ä‘áº§u</div>
+                                <div id="summary-start-date-view" style="font-weight: 500;">-</div>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">NgÃ y káº¿t thÃºc</div>
+                                <div id="summary-end-date-view" style="font-weight: 500;">-</div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Diá»‡n tÃ­ch CFA (m2)</div>
+                            <div id="summary-cfa-view" style="font-weight: 500;">-</div>
