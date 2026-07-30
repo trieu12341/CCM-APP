@@ -1,4 +1,4 @@
-import { state, formatCurrency } from '../app.js';
+﻿import { state, formatCurrency } from '../app.js';
 import { updateTender, saveTender } from '../api.js';
 import { tenderState } from './tender-state.js';
 import { renderTenders, initCBA, renderTenderRoundTabs, renderCBATable } from './tender-ui.js';
@@ -10,7 +10,7 @@ function addRound() {
     if (!tender || !tender.cba) return;
     
     const currentRound = tender.cba.rounds[tender.cba.rounds.length - 1];
-    const nextRoundName = `Round \${tender.cba.rounds.length + 1}`;
+    const nextRoundName = `Round ${tender.cba.rounds.length + 1}`;
     
     const newItems = currentRound.items.map(item => {
         return {

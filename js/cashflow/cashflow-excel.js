@@ -1,4 +1,4 @@
-import { state } from '../app.js';
+﻿import { state } from '../app.js';
 import { getLocalCashflow, saveLocalCashflow } from './cashflow-state.js';
 import { renderCashflowTable } from './cashflow-ui-table.js';
 import { formatToMonthYear, crossCheckValidation } from './cashflow-ui-utils.js';
@@ -44,7 +44,7 @@ export function handleExcelImport(e) {
                         const m = monthMap[parts[0].toLowerCase().substring(0, 3)];
                         let y = parts[1];
                         if (y.length === 2) y = "20" + y;
-                        dateStr = `\${y}-\${m}-01`;
+                        dateStr = `${y}-${m}-01`;
                     } else if (/^\d{1,2}[/-]\d{1,2}[/-]\d{2,4}$/.test(str) || /^\d{1,2}[/-]\d{2,4}$/.test(str)) {
                         isDate = true;
                         const d = new Date(str);
@@ -86,11 +86,11 @@ export function handleExcelImport(e) {
             newItems.forEach(item => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>\${item.package_name || '-'}</td>
-                    <td><span style="font-weight:500; color:var(--primary-blue);">\${item.code || '-'}</span></td>
-                    <td>\${item.desc || '-'}</td>
-                    <td style="text-align: right; font-weight:600;">\${(item.value || 0).toLocaleString('en-US')}</td>
-                    <td>\${formatToMonthYear(item.date)}</td>
+                    <td>${item.package_name || '-'}</td>
+                    <td><span style="font-weight:500; color:var(--primary-blue);">${item.code || '-'}</span></td>
+                    <td>${item.desc || '-'}</td>
+                    <td style="text-align: right; font-weight:600;">${(item.value || 0).toLocaleString('en-US')}</td>
+                    <td>${formatToMonthYear(item.date)}</td>
                 `;
                 importTbody.appendChild(tr);
             });
@@ -144,5 +144,5 @@ export function saveImportedCashflow() {
     
     renderCashflowTable();
     crossCheckValidation();
-    alert(`✅ Đã cập nhật thành công! (Thêm mới \${addedCount} đợt thanh toán, Cập nhật \${updatedCount} đợt thanh toán hiện có)`);
+    alert(`✅ Đã cập nhật thành công! (Thêm mới ${addedCount} đợt thanh toán, Cập nhật ${updatedCount} đợt thanh toán hiện có)`);
 }

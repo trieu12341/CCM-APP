@@ -1,4 +1,4 @@
-import { state, formatCurrency, formatDate, mockActivities } from '../app.js';
+﻿import { state, formatCurrency, formatDate, mockActivities } from '../app.js';
 import { renderTenders } from '../tender.js';
 import { renderContracts } from '../contract.js';
 import { renderCashflow } from '../cashflow.js';
@@ -10,8 +10,8 @@ export function renderProjectTabs() {
     
     state.appData.Projects.forEach(project => {
         const btn = document.createElement('button');
-        btn.className = `project-tab \${project.project_id === state.currentProjectId ? 'active' : ''}`;
-        btn.textContent = `[\${project.project_name}]`;
+        btn.className = `project-tab ${project.project_id === state.currentProjectId ? 'active' : ''}`;
+        btn.textContent = `[${project.project_name}]`;
         btn.onclick = () => {
             state.currentProjectId = project.project_id;
             renderProjectTabs();
@@ -42,14 +42,14 @@ export function renderDashboard() {
     const project = state.appData.Projects.find(p => p.project_id === state.currentProjectId);
     if (!project) return;
 
-    document.getElementById('project-name').innerHTML = `\${project.project_name} <i class="fa-solid fa-circle-info" style="color: var(--primary-blue); font-size: 1.2rem;"></i>`;
+    document.getElementById('project-name').innerHTML = `${project.project_name} <i class="fa-solid fa-circle-info" style="color: var(--primary-blue); font-size: 1.2rem;"></i>`;
     
     const metaElement = document.querySelector('.project-meta');
     if (metaElement) {
         const start = project.start_date ? new Date(project.start_date).toLocaleDateString('en-GB') : '1 January 2024';
         const end = project.end_date ? new Date(project.end_date).toLocaleDateString('en-GB') : '1 December 2024';
         const loc = project.location || 'Belgrade, Serbia';
-        metaElement.textContent = `\${start} - \${end} • \${loc}`;
+        metaElement.textContent = `${start} - ${end} • ${loc}`;
     }
     
     const totalBudget = project.total_budget + project.contingency_budget;
@@ -92,14 +92,14 @@ export function renderDashboard() {
         
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>\${contract.package_name || contract.contract_name || 'Unnamed Package'}</td>
-            <td>\${formatCurrency(budgeted)}</td>
-            <td>\${formatCurrency(committed)}</td>
-            <td>\${formatCurrency(expended)}</td>
-            <td class="\${varianceVal < 0 ? 'negative' : ''}">\${varianceVal < 0 ? '-' : ''}\${formatCurrency(Math.abs(varianceVal))}</td>
+            <td>${contract.package_name || contract.contract_name || 'Unnamed Package'}</td>
+            <td>${formatCurrency(budgeted)}</td>
+            <td>${formatCurrency(committed)}</td>
+            <td>${formatCurrency(expended)}</td>
+            <td class="${varianceVal < 0 ? 'negative' : ''}">${varianceVal < 0 ? '-' : ''}${formatCurrency(Math.abs(varianceVal))}</td>
             <td>
                 <div class="progress-bar">
-                    <div class="progress-fill" style="width: \${progress}%"></div>
+                    <div class="progress-fill" style="width: ${progress}%"></div>
                 </div>
             </td>
         `;
@@ -110,10 +110,10 @@ export function renderDashboard() {
     const totalVariance = totalBudget - allocatedBudget - totalPayments;
     trTotal.innerHTML = `
         <td><strong>Total</strong></td>
-        <td><strong>\${formatCurrency(totalBudget)}</strong></td>
-        <td><strong>\${formatCurrency(allocatedBudget)}</strong></td>
-        <td><strong>\${formatCurrency(totalPayments)}</strong></td>
-        <td class="\${totalVariance < 0 ? 'negative' : ''}"><strong>\${totalVariance < 0 ? '-' : ''}\${formatCurrency(Math.abs(totalVariance))}</strong></td>
+        <td><strong>${formatCurrency(totalBudget)}</strong></td>
+        <td><strong>${formatCurrency(allocatedBudget)}</strong></td>
+        <td><strong>${formatCurrency(totalPayments)}</strong></td>
+        <td class="${totalVariance < 0 ? 'negative' : ''}"><strong>${totalVariance < 0 ? '-' : ''}${formatCurrency(Math.abs(totalVariance))}</strong></td>
         <td></td>
     `;
     tbody.appendChild(trTotal);
@@ -127,12 +127,12 @@ export function renderDashboard() {
             const docCard = document.createElement('div');
             docCard.className = 'doc-card';
             docCard.innerHTML = `
-                <div class="doc-icon \${isPdf ? 'pdf' : 'excel'}">
-                    <i class="fa-regular \${isPdf ? 'fa-file-pdf' : 'fa-file-excel'}"></i>
+                <div class="doc-icon ${isPdf ? 'pdf' : 'excel'}">
+                    <i class="fa-regular ${isPdf ? 'fa-file-pdf' : 'fa-file-excel'}"></i>
                 </div>
                 <div class="doc-info">
-                    <h5>\${doc.file_name}</h5>
-                    <span>2MB - \${isPdf ? 'PDF' : 'DOC'}</span>
+                    <h5>${doc.file_name}</h5>
+                    <span>2MB - ${isPdf ? 'PDF' : 'DOC'}</span>
                 </div>
             `;
             docsGrid.appendChild(docCard);
@@ -154,8 +154,8 @@ export function renderActivities() {
         div.innerHTML = `
             <div class="activity-dot"></div>
             <div class="activity-content">
-                <p><strong>\${act.text}</strong></p>
-                <span>\${formatDate(act.date)}</span>
+                <p><strong>${act.text}</strong></p>
+                <span>${formatDate(act.date)}</span>
             </div>
         `;
         timeline.appendChild(div);

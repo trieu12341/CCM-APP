@@ -1,4 +1,4 @@
-import { state } from '../app.js';
+﻿import { state } from '../app.js';
 import { getLocalContracts, saveLocalContracts } from './contract-state.js';
 import { renderContracts } from './contract-ui.js';
 
@@ -69,7 +69,7 @@ export function bulkDeleteContracts() {
     const checkboxes = document.querySelectorAll('.contract-cb:checked');
     if (checkboxes.length === 0) return;
     
-    if (!confirm(`Bạn có chắc chắn muốn xóa \${checkboxes.length} hợp đồng đã chọn?`)) return;
+    if (!confirm(`Bạn có chắc chắn muốn xóa ${checkboxes.length} hợp đồng đã chọn?`)) return;
     
     const idsToDelete = Array.from(checkboxes).map(cb => cb.dataset.id);
     let allData = getLocalContracts();
@@ -152,7 +152,7 @@ export function handleContractExcelImport(e) {
             allData = allData.concat(newItems);
             saveLocalContracts(allData);
             
-            alert(`Import thành công \${newItems.length} Hợp đồng!`);
+            alert(`Import thành công ${newItems.length} Hợp đồng!`);
             renderContracts();
         } else {
             alert("Không tìm thấy dữ liệu hợp lệ trong file Excel. Yêu cầu ít nhất Mã HĐ và Tên Gói thầu.");

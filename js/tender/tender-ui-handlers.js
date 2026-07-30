@@ -1,4 +1,4 @@
-import { state, formatCurrencyVND } from '../app.js';
+﻿import { state, formatCurrencyVND } from '../app.js';
 import { tenderState } from './tender-state.js';
 import { recalculateCBA, parseFormattedNumber } from './tender-calc.js';
 import { renderCBATable } from './tender-ui.js';
@@ -8,7 +8,7 @@ window.updateBidderName = function(bIdx, newName) {
     if (!tender) return;
     
     const oldName = tender.cba.bidders[bIdx];
-    tender.cba.bidders[bIdx] = newName || `Bidder \${bIdx+1}`;
+    tender.cba.bidders[bIdx] = newName || `Bidder ${bIdx+1}`;
     
     tender.cba.rounds.forEach(round => {
         round.items.forEach(item => {
@@ -46,7 +46,7 @@ window.addBidder = function() {
     const tender = state.appData.Tenders.find(t => t.tender_id === tenderState.currentTenderDetailId);
     if (!tender || !tender.cba) return;
     const count = tender.cba.bidders.length + 1;
-    tender.cba.bidders.push(`Nhà thầu \${count}`);
+    tender.cba.bidders.push(`Nhà thầu ${count}`);
     renderCBATable();
 }
 

@@ -1,4 +1,4 @@
-export function parseExcelMatrixFormat(rows, headerRowIdx, ipcColumns, projectId) {
+﻿export function parseExcelMatrixFormat(rows, headerRowIdx, ipcColumns, projectId) {
     let newItems = [];
     let currentPackageName = "";
 
@@ -120,9 +120,9 @@ export function parseExcelStandardFormat(rows, projectId, selectedContract) {
             } else if (typeof dateRaw === 'string') {
                 const parts = dateRaw.split('/');
                 if (parts.length === 2) { 
-                    dateStr = `\${parts[1]}-\${parts[0].padStart(2, '0')}-01`;
+                    dateStr = `${parts[1]}-${parts[0].padStart(2, '0')}-01`;
                 } else if (parts.length === 3) { 
-                    dateStr = `\${parts[2]}-\${parts[1].padStart(2, '0')}-\${parts[0].padStart(2, '0')}`;
+                    dateStr = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
                 } else {
                     const d = new Date(dateRaw);
                     if (!isNaN(d.getTime())) {

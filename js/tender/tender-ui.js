@@ -27,12 +27,12 @@ export function renderTenders() {
         tenders.forEach(t => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>\${t.tender_id}</td>
-                <td>\${t.tender_name}</td>
-                <td>\${formatCurrency(t.approved_budget)}</td>
-                <td>\${formatDate(t.deadline)}</td>
-                <td><span class="status-badge \${t.status.toLowerCase()}">\${t.status}</span></td>
-                <td>\${t.winner || '-'}</td>
+                <td>${t.tender_id}</td>
+                <td>${t.tender_name}</td>
+                <td>${formatCurrency(t.approved_budget)}</td>
+                <td>${formatDate(t.deadline)}</td>
+                <td><span class="status-badge ${t.status.toLowerCase()}">${t.status}</span></td>
+                <td>${t.winner || '-'}</td>
             `;
             tr.style.cursor = 'pointer';
             tr.onclick = () => openTenderDetail(t.tender_id);
@@ -102,7 +102,7 @@ export function renderTenderRoundTabs() {
         const a = document.createElement('a');
         a.href = '#';
         a.className = 'tab' + (index === tenderState.currentRoundIndex ? ' active' : '');
-        a.innerHTML = `<i class="fa-solid fa-layer-group"></i> \${round.round_name}`;
+        a.innerHTML = `<i class="fa-solid fa-layer-group"></i> ${round.round_name}`;
         a.onclick = (e) => {
             e.preventDefault();
             tenderState.currentRoundIndex = index;
@@ -129,8 +129,8 @@ export function renderCBATable() {
     `;
     bidders.forEach((bidder, idx) => {
         theadHtml += `<th style="width: 150px; text-align: right; position: relative; padding-right: 25px;">
-            <input type="text" value="\${bidder}" onchange="window.updateBidderName(\${idx}, this.value)" placeholder="Tên Nhà thầu" style="text-align: right; font-weight: bold;">
-            <button onclick="window.removeBidder(\${idx})" class="btn-remove-col" title="Xóa cột này">❌</button>
+            <input type="text" value="${bidder}" onchange="window.updateBidderName(${idx}, this.value)" placeholder="Tên Nhà thầu" style="text-align: right; font-weight: bold;">
+            <button onclick="window.removeBidder(${idx})" class="btn-remove-col" title="Xóa cột này">❌</button>
         </th>`;
     });
     theadHtml += `<th style="width: 40px;"></th>`;

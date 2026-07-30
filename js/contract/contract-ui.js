@@ -1,4 +1,4 @@
-import { state, formatCurrency } from '../app.js';
+﻿import { state, formatCurrency } from '../app.js';
 import { getLocalContracts } from './contract-state.js';
 
 export function toggleDynamicFields(type) {
@@ -51,15 +51,15 @@ export function renderContracts() {
         const typeStr = contract.type === 'Consultancy' ? 'Tư vấn' : 'Thi công';
 
         tr.innerHTML = `
-            <td style="font-weight: 500;">\${contract.budget_code || '-'}</td>
-            <td style="font-weight: 500; color: var(--primary-blue);">\${contract.contract_code || '-'}</td>
-            <td><span class="badge \${contract.type === 'Consultancy' ? 'bg-purple' : 'bg-blue'}" style="padding:4px 8px; border-radius:4px; font-size:0.8rem; background:\${contract.type === 'Consultancy' ? '#e9d5ff; color:#6b21a8;' : '#dbeafe; color:#1e40af;'}">\${typeStr}</span></td>
-            <td>\${contract.package_name || '-'}</td>
-            <td>\${contract.contractor || '-'}</td>
-            <td style="font-weight: 600;">\${formatCurrency(contract.budget_value || 0)}</td>
-            <td style="font-weight: 600;">\${formatCurrency(contract.total_value || 0)}</td>
-            <td class="\${statusClass}"><i class="fa-solid fa-circle" style="font-size: 0.5rem; margin-right: 4px;"></i>\${statusText}</td>
-            <td style="text-align: center;"><input type="checkbox" class="contract-cb" data-id="\${contract.contract_id}"></td>
+            <td style="font-weight: 500;">${contract.budget_code || '-'}</td>
+            <td style="font-weight: 500; color: var(--primary-blue);">${contract.contract_code || '-'}</td>
+            <td><span class="badge ${contract.type === 'Consultancy' ? 'bg-purple' : 'bg-blue'}" style="padding:4px 8px; border-radius:4px; font-size:0.8rem; background:${contract.type === 'Consultancy' ? '#e9d5ff; color:#6b21a8;' : '#dbeafe; color:#1e40af;'}">${typeStr}</span></td>
+            <td>${contract.package_name || '-'}</td>
+            <td>${contract.contractor || '-'}</td>
+            <td style="font-weight: 600;">${formatCurrency(contract.budget_value || 0)}</td>
+            <td style="font-weight: 600;">${formatCurrency(contract.total_value || 0)}</td>
+            <td class="${statusClass}"><i class="fa-solid fa-circle" style="font-size: 0.5rem; margin-right: 4px;"></i>${statusText}</td>
+            <td style="text-align: center;"><input type="checkbox" class="contract-cb" data-id="${contract.contract_id}"></td>
         `;
         
         tr.addEventListener('click', (e) => {
@@ -96,7 +96,7 @@ export function openContractModal(contract = null) {
     form.reset();
     
     if (contract) {
-        document.getElementById('contract-modal-title').textContent = `Sửa Hợp đồng: \${contract.contract_code}`;
+        document.getElementById('contract-modal-title').textContent = `Sửa Hợp đồng: ${contract.contract_code}`;
         document.getElementById('contract-id-hidden').value = contract.contract_id || '';
         
         document.getElementById('contract-code-input').value = contract.contract_code || '';

@@ -1,4 +1,4 @@
-import { state, mockActivities } from '../app.js';
+﻿import { state, mockActivities } from '../app.js';
 import { saveProject, saveBudget } from '../api.js';
 import { renderProjectTabs, renderDashboard } from './budget-ui.js';
 
@@ -40,7 +40,7 @@ export function setupBudgetEvents() {
         
         const contractName = state.appData.Contracts.find(c => c.contract_id === contractId)?.contract_name;
         mockActivities.unshift({
-            text: `Payment Claim Approved: $\${amount.toLocaleString()} for \${contractName}`,
+            text: `Payment Claim Approved: $${amount.toLocaleString()} for ${contractName}`,
             date: new Date().toISOString()
         });
         
@@ -87,7 +87,7 @@ export function setupBudgetEvents() {
         state.appData.Contracts.push(newContract);
 
         mockActivities.unshift({
-            text: `New Budget Entry added: \${categoryName} for $\${amount.toLocaleString()}`,
+            text: `New Budget Entry added: ${categoryName} for $${amount.toLocaleString()}`,
             date: new Date().toISOString()
         });
 

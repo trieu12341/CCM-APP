@@ -1,4 +1,4 @@
-import { state, formatCurrencyVND } from '../app.js';
+﻿import { state, formatCurrencyVND } from '../app.js';
 import { tenderState } from './tender-state.js';
 
 export function recalculateCBA() {
@@ -24,7 +24,7 @@ export function recalculateCBA() {
     let tfootSumHtml = `
         <tr>
             <td colspan="2">TỔNG CỘNG (TOTAL)</td>
-            <td style="text-align: right; background: #e0f2fe; color: #0284c7;">\${formatCurrencyVND(sumPTE)}</td>
+            <td style="text-align: right; background: #e0f2fe; color: #0284c7;">${formatCurrencyVND(sumPTE)}</td>
     `;
     
     let tfootVarHtml = `
@@ -34,16 +34,16 @@ export function recalculateCBA() {
     `;
 
     bidders.forEach((bidder, bIdx) => {
-        tfootSumHtml += `<td style="text-align: right;">\${formatCurrencyVND(sumBidders[bIdx])}</td>`;
+        tfootSumHtml += `<td style="text-align: right;">${formatCurrencyVND(sumBidders[bIdx])}</td>`;
         
         let variance = sumBidders[bIdx] - sumPTE;
         let varPercent = sumPTE === 0 ? 0 : (variance / sumPTE * 100);
         let colorClass = variance > 0 ? "text-orange" : "text-green";
         let sign = variance > 0 ? "+" : "";
         
-        tfootVarHtml += `<td style="text-align: right;" class="variance-cell \${colorClass}">
-            \${sign}\${formatCurrencyVND(variance)}<br>
-            <small>\${sign}\${varPercent.toFixed(2)}%</small>
+        tfootVarHtml += `<td style="text-align: right;" class="variance-cell ${colorClass}">
+            ${sign}${formatCurrencyVND(variance)}<br>
+            <small>${sign}${varPercent.toFixed(2)}%</small>
         </td>`;
     });
     
