@@ -151,4 +151,26 @@ export function setupCashflowEvents() {
             }
         });
     }
+
+    // Switcher View Logic
+    const btnTableView = document.getElementById('cf-btn-table-view');
+    const btnTimelineView = document.getElementById('cf-btn-timeline-view');
+    const tableViewContainer = document.getElementById('cashflow-table-view');
+    const timelineViewContainer = document.getElementById('cashflow-timeline-view');
+
+    if (btnTableView && btnTimelineView && tableViewContainer && timelineViewContainer) {
+        btnTableView.addEventListener('click', () => {
+            btnTableView.classList.add('active');
+            btnTimelineView.classList.remove('active');
+            tableViewContainer.style.display = 'block';
+            timelineViewContainer.style.display = 'none';
+        });
+
+        btnTimelineView.addEventListener('click', () => {
+            btnTimelineView.classList.add('active');
+            btnTableView.classList.remove('active');
+            timelineViewContainer.style.display = 'flex'; // It's a flex container for the placeholder
+            tableViewContainer.style.display = 'none';
+        });
+    }
 }

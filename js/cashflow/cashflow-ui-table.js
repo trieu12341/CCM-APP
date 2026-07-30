@@ -100,9 +100,15 @@ function renderPackageList(contracts, cashflows) {
                 <div class="cf-mini-progress-bar" style="width: ${progressPct}%"></div>
             </div>
         `;
-        card.addEventListener('click', () => {
+        card.addEventListener('click', (e) => {
             currentSelectedPackageId = c.id;
-            renderCashflowTable();
+            // Remove active from all cards
+            document.querySelectorAll('.cf-package-card').forEach(card => card.classList.remove('active'));
+            // Add active to clicked card
+            e.currentTarget.classList.add('active');
+            
+            // Re-render only the right pane
+            renderRightPane(currentSelectedPackageId, contracts, cashflows);
         });
         listContainer.appendChild(card);
     });

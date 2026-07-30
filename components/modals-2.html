@@ -241,8 +241,8 @@
                         </div>
                         <div style="display: flex; align-items: center; gap: 1rem;">
                             <div class="cf-switcher">
-                                <button class="cf-switcher-btn active">📋 Bảng Chi tiết</button>
-                                <button class="cf-switcher-btn">📈 Tiến độ Timeline</button>
+                                <button id="cf-btn-table-view" class="cf-switcher-btn active">📋 Bảng Chi tiết</button>
+                                <button id="cf-btn-timeline-view" class="cf-switcher-btn">📈 Tiến độ Timeline</button>
                             </div>
                             <input type="file" id="excel-import" accept=".xlsx, .xls, .csv" style="display: none;">
                             <button type="button" class="btn" id="btn-cf-import-excel" style="background-color: #10b981; color: white; padding: 0.4rem 0.8rem; font-size: 0.85rem;" onclick="document.getElementById('excel-import').click()"><i class="fa-solid fa-file-excel"></i> Import</button>
@@ -250,8 +250,8 @@
                         </div>
                     </div>
 
-                    <!-- D. Data Table -->
-                    <div class="cf-table-area">
+                    <!-- D. Data Table View -->
+                    <div id="cashflow-table-view" class="cf-table-area">
                         <table class="data-table" id="cashflow-table">
                             <thead>
                                 <tr>
@@ -279,6 +279,12 @@
                                 </tr>
                             </tfoot>
                         </table>
+                    </div>
+
+                    <!-- E. Timeline View Placeholder -->
+                    <div id="cashflow-timeline-view" class="cf-table-area" style="display: none; align-items: center; justify-content: center; background: #f8fafc; flex-direction: column;">
+                        <i class="fa-solid fa-chart-gantt" style="font-size: 4rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+                        <h3 style="color: var(--text-muted); font-size: 1.2rem;">Giao diện Tiến độ Timeline đang được phát triển (Coming Soon)</h3>
                     </div>
 
                 </div>
