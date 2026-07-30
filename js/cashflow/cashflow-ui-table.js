@@ -58,7 +58,7 @@ export function renderCashflowTable() {
     renderPackageList(projectContracts, allCashflows);
     
     if (projectContracts.length > 0) {
-        if (!currentSelectedPackageId || !projectContracts.find(c => c.id === currentSelectedPackageId)) {
+        if (!currentSelectedPackageId || !projectContracts.find(c => String(c.id) === String(currentSelectedPackageId))) {
             currentSelectedPackageId = projectContracts[0].id;
         }
         renderRightPane(currentSelectedPackageId, projectContracts, allCashflows);
@@ -92,16 +92,21 @@ function renderPackageList(contracts, cashflows) {
         const progressPct = contractValue > 0 ? Math.min(100, (totalPaid / contractValue) * 100) : 0;
 
         const card = document.createElement('div');
-        card.className = `cf-package-card ${currentSelectedPackageId === c.id ? 'active' : ''}`;
+        card.className = `cf-package-card ${String(currentSelectedPackageId) === String(c.id) ? 'active' : ''}`;
+        card.dataset.id = c.id;
+        // Bug 3: Warning Icon
+        const showWarning = (totalPlan !== contractValue || cCashflows.length === 0);
+        
         card.innerHTML = `
             <div class="cf-pkg-code">${c.package_name}</div>
             <div class="cf-pkg-name">${c.type || 'Hợp đồng'}</div>
             <div class="cf-mini-progress">
                 <div class="cf-mini-progress-bar" style="width: ${progressPct}%"></div>
             </div>
+            ${showWarning ? '<i class="fa-solid fa-circle-exclamation text-warning" style="position: absolute; top: 8px; right: 8px; color: #f59e0b; font-size: 14px;" title="Chưa khớp Giá trị Hợp đồng hoặc chưa có Cashflow"></i>' : ''}
         `;
         card.addEventListener('click', (e) => {
-            currentSelectedPackageId = c.id;
+            currentSelectedPackageId = e.currentTarget.dataset.id;
             // Remove active from all cards
             document.querySelectorAll('.cf-package-card').forEach(card => card.classList.remove('active'));
             // Add active to clicked card
@@ -119,7 +124,7 @@ function renderRightPane(contractId, contracts, allCashflows) {
     const container = document.getElementById('cf-right-pane-container');
     container.style.display = 'flex';
 
-    const contract = contracts.find(c => c.id === contractId);
+    const contract = contracts.find(c => String(c.id) === String(contractId));
     if (!contract) return;
 
     const contractCashflows = allCashflows.filter(cf => cf.package_name === contract.package_name || cf.contract === contract.package_name);
@@ -184,6 +189,65 @@ function renderRightPane(contractId, contracts, allCashflows) {
             const tr = createCashflowRowNode(item, false);
             tbody.appendChild(tr);
         });
+    }
+
+    // Render Timeline View
+    const timelineContainer = document.getElementById('cashflow-timeline-view');
+    if (timelineContainer) {
+        timelineContainer.innerHTML = '';
+        timelineContainer.style.justifyContent = 'flex-start';
+        timelineContainer.style.background = 'white';
+        timelineContainer.style.overflowY = 'auto';
+        
+        if (contractCashflows.length === 0) {
+            timelineContainer.innerHTML = `<div style="padding: 2rem; text-align: center; color: var(--text-muted);">Chưa có dữ liệu Cashflow để hiển thị Timeline.</div>`;
+            timelineContainer.style.alignItems = 'center';
+            timelineContainer.style.justifyContent = 'center';
+        } else {
+            const timelineWrapper = document.createElement('div');
+            timelineWrapper.style.cssText = 'padding: 2rem; width: 100%; max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem; position: relative;';
+            timelineWrapper.innerHTML = `<div style="position: absolute; left: 2.45rem; top: 2.5rem; bottom: 2rem; width: 2px; background: #e2e8f0; z-index: 1;"></div>`;
+            
+            // Sort by date (handle missing dates by putting them at the end or beginning)
+            const sortedFlows = [...contractCashflows].sort((a,b) => {
+                if (!a.date) return 1;
+                if (!b.date) return -1;
+                return new Date(a.date) - new Date(b.date);
+            });
+            
+            sortedFlows.forEach(cf => {
+                let dotColor = '#94a3b8'; // Planned (gray)
+                if (cf.status === 'Paid') dotColor = '#10b981'; // Green
+                else if (cf.status === 'Certified') dotColor = '#f59e0b'; // Amber/Yellow
+                
+                const valStr = (parseFloat(cf.value) || 0).toLocaleString('en-US');
+                let dateDisplay = '-';
+                if (cf.date) {
+                    const d = new Date(cf.date);
+                    dateDisplay = (d.getMonth() + 1).toString().padStart(2, '0') + '/' + d.getFullYear();
+                }
+                
+                const itemHtml = `
+                    <div style="display: flex; gap: 1.5rem; position: relative; z-index: 2;">
+                        <div style="width: 1.2rem; height: 1.2rem; border-radius: 50%; background: ${dotColor}; margin-top: 0.35rem; border: 3px solid white; box-shadow: 0 0 0 1px #cbd5e1;"></div>
+                        <div style="flex: 1; background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <strong style="color: var(--text-dark); font-size: 1.05rem;">${cf.code || 'N/A'}</strong>
+                                <span style="font-size: 0.85rem; font-weight: 600; color: ${dotColor}; border: 1px solid ${dotColor}; padding: 2px 6px; border-radius: 12px; opacity: 0.9;">${cf.status || 'Planned'}</span>
+                            </div>
+                            <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.75rem;">${cf.desc || 'Không có diễn giải'}</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="font-size: 0.85rem; color: var(--text-muted);"><i class="fa-regular fa-calendar" style="margin-right: 4px;"></i>${dateDisplay}</div>
+                                <div style="font-weight: 700; color: var(--primary-blue); font-size: 1.05rem;">VNĐ ${valStr}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                timelineWrapper.insertAdjacentHTML('beforeend', itemHtml);
+            });
+            timelineContainer.appendChild(timelineWrapper);
+            timelineContainer.style.alignItems = 'flex-start';
+        }
     }
 
     updateCashflowSubtotal();
