@@ -1,6 +1,6 @@
-﻿                        </div>
+                        </div>
                         <div style="margin-bottom: 1rem;">
-                            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">NhÃ  tháº§u chÃ­nh</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Nhà thầu chính</div>
                             <div id="summary-contractor-view" style="font-weight: 500;">-</div>
                         </div>
                     </div>
@@ -8,37 +8,37 @@
                     <!-- Edit Mode -->
                     <div id="summary-edit-mode" class="hidden">
                         <div class="form-group" style="margin-bottom: 1rem;">
-                            <label>TÃªn dá»± Ã¡n</label>
+                            <label>Tên dự án</label>
                             <input type="text" id="summary-name-input" required>
                         </div>
                         <div class="form-group" style="margin-bottom: 1rem;">
-                            <label>Quy mÃ´</label>
+                            <label>Quy mô</label>
                             <input type="text" id="summary-scale-input">
                         </div>
                         <div class="form-group" style="margin-bottom: 1rem;">
-                            <label>Äá»‹a Ä‘iá»ƒm</label>
+                            <label>Địa điểm</label>
                             <input type="text" id="summary-location-input">
                         </div>
                         <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
                             <div class="form-group" style="flex: 1;">
-                                <label>NgÃ y báº¯t Ä‘áº§u</label>
+                                <label>Ngày bắt đầu</label>
                                 <input type="date" id="summary-start-date-input">
                             </div>
                             <div class="form-group" style="flex: 1;">
-                                <label>NgÃ y káº¿t thÃºc</label>
+                                <label>Ngày kết thúc</label>
                                 <input type="date" id="summary-end-date-input">
                             </div>
                         </div>
                         <div class="form-group" style="margin-bottom: 1rem;">
-                            <label>Diá»‡n tÃ­ch CFA (m2)</label>
+                            <label>Diện tích CFA (m2)</label>
                             <input type="number" id="summary-cfa-input">
                         </div>
                         <div class="form-group" style="margin-bottom: 1rem;">
-                            <label>Danh sÃ¡ch TÆ° váº¥n</label>
+                            <label>Danh sách Tư vấn</label>
                             <textarea id="summary-consultants-input" rows="3" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; font-family: inherit; resize: vertical;"></textarea>
                         </div>
                         <div class="form-group" style="margin-bottom: 1rem;">
-                            <label>NhÃ  tháº§u chÃ­nh</label>
+                            <label>Nhà thầu chính</label>
                             <input type="text" id="summary-contractor-input">
                         </div>
                     </div>
@@ -46,8 +46,8 @@
             </div>
             
             <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
-                <button type="button" class="btn btn-secondary" id="btn-edit-summary">Sá»­a ThÃ´ng Tin</button>
-                <button type="button" class="btn btn-primary hidden" id="btn-save-summary">LÆ°u Cáº­p Nháº­t</button>
+                <button type="button" class="btn btn-secondary" id="btn-edit-summary">Sửa Thông Tin</button>
+                <button type="button" class="btn btn-primary hidden" id="btn-save-summary">Lưu Cập Nhật</button>
             </div>
         </div>
     </div>
@@ -55,118 +55,118 @@
     <div id="contract-detail-modal" class="modal-overlay hidden">
         <div class="modal-content" style="max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto;">
             <div class="modal-header">
-                <h2 id="contract-modal-title">Chi tiáº¿t Há»£p Ä‘á»“ng</h2>
+                <h2 id="contract-modal-title">Chi tiết Hợp đồng</h2>
                 <button id="close-contract-modal" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
             <form id="contract-form">
                 <input type="hidden" id="contract-id-hidden">
                 
-                <!-- 1. ThÃ´ng tin chung -->
-                <div class="section-title" style="margin-top: 1rem;">1. ThÃ´ng tin chung</div>
+                <!-- 1. Thông tin chung -->
+                <div class="section-title" style="margin-top: 1rem;">1. Thông tin chung</div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
                     <div class="form-group">
-                        <label>MÃ£ Há»£p Ä‘á»“ng</label>
+                        <label>Mã Hợp đồng</label>
                         <input type="text" id="contract-code-input" required>
                     </div>
                     <div class="form-group">
-                        <label>Loáº¡i Há»£p Ä‘á»“ng</label>
+                        <label>Loại Hợp đồng</label>
                         <select id="contract-type-select" required>
-                            <option value="Construction">Thi cÃ´ng (Construction)</option>
-                            <option value="Consultancy">TÆ° váº¥n (Consultancy)</option>
+                            <option value="Construction">Thi công (Construction)</option>
+                            <option value="Consultancy">Tư vấn (Consultancy)</option>
                         </select>
                     </div>
                     <div class="form-group" style="grid-column: span 2;">
-                        <label>TÃªn GÃ³i tháº§u</label>
+                        <label>Tên Gói thầu</label>
                         <input type="text" id="contract-name-input" required>
                     </div>
                     <div class="form-group">
-                        <label>NhÃ  tháº§u</label>
+                        <label>Nhà thầu</label>
                         <input type="text" id="contract-contractor-input" required>
                     </div>
                     <div class="form-group">
-                        <label>NgÃ y kÃ½ HÄ</label>
+                        <label>Ngày ký HĐ</label>
                         <input type="date" id="contract-date-input">
                     </div>
                     <div class="form-group">
-                        <label>Tráº¡ng thÃ¡i</label>
+                        <label>Trạng thái</label>
                         <select id="contract-status-input">
-                            <option value="Active">Äang thá»±c hiá»‡n (Active)</option>
-                            <option value="Closed">ÄÃ£ Ä‘Ã³ng (Closed)</option>
-                            <option value="Draft">NhÃ¡p (Draft)</option>
+                            <option value="Active">Đang thực hiện (Active)</option>
+                            <option value="Closed">Đã đóng (Closed)</option>
+                            <option value="Draft">Nháp (Draft)</option>
                         </select>
                     </div>
                 </div>
 
-                <!-- 2. GiÃ¡ trá»‹ Há»£p Ä‘á»“ng -->
-                <div class="section-title">2. GiÃ¡ trá»‹ Há»£p Ä‘á»“ng</div>
+                <!-- 2. Giá trị Hợp đồng -->
+                <div class="section-title">2. Giá trị Hợp đồng</div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
                     <div class="form-group">
-                        <label>NgÃ¢n sÃ¡ch (VNÄ)</label>
+                        <label>Ngân sách (VNĐ)</label>
                         <input type="number" id="contract-budget-input" required>
                     </div>
                     <div class="form-group">
-                        <label>GiÃ¡ trá»‹ ban Ä‘áº§u (VNÄ)</label>
+                        <label>Giá trị ban đầu (VNĐ)</label>
                         <input type="number" id="contract-value-input" required>
                     </div>
                     <div class="form-group">
-                        <label>Link Ä‘Ã­nh kÃ¨m Há»£p Ä‘á»“ng</label>
+                        <label>Link đính kèm Hợp đồng</label>
                         <input type="url" id="contract-attachment-input" placeholder="https://drive.google.com/...">
                     </div>
                 </div>
 
-                <!-- 3. Äiá»u khoáº£n Thanh toÃ¡n -->
-                <div class="section-title">3. Äiá»u khoáº£n Thanh toÃ¡n</div>
+                <!-- 3. Điều khoản Thanh toán -->
+                <div class="section-title">3. Điều khoản Thanh toán</div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
                     <div class="form-group">
-                        <label>% Táº¡m á»©ng (Advance Payment)</label>
+                        <label>% Tạm ứng (Advance Payment)</label>
                         <div style="position: relative;">
                             <input type="number" id="contract-adv-percent-input" step="0.01" min="0" max="100" style="padding-right: 2rem;">
                             <span style="position: absolute; right: 10px; top: 10px;">%</span>
                         </div>
                     </div>
                     
-                    <!-- CÃ¡c trÆ°á»ng Ä‘á»™ng cho Thi cÃ´ng -->
+                    <!-- Các trường động cho Thi công -->
                     <div id="contract-dynamic-fields" style="display: contents;">
                         <div class="form-group">
-                            <label>% Kháº¥u trá»« táº¡m á»©ng (AP Recovery)</label>
+                            <label>% Khấu trừ tạm ứng (AP Recovery)</label>
                             <div style="position: relative;">
                                 <input type="number" id="contract-ap-recovery-input" step="0.01" min="0" max="100" style="padding-right: 2rem;">
                                 <span style="position: absolute; right: 10px; top: 10px;">%</span>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>% Giá»¯ láº¡i báº£o hÃ nh (Retention)</label>
+                            <label>% Giữ lại bảo hành (Retention)</label>
                             <div style="position: relative;">
                                 <input type="number" id="contract-retention-percent-input" step="0.01" min="0" max="100" style="padding-right: 2rem;">
                                 <span style="position: absolute; right: 10px; top: 10px;">%</span>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>Giá»›i háº¡n báº£o hÃ nh (Max Retention)</label>
+                            <label>Giới hạn bảo hành (Max Retention)</label>
                             <div style="position: relative;">
                                 <input type="number" id="contract-max-retention-input" step="0.01" min="0" max="100" style="padding-right: 2rem;">
                                 <span style="position: absolute; right: 10px; top: 10px;">%</span>
                             </div>
                         </div>
                         <div class="form-group" style="grid-column: span 2;">
-                            <label>Pháº¡t cháº­m tiáº¿n Ä‘á»™ (LD)</label>
-                            <input type="text" id="contract-ld-input" placeholder="VÃ­ dá»¥: 0.1% má»—i ngÃ y, tá»‘i Ä‘a 10%">
+                            <label>Phạt chậm tiến độ (LD)</label>
+                            <input type="text" id="contract-ld-input" placeholder="Ví dụ: 0.1% mỗi ngày, tối đa 10%">
                         </div>
                     </div>
                 </div>
 
-                <!-- 4. Pháº¡m vi cÃ´ng viá»‡c -->
-                <div class="section-title">4. Pháº¡m vi cÃ´ng viá»‡c (Scope of Work)</div>
+                <!-- 4. Phạm vi công việc -->
+                <div class="section-title">4. Phạm vi công việc (Scope of Work)</div>
                 <div class="form-group" style="margin-bottom: 1.5rem;">
                     <textarea id="contract-scope-input" rows="4" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; font-family: inherit; resize: vertical;"></textarea>
                 </div>
 
                 <div class="modal-footer" style="display: flex; justify-content: space-between; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
-                    <button type="button" class="btn btn-secondary" id="btn-delete-contract" style="color: var(--danger-color); border-color: var(--danger-color);"><i class="fa-solid fa-trash"></i> XÃ³a Há»£p Ä‘á»“ng</button>
+                    <button type="button" class="btn btn-secondary" id="btn-delete-contract" style="color: var(--danger-color); border-color: var(--danger-color);"><i class="fa-solid fa-trash"></i> Xóa Hợp đồng</button>
                     <div style="display: flex; gap: 1rem;">
-                        <button type="button" class="btn btn-secondary" id="btn-cancel-contract">Há»§y</button>
-                        <button type="button" class="btn btn-primary" id="btn-save-contract">LÆ°u Há»£p Ä‘á»“ng</button>
+                        <button type="button" class="btn btn-secondary" id="btn-cancel-contract">Hủy</button>
+                        <button type="button" class="btn btn-primary" id="btn-save-contract">Lưu Hợp đồng</button>
                     </div>
                 </div>
             </form>
@@ -177,15 +177,15 @@
     <div id="cashflow-detail-modal" class="modal-overlay hidden">
         <div class="modal-content" style="max-width: 98vw; width: 98vw; height: 90vh; display: flex; flex-direction: column; overflow: hidden;">
             <div class="modal-header" style="flex-wrap: wrap; gap: 1rem; padding-bottom: 1rem;">
-                <h2 style="margin: 0; min-width: 250px;">Chi tiáº¿t Káº¿ hoáº¡ch DÃ²ng tiá»n</h2>
+                <h2 style="margin: 0; min-width: 250px;">Chi tiết Kế hoạch Dòng tiền</h2>
                 <div style="display: flex; align-items: center; gap: 1rem; flex: 1; justify-content: flex-end;">
                     <div style="position: relative; max-width: 250px; width: 100%;">
                         <i class="fa-solid fa-search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
-                        <input type="text" id="cf-search-input" class="form-control" placeholder="TÃ¬m tÃªn, mÃ£ Ä‘á»£t..." style="padding-left: 2rem;">
+                        <input type="text" id="cf-search-input" class="form-control" placeholder="Tìm tên, mã đợt..." style="padding-left: 2rem;">
                     </div>
-                    <label for="cf-filter-contract" style="font-weight: 500;">Há»£p Ä‘á»“ng:</label>
+                    <label for="cf-filter-contract" style="font-weight: 500;">Hợp đồng:</label>
                     <select id="cf-filter-contract" class="form-control" style="max-width: 250px; padding: 0.4rem;"></select>
-                    <button type="button" class="btn btn-secondary" id="btn-clear-cashflow" style="color: var(--danger-color); border-color: var(--danger-color);"><i class="fa-solid fa-trash"></i> XÃ³a táº¥t cáº£</button>
+                    <button type="button" class="btn btn-secondary" id="btn-clear-cashflow" style="color: var(--danger-color); border-color: var(--danger-color);"><i class="fa-solid fa-trash"></i> Xóa tất cả</button>
                     <input type="file" id="excel-import" accept=".xlsx, .xls, .csv" style="display: none;">
                     <button type="button" class="btn" id="btn-cf-import-excel" style="background-color: #10b981; color: white;" onclick="document.getElementById('excel-import').click()"><i class="fa-solid fa-file-excel"></i> Import Excel</button>
                     <button id="close-cashflow-modal" class="close-btn" style="position: static;"><i class="fa-solid fa-xmark"></i></button>
@@ -201,12 +201,12 @@
                             <th>Package name</th>
                             <th>Payment No.</th>
                             <th>Description</th>
-                            <th>Plan Amount (VNÄ)</th>
+                            <th>Plan Amount (VNĐ)</th>
                             <th>Plan Date</th>
                             <th>Certified Date</th>
                             <th>Paid Date</th>
                             <th>Status</th>
-                            <th>HÃ nh Ä‘á»™ng</th>
+                            <th>Hành động</th>
                         </tr>
                     </thead>
                     <tbody id="cashflow-tbody">
@@ -214,7 +214,7 @@
                     </tbody>
                     <tfoot id="cashflow-tfoot">
                         <tr>
-                            <td colspan="3" style="text-align: right; font-weight: bold; font-size: 1.1rem; padding-right: 1rem;">Tá»”NG Cá»˜NG TOÃ€N Bá»˜ Dá»° ÃN</td>
+                            <td colspan="3" style="text-align: right; font-weight: bold; font-size: 1.1rem; padding-right: 1rem;">TỔNG CỘNG TOÀN BỘ DỰ ÁN</td>
                             <td id="cf-grand-total-plan" style="font-weight: bold; font-size: 1.1rem; text-align: right;">0</td>
                             <td colspan="5"></td>
                         </tr>
@@ -224,8 +224,8 @@
 
             <div class="modal-footer" style="display: flex; justify-content: flex-end; align-items: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color); background: var(--card-bg);">
                 <div style="display: flex; gap: 1rem;">
-                    <button type="button" class="btn btn-secondary" id="btn-add-release" style="color: #ea580c; border-color: #ea580c; display: none;">+ ThÃªm Ä‘á»£t Release Retention</button>
-                    <button type="button" class="btn btn-secondary" id="btn-add-cashflow-row">+ ThÃªm Äá»£t Káº¿ Hoáº¡ch</button>
+                    <button type="button" class="btn btn-secondary" id="btn-add-release" style="color: #ea580c; border-color: #ea580c; display: none;">+ Thêm đợt Release Retention</button>
+                    <button type="button" class="btn btn-secondary" id="btn-add-cashflow-row">+ Thêm Đợt Kế Hoạch</button>
                 </div>
             </div>
         </div>
@@ -235,7 +235,7 @@
     <div id="cashflow-import-modal" class="modal-overlay hidden" style="z-index: 10001;">
         <div class="modal-content" style="max-width: 1400px; width: 95%; height: 85vh; display: flex; flex-direction: column; overflow: hidden; border: 2px solid #10b981;">
             <div class="modal-header" style="padding-bottom: 1rem; border-bottom: 1px solid var(--border-color);">
-                <h2 style="margin: 0; color: #10b981;"><i class="fa-solid fa-eye"></i> Xem TrÆ°á»›c Dá»¯ Liá»‡u Import (Preview)</h2>
+                <h2 style="margin: 0; color: #10b981;"><i class="fa-solid fa-eye"></i> Xem Trước Dữ Liệu Import (Preview)</h2>
                 <button id="close-cf-import-modal" class="close-btn" style="position: static;"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
@@ -246,7 +246,7 @@
                             <th>Package name</th>
                             <th>Payment No.</th>
                             <th>Description</th>
-                            <th>Plan Amount (VNÄ)</th>
+                            <th>Plan Amount (VNĐ)</th>
                             <th>Plan Date</th>
                         </tr>
                     </thead>
@@ -258,11 +258,11 @@
 
             <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
                 <div style="font-weight: bold; font-size: 1rem; color: var(--text-color);">
-                    Tá»•ng sá»‘ dÃ²ng há»£p lá»‡: <span id="cf-import-count" style="color: #10b981;">0</span>
+                    Tổng số dòng hợp lệ: <span id="cf-import-count" style="color: #10b981;">0</span>
                 </div>
                 <div style="display: flex; gap: 1rem;">
-                    <button type="button" class="btn btn-secondary" id="btn-cancel-cf-import">Há»§y Bá»</button>
-                    <button type="button" class="btn btn-primary" id="btn-save-cf-import" style="background-color: #10b981; border-color: #10b981;">LÆ°u & Xem ToÃ n Bá»™ Cashflow</button>
+                    <button type="button" class="btn btn-secondary" id="btn-cancel-cf-import">Hủy Bỏ</button>
+                    <button type="button" class="btn btn-primary" id="btn-save-cf-import" style="background-color: #10b981; border-color: #10b981;">Lưu & Xem Toàn Bộ Cashflow</button>
                 </div>
             </div>
         </div>

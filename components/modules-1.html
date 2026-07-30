@@ -1,4 +1,4 @@
-﻿                <div id="module-overview" class="hidden">
+                <div id="module-overview" class="hidden">
                     <div class="section-title">Overview Dashboard</div>
                     <div class="metrics-grid">
                         <div class="metric-card"><div class="metric-label">Overview Features</div><div class="metric-value">Coming Soon</div></div>
@@ -93,24 +93,24 @@
                     <div id="tender-list-view">
                         <div class="section-title" style="display: flex; justify-content: space-between; width: 100%;">
                             Tender Management
-                            <button class="btn btn-primary manager-hide" id="btn-new-tender">+ Táº¡o GÃ³i tháº§u má»›i</button>
+                            <button class="btn btn-primary manager-hide" id="btn-new-tender">+ Tạo Gói thầu mới</button>
                         </div>
                         <!-- KPI Cards for Tender -->
                         <div class="metrics-grid">
                             <div class="metric-card">
-                                <div class="metric-label">Tá»”NG Sá» GÃ“I THáº¦U</div>
+                                <div class="metric-label">TỔNG SỐ GÓI THẦU</div>
                                 <div class="metric-value" id="tender-kpi-total">0</div>
                             </div>
                             <div class="metric-card">
-                                <div class="metric-label">ÄANG PHÃT HÃ€NH HSMT (FLOATING)</div>
+                                <div class="metric-label">ĐANG PHÁT HÀNH HSMT (FLOATING)</div>
                                 <div class="metric-value text-orange" id="tender-kpi-floating">0</div>
                             </div>
                             <div class="metric-card">
-                                <div class="metric-label">ÄANG CHáº¤M THáº¦U (EVALUATING)</div>
+                                <div class="metric-label">ĐANG CHẤM THẦU (EVALUATING)</div>
                                 <div class="metric-value text-blue" id="tender-kpi-evaluating" style="color: #3b82f6;">0</div>
                             </div>
                             <div class="metric-card">
-                                <div class="metric-label">ÄÃƒ TRAO THáº¦U (AWARDED)</div>
+                                <div class="metric-label">ĐÃ TRAO THẦU (AWARDED)</div>
                                 <div class="metric-value text-green" id="tender-kpi-awarded">0</div>
                             </div>
                         </div>
@@ -120,12 +120,12 @@
                             <table class="data-table" id="tender-tracker-table">
                                 <thead>
                                     <tr>
-                                        <th>MÃ£ gÃ³i</th>
-                                        <th>TÃªn gÃ³i tháº§u</th>
-                                        <th>GiÃ¡ gÃ³i tháº§u dá»± toÃ¡n</th>
-                                        <th>Háº¡n ná»™p HSÄX</th>
-                                        <th>Tráº¡ng thÃ¡i</th>
-                                        <th>NhÃ  tháº§u trÃºng tháº§u</th>
+                                        <th>Mã gói</th>
+                                        <th>Tên gói thầu</th>
+                                        <th>Giá gói thầu dự toán</th>
+                                        <th>Hạn nộp HSĐX</th>
+                                        <th>Trạng thái</th>
+                                        <th>Nhà thầu trúng thầu</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tender-tbody">
@@ -138,29 +138,29 @@
                     <!-- Tender Detail View -->
                     <div id="tender-detail-view" class="hidden">
                         <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-                            <button class="btn btn-secondary" id="btn-back-tender"><i class="fa-solid fa-arrow-left"></i> Quay láº¡i Danh sÃ¡ch GÃ³i tháº§u</button>
+                            <button class="btn btn-secondary" id="btn-back-tender"><i class="fa-solid fa-arrow-left"></i> Quay lại Danh sách Gói thầu</button>
                             <div style="display: flex; gap: 1rem;" class="manager-hide">
-                                <button class="btn btn-primary" id="btn-award-tender" style="background-color: var(--primary-green); border-color: var(--primary-green);">ðŸ† Chá»‘t Chá»n NhÃ  Tháº§u</button>
-                                <button class="btn btn-primary" id="btn-save-cba"><i class="fa-solid fa-floppy-disk"></i> LÆ°u Cáº­p Nháº­t</button>
+                                <button class="btn btn-primary" id="btn-award-tender" style="background-color: var(--primary-green); border-color: var(--primary-green);">🏆 Chốt Chọn Nhà Thầu</button>
+                                <button class="btn btn-primary" id="btn-save-cba"><i class="fa-solid fa-floppy-disk"></i> Lưu Cập Nhật</button>
                             </div>
                         </div>
 
                         <!-- Detail Overview -->
                         <div class="metrics-grid" style="background: white; padding: 1.5rem; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 2rem;">
                             <div style="flex: 1; border-right: 1px solid #e2e8f0; padding-right: 1.5rem;">
-                                <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">GÃ³i tháº§u</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Gói thầu</div>
                                 <div id="detail-tender-name" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--primary-blue);">...</div>
                                 <div id="detail-tender-code" style="font-size: 0.9rem; font-weight: 500;">...</div>
                             </div>
                             <div style="flex: 1; border-right: 1px solid #e2e8f0; padding: 0 1.5rem;">
-                                <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">ThÃ´ng tin ná»™p tháº§u</div>
-                                <div style="margin-top: 0.5rem; font-size: 0.9rem;"><strong>Tráº¡ng thÃ¡i:</strong> <span id="detail-tender-status">...</span></div>
-                                <div style="margin-top: 0.25rem; font-size: 0.9rem;"><strong>Háº¡n ná»™p:</strong> <span id="detail-tender-deadline">...</span></div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Thông tin nộp thầu</div>
+                                <div style="margin-top: 0.5rem; font-size: 0.9rem;"><strong>Trạng thái:</strong> <span id="detail-tender-status">...</span></div>
+                                <div style="margin-top: 0.25rem; font-size: 0.9rem;"><strong>Hạn nộp:</strong> <span id="detail-tender-deadline">...</span></div>
                             </div>
                             <div style="flex: 1; padding-left: 1.5rem;">
-                                <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Káº¿t quáº£ / NhÃ  tháº§u</div>
-                                <div style="margin-top: 0.5rem; font-size: 0.9rem;"><strong>TrÃºng tháº§u:</strong> <span id="detail-tender-winner" style="color: var(--primary-green); font-weight: 600;">...</span></div>
-                                <div style="margin-top: 0.25rem; font-size: 0.9rem;"><strong>GiÃ¡ chá»‘t:</strong> <span id="detail-tender-final-price">...</span></div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Kết quả / Nhà thầu</div>
+                                <div style="margin-top: 0.5rem; font-size: 0.9rem;"><strong>Trúng thầu:</strong> <span id="detail-tender-winner" style="color: var(--primary-green); font-weight: 600;">...</span></div>
+                                <div style="margin-top: 0.25rem; font-size: 0.9rem;"><strong>Giá chốt:</strong> <span id="detail-tender-final-price">...</span></div>
                             </div>
                         </div>
 
@@ -169,25 +169,25 @@
                             <div class="tabs" id="tender-rounds-tabs" style="border-bottom: none; margin-bottom: 0;">
                                 <!-- JS injected -->
                             </div>
-                            <button class="btn btn-secondary manager-hide" id="btn-add-round" style="height: 36px; padding: 0 1rem; font-size: 0.8rem;">+ ThÃªm Äá»£t Ná»™p Tháº§u</button>
+                            <button class="btn btn-secondary manager-hide" id="btn-add-round" style="height: 36px; padding: 0 1rem; font-size: 0.8rem;">+ Thêm Đợt Nộp Thầu</button>
                         </div>
 
                         <!-- CBA Empty State -->
                         <div id="cba-empty-state" class="hidden" style="text-align: center; padding: 4rem 2rem; background: white; border: 1px dashed var(--border-color); border-radius: 8px;">
                             <i class="fa-solid fa-file-invoice-dollar" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
-                            <h3 style="margin-bottom: 0.5rem;">ChÆ°a cÃ³ dá»¯ liá»‡u Báº£ng So SÃ¡nh GiÃ¡</h3>
-                            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Khá»Ÿi táº¡o báº£ng CBA Ä‘á»ƒ báº¯t Ä‘áº§u phÃ¢n tÃ­ch giÃ¡ tháº§u.</p>
-                            <button class="btn btn-primary manager-hide" id="btn-init-cba" style="margin: 0 auto;">+ Khá»Ÿi táº¡o Báº£ng So SÃ¡nh GiÃ¡ (CBA)</button>
+                            <h3 style="margin-bottom: 0.5rem;">Chưa có dữ liệu Bảng So Sánh Giá</h3>
+                            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Khởi tạo bảng CBA để bắt đầu phân tích giá thầu.</p>
+                            <button class="btn btn-primary manager-hide" id="btn-init-cba" style="margin: 0 auto;">+ Khởi tạo Bảng So Sánh Giá (CBA)</button>
                         </div>
 
                         <!-- CBA Table View -->
                         <div id="cba-table-view" class="hidden">
                             <div style="display: flex; gap: 1rem; margin-bottom: 1rem;" class="manager-hide">
-                                <button class="btn btn-secondary" id="btn-add-bidder">+ ThÃªm NhÃ  tháº§u</button>
-                                <button class="btn btn-secondary" id="btn-add-item">+ ThÃªm Háº¡ng má»¥c</button>
+                                <button class="btn btn-secondary" id="btn-add-bidder">+ Thêm Nhà thầu</button>
+                                <button class="btn btn-secondary" id="btn-add-item">+ Thêm Hạng mục</button>
                                 <div style="width: 1px; background: #e2e8f0; margin: 0 0.5rem;"></div>
                                 <input type="file" id="excel-upload-input" accept=".xlsx, .xls" class="hidden" style="display: none;">
-                                <button class="btn btn-secondary" id="btn-import-excel" style="color: #10b981; border-color: #10b981;"><i class="fa-solid fa-file-excel"></i> Import tá»« file Excel</button>
+                                <button class="btn btn-secondary" id="btn-import-excel" style="color: #10b981; border-color: #10b981;"><i class="fa-solid fa-file-excel"></i> Import từ file Excel</button>
                             </div>
                             <div class="table-container" style="overflow-x: auto;">
                                 <table class="data-table editable-table" id="cba-table">
@@ -215,26 +215,26 @@
                     <div class="section-title" style="display: flex; justify-content: space-between; width: 100%;">
                         Contract Management
                         <div style="display: flex; gap: 1rem;" class="manager-hide">
-                            <button class="btn btn-secondary hidden" id="btn-bulk-delete-contract" style="color: var(--danger-color); border-color: var(--danger-color);"><i class="fa-solid fa-trash"></i> XÃ³a HÄ Ä‘Ã£ chá»n</button>
+                            <button class="btn btn-secondary hidden" id="btn-bulk-delete-contract" style="color: var(--danger-color); border-color: var(--danger-color);"><i class="fa-solid fa-trash"></i> Xóa HĐ đã chọn</button>
                             <input type="file" id="contract-excel-import" accept=".xlsx, .xls, .csv" hidden>
-                            <button class="btn btn-secondary" id="btn-import-contract" style="color: #10b981; border-color: #10b981;" onclick="document.getElementById('contract-excel-import').click()"><i class="fa-solid fa-file-excel"></i> Import Há»£p Ä‘á»“ng</button>
-                            <button class="btn btn-primary" id="btn-new-contract">+ Táº¡o Há»£p Ä‘á»“ng</button>
+                            <button class="btn btn-secondary" id="btn-import-contract" style="color: #10b981; border-color: #10b981;" onclick="document.getElementById('contract-excel-import').click()"><i class="fa-solid fa-file-excel"></i> Import Hợp đồng</button>
+                            <button class="btn btn-primary" id="btn-new-contract">+ Tạo Hợp đồng</button>
                         </div>
                     </div>
                     <div class="table-container">
                         <table class="data-table" id="contract-table">
                             <thead>
                                 <tr>
-                                    <th>MÃ£ ngÃ¢n sÃ¡ch</th>
-                                    <th>MÃ£ HÄ</th>
-                                    <th>Loáº¡i HÄ</th>
-                                    <th>TÃªn GÃ³i tháº§u</th>
-                                    <th>NhÃ  tháº§u</th>
-                                    <th>NgÃ¢n sÃ¡ch</th>
-                                    <th>Tá»•ng giÃ¡ trá»‹</th>
-                                    <th>Tráº¡ng thÃ¡i</th>
+                                    <th>Mã ngân sách</th>
+                                    <th>Mã HĐ</th>
+                                    <th>Loại HĐ</th>
+                                    <th>Tên Gói thầu</th>
+                                    <th>Nhà thầu</th>
+                                    <th>Ngân sách</th>
+                                    <th>Tổng giá trị</th>
+                                    <th>Trạng thái</th>
                                     <th style="width: 50px; text-align: center;">
-                                        <input type="checkbox" id="cb-select-all-contracts" title="Chá»n táº¥t cáº£">
+                                        <input type="checkbox" id="cb-select-all-contracts" title="Chọn tất cả">
                                     </th>
                                 </tr>
                             </thead>
