@@ -1,4 +1,5 @@
-﻿    display: flex;
+.metrics-grid {
+    display: flex;
     gap: 1rem;
     margin-bottom: 2rem;
     flex-wrap: wrap;
@@ -29,6 +30,7 @@
 .text-green { color: var(--primary-green); }
 .text-orange { color: var(--primary-orange); }
 
+.progress-bar {
     height: 6px;
     background: #e2e8f0;
     border-radius: 3px;
