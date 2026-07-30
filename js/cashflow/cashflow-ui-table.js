@@ -3,6 +3,8 @@ import { getLocalCashflow } from './cashflow-state.js';
 import { calculateForecastEngine, syncCashflowWithPayment } from './cashflow-calc.js';
 import { createCashflowRowNode } from './cashflow-ui-row.js';
 
+let currentSelectedPackageId = null;
+
 export function updateCashflowSubtotal() {
     const tbody = document.getElementById('cashflow-tbody');
     if (!tbody) return;
@@ -23,11 +25,6 @@ export function updateCashflowSubtotal() {
         }
     });
 
-    const subtotalEl = document.getElementById('cf-subtotal');
-    if (subtotalEl) {
-        subtotalEl.textContent = total.toLocaleString('en-US');
-    }
-
     const footerTotal = document.getElementById('cf-grand-total-plan');
     if (footerTotal) {
         footerTotal.textContent = total.toLocaleString('en-US');
@@ -35,128 +32,153 @@ export function updateCashflowSubtotal() {
 }
 
 export function renderCashflowTable() {
-    const tbody = document.getElementById('cashflow-tbody');
-    if (!tbody) return;
-    tbody.innerHTML = '';
-
     const projectId = state.currentProjectId;
     if (!projectId) return;
 
-    const filterContract = document.getElementById('cf-filter-contract');
-    const selectedContract = filterContract ? filterContract.value : '';
-
-    const btnAddRelease = document.getElementById('btn-add-release');
-    if (btnAddRelease) {
-        if (selectedContract) {
-            const allContracts = state.appData.Contracts || [];
-            const c = allContracts.find(x => (x.package_name === selectedContract || x.contract === selectedContract) && x.project_id === projectId);
-            if (c && c.type === 'Construction') {
-                btnAddRelease.style.display = 'inline-block';
-            } else {
-                btnAddRelease.style.display = 'none';
-            }
-        } else {
-            btnAddRelease.style.display = 'none';
-        }
-    }
-
-    const searchInput = document.getElementById('cf-search-input');
-    const searchVal = searchInput ? searchInput.value.trim().toLowerCase() : '';
-
     syncCashflowWithPayment(projectId);
 
-    let items = getLocalCashflow().filter(c => c.project_id === projectId);
-
-    if (selectedContract) {
-        items = items.filter(c => c.package_name === selectedContract || c.contract === selectedContract);
-    }
-
-    if (searchVal) {
-        items = items.filter(c =>
-            (c.package_name && c.package_name.toLowerCase().includes(searchVal)) ||
-            (c.code && c.code.toLowerCase().includes(searchVal)) ||
-            (c.desc && c.desc.toLowerCase().includes(searchVal))
-        );
-    }
-
-    if (items.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:1rem; color:var(--text-muted);">Chưa có dữ liệu. Bấm "+ Thêm Đợt Kế Hoạch" để bắt đầu hoặc Import từ Excel.</td></tr>`;
-        updateCashflowSubtotal();
-        return;
-    }
-
     const allContracts = state.appData.Contracts || [];
-    const constructionPackages = allContracts.filter(c => c.project_id === projectId && c.type === 'Construction');
+    const projectContracts = allContracts.filter(c => c.project_id === projectId);
+    
+    const allCashflows = getLocalCashflow().filter(c => c.project_id === projectId);
+    const contractsWithoutCashflow = projectContracts.filter(c => {
+        return !allCashflows.some(cf => cf.package_name === c.package_name || cf.contract === c.package_name);
+    }).length;
 
-    constructionPackages.forEach(contract => {
-        const contractCashflows = items.filter(c => c.package_name === contract.package_name);
-        if (contractCashflows.length > 0) {
-            calculateForecastEngine(contractCashflows, contract);
+    const badge = document.getElementById('cf-left-warning-badge');
+    if (badge) {
+        if (contractsWithoutCashflow > 0) {
+            badge.textContent = `${contractsWithoutCashflow} gói ⚠️`;
+            badge.style.display = 'inline-block';
+        } else {
+            badge.style.display = 'none';
         }
-    });
+    }
 
-    const grouped = items.reduce((acc, item) => {
-        const pkg = item.package_name || 'Khác';
-        if (!acc[pkg]) {
-            const allContracts = state.appData.Contracts || [];
-            const matchedContract = allContracts.find(c => c.package_name === pkg && c.project_id === state.currentProjectId);
-            const contractTotal = matchedContract ? (Number(matchedContract.total_value) || Number(matchedContract.budget_value) || 0) : 0;
-
-            acc[pkg] = { items: [], totalPlan: contractTotal };
+    renderPackageList(projectContracts, allCashflows);
+    
+    if (projectContracts.length > 0) {
+        if (!currentSelectedPackageId || !projectContracts.find(c => c.id === currentSelectedPackageId)) {
+            currentSelectedPackageId = projectContracts[0].id;
         }
-        acc[pkg].items.push(item);
-        if (acc[pkg].totalPlan === 0 && (!state.appData.Contracts || !state.appData.Contracts.some(c => c.package_name === pkg && c.project_id === state.currentProjectId))) {
-            acc[pkg].totalPlan += (Number(item.value) || 0);
-        }
-        return acc;
-    }, {});
+        renderRightPane(currentSelectedPackageId, projectContracts, allCashflows);
+    } else {
+        document.getElementById('cf-right-pane-empty').style.display = 'flex';
+        document.getElementById('cf-right-pane-container').style.display = 'none';
+    }
+}
 
-    Object.keys(grouped).forEach(pkgName => {
-        const group = grouped[pkgName];
+export function getCurrentSelectedPackageId() {
+    return currentSelectedPackageId;
+}
 
-        const headerRow = document.createElement('tr');
-        headerRow.className = 'cf-group-header';
-        headerRow.innerHTML = `
-            <td colspan="9">
-                <div style="display:flex; justify-content: space-between; align-items: center; width: 100%;">
-                    <div style="display:flex; align-items: center; gap: 0.5rem; color: var(--primary-blue);">
-                        <i class="fa-solid fa-chevron-down group-toggle" style="width: 20px;"></i>
-                        <span style="font-size: 1.05rem;">${pkgName}</span>
-                    </div>
-                    <div>
-                        <span style="color: var(--text-color); font-weight: normal; margin-right: 0.5rem;">Tổng giá trị:</span>
-                        <span style="color: var(--primary-blue); font-size: 1.05rem;">${group.totalPlan.toLocaleString('en-US')} VNĐ</span>
-                    </div>
-                </div>
-            </td>
+function renderPackageList(contracts, cashflows) {
+    const listContainer = document.getElementById('cf-package-list-container');
+    if (!listContainer) return;
+    listContainer.innerHTML = '';
+
+    contracts.forEach(c => {
+        const cCashflows = cashflows.filter(cf => cf.package_name === c.package_name || cf.contract === c.package_name);
+        
+        let totalPlan = 0;
+        let totalPaid = 0;
+        cCashflows.forEach(cf => {
+            const val = parseFloat(cf.value) || 0;
+            totalPlan += val;
+            if (cf.status === 'Paid') totalPaid += val;
+        });
+
+        const contractValue = parseFloat(c.total_value) || parseFloat(c.budget_value) || 0;
+        const progressPct = contractValue > 0 ? Math.min(100, (totalPaid / contractValue) * 100) : 0;
+
+        const card = document.createElement('div');
+        card.className = `cf-package-card ${currentSelectedPackageId === c.id ? 'active' : ''}`;
+        card.innerHTML = `
+            <div class="cf-pkg-code">${c.package_name}</div>
+            <div class="cf-pkg-name">${c.type || 'Hợp đồng'}</div>
+            <div class="cf-mini-progress">
+                <div class="cf-mini-progress-bar" style="width: ${progressPct}%"></div>
+            </div>
         `;
-
-        tbody.appendChild(headerRow);
-
-        const childRows = [];
-        group.items.forEach(item => {
-            const tr = createCashflowRowNode(item, false);
-            tr.classList.add('cf-child-row');
-            tbody.appendChild(tr);
-            childRows.push(tr);
+        card.addEventListener('click', () => {
+            currentSelectedPackageId = c.id;
+            renderCashflowTable();
         });
-
-        headerRow.addEventListener('click', (e) => {
-            if (e.target.closest('.cf-edit-btn') || e.target.closest('.cf-del-btn')) return;
-            const icon = headerRow.querySelector('.group-toggle');
-            const isCollapsed = icon.classList.contains('fa-chevron-right');
-
-            if (isCollapsed) {
-                icon.classList.remove('fa-chevron-right');
-                icon.classList.add('fa-chevron-down');
-                childRows.forEach(r => r.classList.remove('hidden'));
-            } else {
-                icon.classList.remove('fa-chevron-down');
-                icon.classList.add('fa-chevron-right');
-                childRows.forEach(r => r.classList.add('hidden'));
-            }
-        });
+        listContainer.appendChild(card);
     });
+}
+
+function renderRightPane(contractId, contracts, allCashflows) {
+    document.getElementById('cf-right-pane-empty').style.display = 'none';
+    const container = document.getElementById('cf-right-pane-container');
+    container.style.display = 'flex';
+
+    const contract = contracts.find(c => c.id === contractId);
+    if (!contract) return;
+
+    const contractCashflows = allCashflows.filter(cf => cf.package_name === contract.package_name || cf.contract === contract.package_name);
+    if (contract.type === 'Construction' && contractCashflows.length > 0) {
+        calculateForecastEngine(contractCashflows, contract);
+    }
+
+    const contractValue = parseFloat(contract.total_value) || parseFloat(contract.budget_value) || 0;
+    
+    let totalPlan = 0, totalCert = 0, totalPaid = 0;
+    contractCashflows.forEach(cf => {
+        const val = parseFloat(cf.value) || 0;
+        totalPlan += val;
+        if (cf.status === 'Certified') totalCert += val;
+        if (cf.status === 'Paid') totalPaid += val;
+    });
+
+    // Update Header
+    document.getElementById('cf-detail-title').textContent = `Gói thầu: ${contract.package_name}`;
+    document.getElementById('cf-detail-type').textContent = contract.type || 'N/A';
+    document.getElementById('cf-detail-status').textContent = contract.status || 'N/A';
+    document.getElementById('cf-detail-contract-val').textContent = contractValue.toLocaleString('en-US');
+    document.getElementById('cf-detail-planned-val').textContent = totalPlan.toLocaleString('en-US');
+
+    // Smart Alert
+    const alertEl = document.getElementById('cf-smart-alert');
+    const alertText = document.getElementById('cf-smart-alert-text');
+    if (totalPlan !== contractValue) {
+        const diff = Math.abs(contractValue - totalPlan);
+        alertEl.style.display = 'flex';
+        alertText.textContent = `Tổng Cashflow (${(totalPlan/1e6).toFixed(0)}M) chưa khớp với Giá trị Hợp đồng (${(contractValue/1e6).toFixed(0)}M). Lệch ${(diff/1e6).toFixed(0)}M.`;
+    } else {
+        alertEl.style.display = 'none';
+    }
+
+    // Sub-KPIs
+    document.getElementById('cf-kpi-card-planned').textContent = totalPlan.toLocaleString('en-US');
+    document.getElementById('cf-kpi-card-certified').textContent = totalCert.toLocaleString('en-US');
+    document.getElementById('cf-kpi-card-paid').textContent = totalPaid.toLocaleString('en-US');
+
+    // Progress Bar
+    const totalDivisor = Math.max(contractValue, totalPlan) || 1;
+    const paidPct = Math.min(100, (totalPaid / totalDivisor) * 100);
+    const certPct = Math.min(100 - paidPct, (totalCert / totalDivisor) * 100);
+    document.getElementById('cf-prog-paid-bar').style.width = `${paidPct}%`;
+    document.getElementById('cf-prog-cert-bar').style.width = `${certPct}%`;
+
+    // Toggle Add Release Button
+    const btnAddRelease = document.getElementById('btn-add-release');
+    if (btnAddRelease) {
+        btnAddRelease.style.display = (contract.type === 'Construction') ? 'block' : 'none';
+    }
+
+    // Render Table Rows
+    const tbody = document.getElementById('cashflow-tbody');
+    tbody.innerHTML = '';
+    
+    if (contractCashflows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:2rem; color:var(--text-muted);">Chưa có dữ liệu cho gói thầu này.</td></tr>`;
+    } else {
+        contractCashflows.forEach(item => {
+            const tr = createCashflowRowNode(item, false);
+            tbody.appendChild(tr);
+        });
+    }
 
     updateCashflowSubtotal();
 }

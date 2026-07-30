@@ -1,7 +1,7 @@
 import { state } from '../app.js';
 import { getLocalCashflow, saveLocalCashflow } from './cashflow-state.js';
 import { getContractOptions, crossCheckValidation } from './cashflow-ui-utils.js';
-import { renderCashflowTable } from './cashflow-ui-table.js';
+import { renderCashflowTable, getCurrentSelectedPackageId } from './cashflow-ui-table.js';
 import { renderCashflow } from './cashflow-ui-charts.js';
 import { addCashflowRow } from './cashflow-ui-row.js';
 import { handleExcelImport, saveImportedCashflow } from './cashflow-excel.js';
@@ -82,8 +82,11 @@ export function setupCashflowEvents() {
 
     if (addReleaseBtn) {
         addReleaseBtn.addEventListener('click', () => {
-            const filterContract = document.getElementById('cf-filter-contract');
-            const selectedContract = filterContract ? filterContract.value : '';
+            const contractId = getCurrentSelectedPackageId();
+            if (!contractId) return;
+            const allContracts = state.appData.Contracts || [];
+            const contractObj = allContracts.find(c => c.id === contractId);
+            const selectedContract = contractObj ? contractObj.package_name : '';
             if (!selectedContract) return;
 
             const tbody = document.getElementById('cashflow-tbody');
