@@ -1,11 +1,10 @@
 import { state } from '../app.js';
-import { saveContracts } from '../api.js';
+import { persistContracts } from '../core/data-store.js';
 
 export function getLocalContracts() {
     return state.appData.Contracts ? [...state.appData.Contracts] : [];
 }
 
 export function saveLocalContracts(contracts) {
-    state.appData.Contracts = contracts;
-    saveContracts(contracts).catch(err => console.error('Failed to save contracts', err));
+    persistContracts(contracts);
 }

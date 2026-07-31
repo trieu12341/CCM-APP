@@ -1,6 +1,6 @@
-import { state, formatCurrency } from '../app.js';
+import { state, formatCurrency, formatCurrencyVND } from '../app.js';
 import { getLocalCashflow } from './cashflow-state.js';
-import { calculateForecastEngine } from './cashflow-calc.js';
+import { calculateForecastEngine, calculatePackageTotalPlanned } from './cashflow-calc.js';
 
 let chartInstances = [];
 
@@ -37,7 +37,7 @@ export function renderCashflow() {
     let monthlyData = {}; 
 
     cashflows.filter(c => c.project_id === state.currentProjectId).forEach(c => {
-        const val = c.is_construction ? (Number(c.total_cert) || 0) : (Number(c.value) || 0);
+        const val = c.is_construction ? (Number(c.netPayable) || Number(c.total_cert) || 0) : (Number(c.value) || 0);
         
         if (c.status === 'Certified' || c.status === 'Paid') {
             totalCertified += val;
@@ -69,13 +69,25 @@ export function renderCashflow() {
         pctCertified: revised > 0 ? ((totalCertified / revised) * 100).toFixed(1) : 0
     };
 
-    document.getElementById('cf-kpi-budget').textContent = formatCurrency(kpiData.budget);
-    document.getElementById('cf-kpi-revised').textContent = formatCurrency(kpiData.revised);
-    document.getElementById('cf-kpi-certified').textContent = formatCurrency(kpiData.certified);
-    document.getElementById('cf-kpi-balance').textContent = formatCurrency(kpiData.balance);
-    document.getElementById('cf-kpi-paid').textContent = formatCurrency(kpiData.paid);
-    document.getElementById('cf-kpi-pct-paid').textContent = kpiData.pctPaid + '%';
-    document.getElementById('cf-kpi-pct-certified').textContent = kpiData.pctCertified + '%';
+    const totalPlan = calculatePackageTotalPlanned(cashflows.filter(c => c.project_id === state.currentProjectId));
+
+    const setKPIHtml = (id, html) => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = html;
+    };
+    const setKPIText = (id, text) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = text;
+    };
+
+    setKPIHtml('cf-kpi-budget', `${formatCurrencyVND(kpiData.budget)} <span>VNĐ</span>`);
+    setKPIHtml('cf-kpi-revised', `${formatCurrencyVND(kpiData.revised)} <span>VNĐ</span>`);
+    setKPIHtml('cf-kpi-planned', `${formatCurrencyVND(totalPlan)} <span>VNĐ</span>`);
+    setKPIHtml('cf-kpi-certified', `${formatCurrencyVND(kpiData.certified)} <span>VNĐ</span>`);
+    setKPIHtml('cf-kpi-balance', `${formatCurrencyVND(kpiData.balance)} <span>VNĐ</span>`);
+    setKPIHtml('cf-kpi-paid', `${formatCurrencyVND(kpiData.paid)} <span>VNĐ</span>`);
+    setKPIText('cf-kpi-pct-paid', kpiData.pctPaid + '%');
+    setKPIText('cf-kpi-pct-certified', kpiData.pctCertified + '%');
 
     const budgetB = budget > 0 ? budget / 1000000000 : 0;
     const revisedB = revised > 0 ? revised / 1000000000 : 0;

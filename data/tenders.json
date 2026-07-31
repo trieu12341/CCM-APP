@@ -62,6 +62,40 @@
       "status": "Floating",
       "deadline": "2026-08-14",
       "winner": ""
+    },
+    {
+      "tender_id": "T008",
+      "project_id": "P001",
+      "tender_name": "Tư vấn AV",
+      "type": "Consultancy",
+      "approved_budget": 500000000,
+      "status": "Awarded",
+      "deadline": "2026-08-14",
+      "winner": "Công ty Revisik",
+      "final_price": 400000000
+    },
+    {
+      "tender_id": "T009",
+      "project_id": "P001",
+      "tender_name": "Thi công trạm điện tạm phục vụ thi công",
+      "type": "Construction",
+      "approved_budget": 3000000000,
+      "status": "Awarded",
+      "deadline": "2026-08-14",
+      "winner": "Công ty Trung Nam",
+      "final_price": 2000000000
+    },
+    {
+      "tender_id": "T010",
+      "project_id": "P001",
+      "tender_name": "Thi công Facade",
+      "type": "Construction",
+      "approved_budget": 160000000000,
+      "budget_id": "B001-1785512360816",
+      "status": "Awarded",
+      "deadline": "2026-08-14",
+      "winner": "BM Window",
+      "final_price": 150000000000
     }
   ]
 }

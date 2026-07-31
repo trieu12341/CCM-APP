@@ -1,6 +1,7 @@
 import { state } from '../app.js';
 import { renderDashboard, renderProjectTabs } from '../budget.js';
 import { getLocalProjects, saveLocalProjects } from './project-state.js';
+import { saveProject } from '../api.js';
 
 export function openSummaryModal() {
     const projectId = state.currentProjectId;
@@ -61,46 +62,44 @@ export function openSummaryModal() {
     document.getElementById('projectInfoModal').classList.remove('hidden');
 }
 
-export function saveSummaryData() {
+export async function saveSummaryData() {
     const projectId = state.currentProjectId;
     if (!projectId) return;
 
-    let projects = getLocalProjects();
-    let projectIndex = projects.findIndex(p => p.project_id === projectId);
-    
-    let project;
-    if (projectIndex === -1) {
-        const stateProj = state.appData.Projects.find(p => p.project_id === projectId);
-        if (stateProj) {
-            projects.push({ ...stateProj });
-            projectIndex = projects.length - 1;
-        } else {
-            return;
-        }
-    }
-    
-    project = projects[projectIndex];
-
-    project.project_name = document.getElementById('summary-name-input').value.trim();
-    project.scale = document.getElementById('summary-scale-input').value.trim();
-    project.location = document.getElementById('summary-location-input').value.trim();
-    project.start_date = document.getElementById('summary-start-date-input').value.trim();
-    project.end_date = document.getElementById('summary-end-date-input').value.trim();
-    project.cfa = document.getElementById('summary-cfa-input').value.trim();
-    project.consultants = document.getElementById('summary-consultants-input').value.trim();
-    project.main_contractor = document.getElementById('summary-contractor-input').value.trim();
-    project.image_url = document.getElementById('summary-img-input').value.trim();
-
-    projects[projectIndex] = project;
-    saveLocalProjects(projects);
-
+    // Find project in state
     const stateProjIndex = state.appData.Projects.findIndex(p => p.project_id === projectId);
-    if (stateProjIndex !== -1) {
-        state.appData.Projects[stateProjIndex] = { ...state.appData.Projects[stateProjIndex], ...project };
+    if (stateProjIndex === -1) return;
+
+    // Read form values into the project object
+    const project = { ...state.appData.Projects[stateProjIndex] };
+    project.project_name     = document.getElementById('summary-name-input').value.trim();
+    project.scale            = document.getElementById('summary-scale-input').value.trim();
+    project.location         = document.getElementById('summary-location-input').value.trim();
+    project.start_date       = document.getElementById('summary-start-date-input').value.trim();
+    project.end_date         = document.getElementById('summary-end-date-input').value.trim();
+    project.cfa              = document.getElementById('summary-cfa-input').value.trim();
+    project.consultants      = document.getElementById('summary-consultants-input').value.trim();
+    project.main_contractor  = document.getElementById('summary-contractor-input').value.trim();
+    project.image_url        = document.getElementById('summary-img-input').value.trim();
+
+    // 1. Update state in memory
+    state.appData.Projects[stateProjIndex] = project;
+
+    // 2. Persist to server (data/projects.json) — source of truth on reload
+    try {
+        await saveProject(state.appData.Projects);
+    } catch (e) {
+        console.error('[saveSummaryData] Failed to save to server:', e);
     }
+
+    // 3. Also sync localStorage as a quick fallback
+    saveLocalProjects(state.appData.Projects);
+    localStorage.setItem('ccm_current_project_id', projectId);
 
     document.getElementById('projectInfoModal').classList.add('hidden');
+    document.body.classList.remove('modal-open');
 
+    // 4. Re-render header & dashboard with updated data
     renderProjectTabs();
     renderDashboard();
 }

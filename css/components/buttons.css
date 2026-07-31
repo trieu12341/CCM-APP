@@ -5,10 +5,10 @@
 }
 
 .btn {
-    padding: 0.5rem 1rem;
+    padding: 4px 12px;
     border-radius: 6px;
     font-weight: 500;
-    font-size: 0.85rem;
+    font-size: 13px;
     cursor: pointer;
     border: none;
     display: flex;
@@ -38,7 +38,7 @@
 }
 
 .section-title {
-    font-size: 1.1rem;
+    font-size: 14px;
     font-weight: 600;
     margin-bottom: 1rem;
     display: flex;

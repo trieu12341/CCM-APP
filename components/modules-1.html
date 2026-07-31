@@ -15,33 +15,49 @@
                     </div>
 
                     <!-- LAYER 1: KPI Grid -->
-                    <div class="kpi-container" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem;">
-                        <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                            <div style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Approved Budget Baseline</div>
-                            <div id="metric-total-budget" style="font-size: 1.5rem; font-weight: 700; color: var(--text-dark); margin-top: 0.5rem;">0 VNĐ</div>
+                    <div class="kpi-container">
+                        <!-- Card 1 -->
+                        <div class="kpi-card kpi-card-slate">
+                            <div class="kpi-header">
+                                <span class="kpi-title">APPROVED BUDGET BASELINE</span>
+                            </div>
+                            <div class="kpi-value" id="metric-total-budget">0 <span>VNĐ</span></div>
                         </div>
-                        <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                            <div style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Committed Cost</div>
-                            <div id="metric-allocated" style="font-size: 1.5rem; font-weight: 700; color: var(--primary-blue); margin-top: 0.5rem;">0 VNĐ</div>
+                        
+                        <!-- Card 2 -->
+                        <div class="kpi-card kpi-card-blue">
+                            <div class="kpi-header">
+                                <span class="kpi-title">COMMITTED COST</span>
+                                <span class="kpi-count" id="metric-allocated-pct">0%</span>
+                            </div>
+                            <div class="kpi-value" id="metric-allocated">0 <span>VNĐ</span></div>
                         </div>
-                        <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                            <div style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Projected Final Cost</div>
-                            <div id="metric-projected" style="font-size: 1.5rem; font-weight: 700; color: var(--text-dark); margin-top: 0.5rem;">0 VNĐ</div>
+
+                        <!-- Card 3 -->
+                        <div class="kpi-card kpi-card-slate">
+                            <div class="kpi-header">
+                                <span class="kpi-title">PROJECTED FINAL COST</span>
+                            </div>
+                            <div class="kpi-value" id="metric-projected">0 <span>VNĐ</span></div>
                         </div>
-                        <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                            <div style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Remaining Contingency</div>
-                            <div id="metric-contingency" style="font-size: 1.5rem; font-weight: 700; color: #f97316; margin-top: 0.5rem;">0 VNĐ</div>
+
+                        <!-- Card 4 -->
+                        <div class="kpi-card kpi-card-orange">
+                            <div class="kpi-header">
+                                <span class="kpi-title">REMAINING CONTINGENCY</span>
+                            </div>
+                            <div class="kpi-value" id="metric-contingency">0 <span>VNĐ</span></div>
                         </div>
                     </div>
 
                     <!-- LAYER 1: Charts Area -->
-                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 2rem;">
-                        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                            <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 1.1rem;">Budget vs Committed vs Expended</h3>
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <div style="background: white; padding: 14px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 14px; font-weight: 600;">Budget vs Committed vs Expended</h3>
                             <div id="budget-chart-bar" style="height: 350px;"></div>
                         </div>
-                        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                            <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 1.1rem;">Cơ cấu Phân bổ Ngân sách</h3>
+                        <div style="background: white; padding: 14px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 14px; font-weight: 600;">Cơ cấu Phân bổ Ngân sách</h3>
                             <div id="budget-chart-pie" style="height: 350px;"></div>
                         </div>
                     </div>
@@ -87,42 +103,51 @@
                         </div>
                         
                         <!-- LAYER 1: KPI Grid -->
-                        <div class="kpi-container" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem;">
-                            <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                                <div style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Total Tender Budget</div>
-                                <div id="tender-kpi-total-val" style="font-size: 1.5rem; font-weight: 700; color: var(--text-dark); margin-top: 0.5rem;">0 VNĐ</div>
-                            </div>
-                            <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                                <div style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Floating (Phát hành)</div>
-                                <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-top: 0.5rem;">
-                                    <div id="tender-kpi-floating-count" style="font-size: 1.5rem; font-weight: 700; color: #f97316;">0</div>
-                                    <div id="tender-kpi-floating-val" style="font-size: 0.9rem; font-weight: 600; color: #f97316;">(0 VNĐ)</div>
+                        <div class="kpi-container">
+                            <!-- Card 1 -->
+                            <div class="kpi-card kpi-card-slate">
+                                <div class="kpi-header">
+                                    <span class="kpi-title">TOTAL TENDER BUDGET</span>
                                 </div>
+                                <div class="kpi-value" id="tender-kpi-total-val">0 <span>VNĐ</span></div>
                             </div>
-                            <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                                <div style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Evaluating (Chấm thầu)</div>
-                                <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-top: 0.5rem;">
-                                    <div id="tender-kpi-evaluating-count" style="font-size: 1.5rem; font-weight: 700; color: #3b82f6;">0</div>
-                                    <div id="tender-kpi-evaluating-val" style="font-size: 0.9rem; font-weight: 600; color: #3b82f6;">(0 VNĐ)</div>
+                            
+                            <!-- Card 2 -->
+                            <div class="kpi-card kpi-card-amber">
+                                <div class="kpi-header">
+                                    <span class="kpi-title">FLOATING (PHÁT HÀNH)</span>
+                                    <span class="kpi-count"><span id="tender-kpi-floating-count">0</span> gói</span>
                                 </div>
+                                <div class="kpi-value" id="tender-kpi-floating-val">0 <span>VNĐ</span></div>
                             </div>
-                            <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                                <div style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Awarded (Đã trao thầu)</div>
-                                <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-top: 0.5rem;">
-                                    <div id="tender-kpi-awarded-count" style="font-size: 1.5rem; font-weight: 700; color: #10b981;">0</div>
-                                    <div id="tender-kpi-awarded-val" style="font-size: 0.9rem; font-weight: 600; color: #10b981;">(0 VNĐ)</div>
+
+                            <!-- Card 3 -->
+                            <div class="kpi-card kpi-card-blue">
+                                <div class="kpi-header">
+                                    <span class="kpi-title">EVALUATING (CHẤM THẦU)</span>
+                                    <span class="kpi-count"><span id="tender-kpi-evaluating-count">0</span> gói</span>
                                 </div>
+                                <div class="kpi-value" id="tender-kpi-evaluating-val">0 <span>VNĐ</span></div>
+                            </div>
+
+                            <!-- Card 4 -->
+                            <div class="kpi-card kpi-card-emerald">
+                                <div class="kpi-header">
+                                    <span class="kpi-title">AWARDED (ĐÃ TRAO THẦU)</span>
+                                    <span class="kpi-count"><span id="tender-kpi-awarded-count">0</span> gói</span>
+                                </div>
+                                <div class="kpi-value" id="tender-kpi-awarded-val">0 <span>VNĐ</span></div>
                             </div>
                         </div>
                         
                         <!-- LAYER 1: Charts Area -->
                         <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
-                            <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                                <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 1.1rem;">Ngân sách phân bổ theo Trạng thái</h3>
+                            <div style="background: white; padding: 14px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 14px; font-weight: 600;">Ngân sách phân bổ theo Trạng thái</h3>
                                 <div id="tender-chart-bar" style="height: 350px;"></div>
                             </div>
-                            <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                                <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 1.1rem;">Cơ cấu Ngân sách Đấu thầu</h3>
+                            <div style="background: white; padding: 14px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 14px; font-weight: 600;">Cơ cấu Ngân sách Đấu thầu</h3>
                                 <div id="tender-chart-pie" style="height: 350px;"></div>
                             </div>
                         </div>
@@ -149,33 +174,48 @@
                     </div>
 
                     <!-- LAYER 1: KPI Grid -->
-                    <div class="kpi-container" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem;">
-                        <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                            <div style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Total Approved Budget</div>
-                            <div id="contract-kpi-budget" style="font-size: 1.5rem; font-weight: 700; color: var(--text-dark); margin-top: 0.5rem;">0 VNĐ</div>
+                    <div class="kpi-container">
+                        <!-- Card 1 -->
+                        <div class="kpi-card kpi-card-slate">
+                            <div class="kpi-header">
+                                <span class="kpi-title">TOTAL APPROVED BUDGET</span>
+                            </div>
+                            <div class="kpi-value" id="contract-kpi-budget">0 <span>VNĐ</span></div>
                         </div>
-                        <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                            <div style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Committed Contract Value</div>
-                            <div id="contract-kpi-committed" style="font-size: 1.5rem; font-weight: 700; color: #10b981; margin-top: 0.5rem;">0 VNĐ</div>
+                        
+                        <!-- Card 2 -->
+                        <div class="kpi-card kpi-card-emerald">
+                            <div class="kpi-header">
+                                <span class="kpi-title">COMMITTED CONTRACT VALUE</span>
+                            </div>
+                            <div class="kpi-value" id="contract-kpi-committed">0 <span>VNĐ</span></div>
                         </div>
-                        <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                            <div style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Budget Variance (Savings)</div>
-                            <div id="contract-kpi-variance" style="font-size: 1.5rem; font-weight: 700; color: #3b82f6; margin-top: 0.5rem;">0 VNĐ</div>
+
+                        <!-- Card 3 -->
+                        <div class="kpi-card kpi-card-blue">
+                            <div class="kpi-header">
+                                <span class="kpi-title">BUDGET VARIANCE (SAVINGS)</span>
+                            </div>
+                            <div class="kpi-value" id="contract-kpi-variance">0 <span>VNĐ</span></div>
                         </div>
-                        <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                            <div style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Awarded Rate</div>
-                            <div id="contract-kpi-awarded-rate" style="font-size: 1.5rem; font-weight: 700; color: #f59e0b; margin-top: 0.5rem;">0%</div>
+
+                        <!-- Card 4 -->
+                        <div class="kpi-card kpi-card-orange">
+                            <div class="kpi-header">
+                                <span class="kpi-title">AWARDED RATE</span>
+                            </div>
+                            <div class="kpi-value" id="contract-kpi-awarded-rate">0%</div>
                         </div>
                     </div>
 
                     <!-- LAYER 1: Charts Area -->
                     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
-                        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                            <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 1.1rem;">Budget vs Actual by Category</h3>
+                        <div style="background: white; padding: 14px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 14px; font-weight: 600;">Budget vs Actual by Category</h3>
                             <div id="contract-chart-bar" style="height: 350px;"></div>
                         </div>
-                        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                            <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 1.1rem;">Contract Value Breakdown</h3>
+                        <div style="background: white; padding: 14px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 14px; font-weight: 600;">Contract Value Breakdown</h3>
                             <div id="contract-chart-pie" style="height: 350px;"></div>
                         </div>
                     </div>

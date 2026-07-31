@@ -1,7 +1,7 @@
 import { state } from '../app.js';
 
 export function getLocalProjects() {
-    const data = localStorage.getItem('vcre_projects');
+    const data = localStorage.getItem('ccm_projects');
     if (data) {
         try {
             return JSON.parse(data);
@@ -11,5 +11,5 @@ export function getLocalProjects() {
 }
 
 export function saveLocalProjects(projects) {
-    localStorage.setItem('vcre_projects', JSON.stringify(projects));
+    localStorage.setItem('ccm_projects', JSON.stringify(projects));
 }

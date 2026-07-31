@@ -2,60 +2,9 @@ import { state } from '../app.js';
 import { getLocalCashflow, saveLocalCashflow } from './cashflow-state.js';
 
 export function generateCashflowForContract(contract) {
-    if (!contract || !contract.total_value) return;
-
-    let cashflows = getLocalCashflow();
-    // Remove old auto-generated cashflow for this contract
-    cashflows = cashflows.filter(cf => cf.contract_id !== contract.contract_id);
-
-    const totalValue = parseFloat(contract.total_value) || 0;
-    const apPercent = parseFloat(contract.advance_payment_percent) || 0;
-    const apValue = totalValue * (apPercent / 100);
-
-    const baseDate = new Date();
-    
-    // Period 1: Advance Payment
-    if (apValue > 0) {
-        cashflows.push({
-            id: 'cf-' + Date.now() + '-0',
-            project_id: contract.project_id,
-            contract_id: contract.contract_id,
-            package_name: contract.package_name || contract.contract_name,
-            code: 'AP',
-            date: baseDate.toISOString().split('T')[0],
-            value: 0,
-            workdone: 0,
-            retention: 0,
-            ap_recovery: 0,
-            total_cert: apValue,
-            status: 'Planned',
-            is_advance_payment: true
-        });
-    }
-
-    // Remaining periods (Spread over 5 months for demo)
-    const remainingValue = totalValue;
-    const months = 5;
-    const valuePerMonth = remainingValue / months;
-
-    for (let i = 1; i <= months; i++) {
-        const d = new Date(baseDate);
-        d.setMonth(d.getMonth() + i);
-        
-        cashflows.push({
-            id: 'cf-' + Date.now() + '-' + i,
-            project_id: contract.project_id,
-            contract_id: contract.contract_id,
-            package_name: contract.package_name || contract.contract_name,
-            code: 'Payment ' + i,
-            date: d.toISOString().split('T')[0],
-            value: valuePerMonth,
-            status: 'Planned',
-            is_construction: contract.type !== 'Consultancy'
-        });
-    }
-
-    saveLocalCashflow(cashflows);
+    // STRICTLY BANNED: Auto-generation of cashflow is disabled to prevent overwriting user data.
+    // See QS Request for Data Protection.
+    return;
 }
 
 export function syncCashflowWithPayment(projectId) {
@@ -117,21 +66,32 @@ export function calculateForecastEngine(cashflows, contract) {
             // Bypass calculation: Trust values parsed from Excel
             cumRetention += item.retention || 0;
             cumApRecovery += item.ap_recovery || 0;
+            item.netPayable = item.total_cert;
+            return; // Skip recalculation
+        }
+
+        if (item.is_advance_payment || item.type === 'advance') {
+            item.type = 'advance';
+            item.netPayable = item.total_cert || parseFloat(item.value) || 0;
             return; // Skip recalculation
         }
 
         if (item.is_release_retention_1) {
+            item.type = 'retention';
             item.workdone = 0;
             item.ap_recovery = 0;
             item.retention = -(cumRetention / 2); // Release 50%
             cumRetention += item.retention; // reduces cumulative retention
             item.total_cert = item.workdone - item.retention - item.ap_recovery;
+            item.netPayable = item.total_cert;
         } else if (item.is_release_retention_2) {
+            item.type = 'retention';
             item.workdone = 0;
             item.ap_recovery = 0;
             item.retention = -cumRetention; // Release remaining
             cumRetention += item.retention;
             item.total_cert = item.workdone - item.retention - item.ap_recovery;
+            item.netPayable = item.total_cert;
         } else {
             let workdone = parseFloat(item.value) || 0;
             item.workdone = workdone;
@@ -163,6 +123,13 @@ export function calculateForecastEngine(cashflows, contract) {
             cumApRecovery += item.ap_recovery;
 
             item.total_cert = item.workdone - item.retention - item.ap_recovery;
+            item.netPayable = item.total_cert;
+            item.type = 'progress';
         }
     });
+}
+
+export function calculatePackageTotalPlanned(cashflows) {
+    if (!cashflows || !Array.isArray(cashflows)) return 0;
+    return cashflows.reduce((sum, item) => sum + (parseFloat(item.netPayable) || parseFloat(item.total_cert) || parseFloat(item.value) || 0), 0);
 }

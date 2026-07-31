@@ -13,16 +13,24 @@
 }
 
 .data-table th, .data-table td {
-    padding: 1rem;
+    padding: 6px 10px;
     text-align: left;
     border-bottom: 1px solid var(--border-color);
-    font-size: 0.9rem;
+    font-size: 13px;
 }
 
 .data-table th {
     background: #f8fafc;
-    color: var(--text-muted);
-    font-weight: 500;
+    color: #4b5563;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    white-space: nowrap;
+    height: 40px;
+    vertical-align: middle;
 }
 
 .data-table td.negative {
@@ -49,7 +57,8 @@
 }
 
 .editable-table td {
-    padding: 0.5rem;
+    padding: 4px 6px;
+    font-size: 13px;
 }
 
 .editable-table input[type="text"] {

@@ -53,7 +53,11 @@ export function setupCashflowEvents() {
         });
     }
 
-    const closeFn = () => window.closeInlineWorkspace();
+    const closeFn = () => {
+        const cashflowModal = document.getElementById('cashflow-detail-modal');
+        if (cashflowModal) cashflowModal.classList.add('hidden');
+        window.closeInlineWorkspace();
+    };
     if (closeBtn) closeBtn.addEventListener('click', closeFn);
     if (cancelBtn) cancelBtn.addEventListener('click', closeFn);
 

@@ -50,26 +50,56 @@ export function saveContract() {
     saveLocalContracts(allContracts);
     generateCashflowForContract(updatedContract);
 
-    // Close modal via helper
     closeContractDetailModal();
     renderContracts();
-    document.dispatchEvent(new Event('dashboardStateChanged'));
 }
 
 export function deleteContract() {
     const contractId = document.getElementById('contract-id-hidden').value;
     if (!contractId) return;
-    
-    if (confirm('Bạn có chắc chắn muốn xóa hợp đồng này không?')) {
+
+    if (confirm('Bạn có chắc chắn muốn xóa Hợp đồng này không?')) {
         let allContracts = getLocalContracts();
         allContracts = allContracts.filter(c => c.contract_id !== contractId);
-        
         saveLocalContracts(allContracts);
-        // Close modal via helper to handle body scroll lock
         closeContractDetailModal();
         renderContracts();
     }
 }
+
+export function createDraftContractFromTender(tender) {
+    if (!tender) return null;
+
+    const allContracts = getLocalContracts();
+    const existing = allContracts.find(c => c.from_tender_id === tender.tender_id);
+    if (existing) return existing; // Guard to prevent duplication
+
+    const isConsultancy = window.isConsultancyContract(tender);
+
+    const draftContract = {
+        contract_id:    'c-' + Date.now(),
+        from_tender_id: tender.tender_id,
+        budget_id:      tender.budget_id, // Key link back to budget
+        project_id:     state.currentProjectId || tender.project_id,
+        contract_code:  'CTR-' + tender.tender_id,
+        type:           isConsultancy ? 'Consultancy' : 'Construction',
+        package_name:   tender.tender_name || '',
+        contractor:     tender.winner || '',
+        contract_date:  new Date().toISOString().split('T')[0],
+        status:         'Draft',
+        budget_value:   Number(tender.budgetAmount || tender.estimatedValue || tender.approved_budget || 0),
+        total_value:    Number(tender.final_price || 0),
+        scope_of_work:  '',
+        attachment_url: ''
+    };
+
+    allContracts.push(draftContract);
+    saveLocalContracts(allContracts);
+    generateCashflowForContract(draftContract);
+    
+    return draftContract;
+}
+
 
 export function bulkDeleteContracts() {
     const checkboxes = document.querySelectorAll('.contract-cb:checked');

@@ -1,24 +1,20 @@
 import { state, mockActivities } from '../app.js';
 import { saveProject, saveBudget, saveTender } from '../api.js';
+import { persistBudgets } from '../core/data-store.js';
 import { renderProjectTabs, renderDashboard, renderBudgetTableModal } from './budget-ui.js';
 import { renderTenders } from '../tender.js';
 
-// Utility: safely bind an event listener, skipping if element not found
-function bindEvent(id, event, handler) {
-    const el = document.getElementById(id);
-    if (el) {
-        el.addEventListener(event, handler);
-    } else {
-        console.warn(`[budget-events] Element #${id} not found — skipping event binding.`);
-    }
-}
+
 
 export function setupBudgetEvents() {
     // --- Workflow 4 Reconcile: Refresh Budget UI when any tab changes state ---
-    document.addEventListener('dashboardStateChanged', () => {
+    const reRenderBudgetUI = () => {
         try { renderDashboard(); } catch(e) { console.error('renderDashboard error:', e); }
         try { renderBudgetTableModal(); } catch(e) { /* Modal may not be open, ignore */ }
-    });
+    };
+    document.addEventListener('budgetsChanged', reRenderBudgetUI);
+    document.addEventListener('tendersChanged', reRenderBudgetUI);
+    document.addEventListener('contractsChanged', reRenderBudgetUI);
 
     // --- Workflow 1: Create Tender from Budget line ---
     window.createTenderFromBudget = async (budget) => {
@@ -28,6 +24,7 @@ export function setupBudgetEvents() {
             tender_name: budget.packageName,
             type: budget.category,
             approved_budget: budget.budgeted,
+            budget_id: budget.id,          // ← LINK: trực tiếp gắn với Budget item
             status: 'Floating',
             deadline: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
             winner: ''
@@ -109,13 +106,7 @@ export function setupBudgetEvents() {
             mockActivities.unshift({ text: `Đã thêm hạng mục ngân sách mới: ${packageName}`, date: new Date().toISOString() });
         }
 
-        await saveBudget({
-            Budgets: state.appData.Budgets,
-            Contracts: state.appData.Contracts,
-            Payment_Claims: state.appData.Payment_Claims,
-            Variations: state.appData.Variations,
-            Documents: state.appData.Documents
-        });
+        persistBudgets(state.appData.Budgets);
         
         renderDashboard();
         renderBudgetTableModal();
@@ -148,13 +139,7 @@ export function setupBudgetEvents() {
                 if (confirm('Bạn có chắc chắn muốn xóa hạng mục ngân sách này không?')) {
                     state.appData.Budgets = state.appData.Budgets.filter(b => b.id !== id);
                     mockActivities.unshift({ text: `Đã xóa hạng mục ngân sách`, date: new Date().toISOString() });
-                    await saveBudget({
-                        Budgets: state.appData.Budgets,
-                        Contracts: state.appData.Contracts,
-                        Payment_Claims: state.appData.Payment_Claims,
-                        Variations: state.appData.Variations,
-                        Documents: state.appData.Documents
-                    });
+                    persistBudgets(state.appData.Budgets);
                     renderDashboard();
                     renderBudgetTableModal();
                 }
@@ -212,13 +197,7 @@ export function setupBudgetEvents() {
                 }
 
                 if (addedCount > 0) {
-                    await saveBudget({
-                        Budgets: state.appData.Budgets,
-                        Contracts: state.appData.Contracts,
-                        Payment_Claims: state.appData.Payment_Claims,
-                        Variations: state.appData.Variations,
-                        Documents: state.appData.Documents
-                    });
+                    persistBudgets(state.appData.Budgets);
                     mockActivities.unshift({ text: `Import thành công ${addedCount} hạng mục ngân sách`, date: new Date().toISOString() });
                     renderDashboard();
                     renderBudgetTableModal();

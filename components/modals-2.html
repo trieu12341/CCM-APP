@@ -173,18 +173,18 @@
 
                 <!-- B. Sub-KPIs & Progress Bar -->
                 <div class="cf-sub-kpis">
-                    <div class="cf-kpi-grid">
-                        <div class="cf-sub-kpi-card">
-                            <div class="cf-sub-kpi-label">Planned</div>
-                            <div class="cf-sub-kpi-value" id="cf-kpi-card-planned">0 VNĐ</div>
+                    <div class="kpi-container" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 0.5rem;">
+                        <div class="kpi-card kpi-card-slate">
+                            <div class="kpi-header"><span class="kpi-title">Planned</span></div>
+                            <div class="kpi-value" id="cf-kpi-card-planned">0 VNĐ</div>
                         </div>
-                        <div class="cf-sub-kpi-card">
-                            <div class="cf-sub-kpi-label">Certified</div>
-                            <div class="cf-sub-kpi-value" id="cf-kpi-card-certified">0 VNĐ</div>
+                        <div class="kpi-card kpi-card-emerald">
+                            <div class="kpi-header"><span class="kpi-title">Certified</span></div>
+                            <div class="kpi-value" id="cf-kpi-card-certified">0 VNĐ</div>
                         </div>
-                        <div class="cf-sub-kpi-card">
-                            <div class="cf-sub-kpi-label">Paid</div>
-                            <div class="cf-sub-kpi-value" id="cf-kpi-card-paid">0 VNĐ</div>
+                        <div class="kpi-card kpi-card-blue">
+                            <div class="kpi-header"><span class="kpi-title">Paid</span></div>
+                            <div class="kpi-value" id="cf-kpi-card-paid">0 VNĐ</div>
                         </div>
                     </div>
                     <div class="cf-stacked-progress" title="Tiến độ giải ngân">
@@ -327,6 +327,7 @@
             <button class="btn btn-secondary" id="btn-back-tender-modal"><i class="fa-solid fa-arrow-left"></i> Quay lại Danh sách</button>
             <div style="display: flex; gap: 1rem;" class="manager-hide">
                 <button class="btn btn-primary" id="btn-award-tender" style="background-color: var(--primary-green); border-color: var(--primary-green);">🏆 Chốt Chọn Nhà Thầu</button>
+                <button class="btn btn-primary hidden" id="btn-convert-to-contract" style="background-color: #2563eb; border-color: #2563eb;">📝 Chuyển Sang Hợp Đồng</button>
                 <button class="btn btn-primary" id="btn-save-cba"><i class="fa-solid fa-floppy-disk"></i> Lưu Cập Nhật</button>
             </div>
             <button id="close-tender-detail-modal" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:#94a3b8; line-height:1;" title="Đóng">✕</button>

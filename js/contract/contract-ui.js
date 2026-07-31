@@ -1,4 +1,4 @@
-import { state, formatCurrency } from '../app.js';
+import { state, formatCurrency, formatCurrencyVND } from '../app.js';
 import { getLocalContracts } from './contract-state.js';
 
 export function toggleDynamicFields(type) {
@@ -16,11 +16,7 @@ export function toggleDynamicFields(type) {
     }
 }
 
-function isConsultancyContract(contract) {
-    if (contract.type) return contract.type === 'Consultancy';
-    const name = (contract.contract_name || '').toLowerCase();
-    return name.includes('tư vấn') || name.includes('tv');
-}
+
 
 let chartInstances = [];
 
@@ -69,14 +65,14 @@ export function renderContracts() {
         const varianceEl = document.getElementById('contract-kpi-variance');
         const elAwardedRate = document.getElementById('contract-kpi-awarded-rate');
 
-        if (elBudget) elBudget.textContent = formatCurrency(totalBudget);
-        if (elCommitted) elCommitted.textContent = formatCurrency(totalCommitted);
+        if (elBudget) elBudget.innerHTML = `${formatCurrencyVND(totalBudget)} <span>VNĐ</span>`;
+        if (elCommitted) elCommitted.innerHTML = `${formatCurrencyVND(totalCommitted)} <span>VNĐ</span>`;
         
         if (varianceEl) {
-            varianceEl.textContent = formatCurrency(Math.abs(variance));
+            varianceEl.innerHTML = `${formatCurrencyVND(Math.abs(variance))} <span>VNĐ</span>`;
             if (variance < 0) {
                 varianceEl.style.color = '#ef4444'; // Red for negative savings
-                varianceEl.textContent = '-' + varianceEl.textContent;
+                varianceEl.innerHTML = `-${formatCurrencyVND(Math.abs(variance))} <span>VNĐ</span>`;
             } else {
                 varianceEl.style.color = '#3b82f6'; // Blue for positive savings
             }

@@ -1,4 +1,4 @@
-import { state, formatCurrency, formatDate, mockActivities } from '../app.js';
+import { state, formatCurrency, formatCurrencyVND, formatDate, mockActivities } from '../app.js';
 import { renderTenders } from '../tender.js';
 import { renderContracts } from '../contract.js';
 import { renderCashflow } from '../cashflow.js';
@@ -14,6 +14,7 @@ export function renderProjectTabs() {
         btn.textContent = `[${project.project_name}]`;
         btn.onclick = () => {
             state.currentProjectId = project.project_id;
+            localStorage.setItem('ccm_current_project_id', state.currentProjectId);
             renderProjectTabs();
             renderDashboard();
             renderContracts();
@@ -100,6 +101,11 @@ export function renderDashboard() {
             expended += contractExpended;
         });
 
+        // Fallback: nếu chưa có Contract linked, dùng cached_committed từ Award
+        if (linkedContracts.length === 0 && budget.cached_committed) {
+            committed = Number(budget.cached_committed) || 0;
+        }
+
         allocatedBudget += committed;
 
         if (budget.category === 'Consultancy') {
@@ -117,7 +123,7 @@ export function renderDashboard() {
         }
     });
 
-    document.getElementById('metric-allocated').textContent = formatCurrency(allocatedBudget);
+    document.getElementById('metric-allocated').innerHTML = `${formatCurrencyVND(allocatedBudget)} <span>VNĐ</span>`;
     
     // Fallback contingency if not modeled in budgets
     if (contingencyBudget === 0) {
@@ -128,21 +134,23 @@ export function renderDashboard() {
     const totalBudget = consultancyBudget + constructionBudget + contingencyBudget;
     const totalBudgetFallback = totalBudget > 0 ? totalBudget : (project.total_budget || 0) + contingencyBudget;
 
-    document.getElementById('metric-total-budget').textContent = formatCurrency(totalBudgetFallback);
+    document.getElementById('metric-total-budget').innerHTML = `${formatCurrencyVND(totalBudgetFallback)} <span>VNĐ</span>`;
     
     const heroBudget = document.getElementById('hero-total-budget');
     if (heroBudget) heroBudget.textContent = formatCurrency(totalBudgetFallback);
 
     const contingencyPct = totalBudgetFallback > 0 ? ((contingencyRemaining / totalBudgetFallback) * 100).toFixed(1) : 0;
     
-    document.getElementById('metric-contingency').textContent = `${formatCurrency(contingencyRemaining)} (${contingencyPct}%)`;
+    document.getElementById('metric-contingency').innerHTML = `${formatCurrencyVND(contingencyRemaining)} <span>VNĐ</span>`;
+    const contingencyPctEl = document.getElementById('metric-contingency-pct');
+    if (contingencyPctEl) contingencyPctEl.textContent = `${contingencyPct}%`;
     
     const totalPayments = consultancyExpended + constructionExpended;
     const metricPayments = document.getElementById('metric-payments');
     if (metricPayments) metricPayments.textContent = formatCurrency(totalPayments);
     
     const projectedFinalCost = allocatedBudget + contingencyRemaining;
-    document.getElementById('metric-projected').textContent = formatCurrency(projectedFinalCost);
+    document.getElementById('metric-projected').innerHTML = `${formatCurrencyVND(projectedFinalCost)} <span>VNĐ</span>`;
 
     // Render Charts
     chartInstances.forEach(c => c.destroy());
@@ -259,6 +267,11 @@ export function renderBudgetTableModal() {
             committed += contractCommitted;
             expended += contractExpended;
         });
+
+        // Fallback: nếu chưa có Contract linked, dùng cached_committed từ Award
+        if (linkedContracts.length === 0 && budget.cached_committed) {
+            committed = Number(budget.cached_committed) || 0;
+        }
 
         const varianceVal = budgeted - committed - expended;
         const progress = committed > 0 ? (expended / committed) * 100 : 0;

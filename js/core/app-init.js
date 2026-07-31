@@ -1,22 +1,11 @@
 import { state } from '../app.js';
 import { fetchProjects, fetchBudget, fetchTenders, fetchContracts, fetchCashflow, fetchPayments, apiLogin, apiGetMe } from '../api.js';
+import { loadBudgetsFromLS, loadTendersFromLS, loadContractsFromLS, loadCashflowFromLS } from '../core/data-store.js';
 import { setupBudgetEvents, renderProjectTabs, renderDashboard } from '../budget.js';
 import { setupTenderEvents } from '../tender.js';
 import { setupContractEvents } from '../contract.js';
 import { setupCashflowEvents, renderCashflow } from '../cashflow.js';
 import { setupProjectSummaryEvents } from '../project.js';
-
-// ─────────────────────────────────────────────────────────────
-// Safe Event Binder — skips silently if element not in DOM
-// ─────────────────────────────────────────────────────────────
-function bindEvent(id, event, handler) {
-    const el = document.getElementById(id);
-    if (el) {
-        el.addEventListener(event, handler);
-    } else {
-        console.warn(`[app-init] Element #${id} not found — skipping.`);
-    }
-}
 
 // ─────────────────────────────────────────────────────────────
 // MAIN ENTRY POINT — called after all HTML components are loaded
@@ -166,7 +155,7 @@ async function loadAppData() {
         let fetchedProjects = projectsData.Projects || [];
         if (fetchedProjects.length === 0) {
             try {
-                const lsProj = localStorage.getItem('vcre_projects');
+                const lsProj = localStorage.getItem('ccm_projects');
                 if (lsProj) fetchedProjects = JSON.parse(lsProj);
             } catch (e) {}
         }
@@ -180,20 +169,59 @@ async function loadAppData() {
                 total_budget: 0,
                 contingency_budget: 0
             }];
+            localStorage.setItem('ccm_projects', JSON.stringify(fetchedProjects));
         }
 
         state.appData.Projects       = fetchedProjects;
-        state.appData.Contracts      = (Array.isArray(contractsData) && contractsData.length > 0)
-                                         ? contractsData : (budgetData.Contracts || []);
-        state.appData.Cashflow       = Array.isArray(cashflowData)  ? cashflowData  : [];
+        
+        // Contracts fallback
+        let fetchedContracts = (Array.isArray(contractsData) && contractsData.length > 0) ? contractsData : (budgetData.Contracts || []);
+        if (fetchedContracts.length === 0) {
+            const lsContracts = loadContractsFromLS();
+            if (lsContracts) fetchedContracts = lsContracts;
+        }
+        state.appData.Contracts = fetchedContracts;
+        
+        // ── CASHFLOW RECOVERY LOGIC (STRICT) ──────────────
+        let fetchedCashflow = Array.isArray(cashflowData) && cashflowData.length > 0 ? cashflowData : [];
+        const localData = localStorage.getItem('ccm_cashflow');
+        if (localData && localData !== '[]' && localData !== 'undefined') {
+            try {
+                // ALWAYS PRIORITIZE LOCALSTORAGE FOR CASHFLOW TO PREVENT DATA LOSS
+                fetchedCashflow = JSON.parse(localData);
+                console.log('✅ Khôi phục thành công dữ liệu Cashflow từ LocalStorage');
+            } catch(e) { console.error('Lỗi khi khôi phục Cashflow:', e); }
+        }
+        state.appData.Cashflow = fetchedCashflow;
+
         state.appData.Payments       = Array.isArray(paymentsData)  ? paymentsData  : [];
+        
+        // Load Budgets with fallback to localStorage
+        let fetchedBudgets = budgetData.Budgets || [];
+        if (fetchedBudgets.length === 0) {
+            const lsBudgets = loadBudgetsFromLS();
+            if (lsBudgets) fetchedBudgets = lsBudgets;
+        }
+        state.appData.Budgets = fetchedBudgets;
+
         state.appData.Payment_Claims = budgetData.Payment_Claims  || [];
         state.appData.Variations     = budgetData.Variations      || [];
         state.appData.Documents      = budgetData.Documents       || [];
-        state.appData.Tenders        = tendersData.Tenders        || [];
+        
+        // Tenders fallback
+        let fetchedTenders = tendersData.Tenders || [];
+        if (fetchedTenders.length === 0) {
+            const lsTenders = loadTendersFromLS();
+            if (lsTenders) fetchedTenders = lsTenders;
+        }
+        state.appData.Tenders = fetchedTenders;
 
-        if (state.appData.Projects.length > 0) {
+        const savedActiveId = localStorage.getItem('ccm_current_project_id');
+        if (savedActiveId && state.appData.Projects.some(p => p.project_id === savedActiveId)) {
+            state.currentProjectId = savedActiveId;
+        } else if (state.appData.Projects.length > 0) {
             state.currentProjectId = state.appData.Projects[0].project_id;
+            localStorage.setItem('ccm_current_project_id', state.currentProjectId);
         }
 
         // ── 2. Wire all event listeners FIRST ────────────

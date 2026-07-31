@@ -23,5 +23,12 @@ export const formatCurrencyDetailed = (value) => {
 
 export const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit' };
-    return new Date(dateString).toLocaleDateString('en-US', options);
+    const dateObj = new Date(dateString);
+    return isNaN(dateObj) ? dateString : dateObj.toLocaleDateString('vi-VN');
+};
+
+export const parseBudget = (val) => {
+    if (!val) return 0;
+    if (typeof val === 'number') return val;
+    return Number(String(val).replace(/,/g, '')) || 0;
 };

@@ -1,6 +1,6 @@
-import { state, formatCurrencyDetailed, formatCurrency } from '../app.js';
+import { state, formatCurrencyDetailed, formatCurrency, formatCurrencyVND } from '../app.js';
 import { getLocalCashflow } from './cashflow-state.js';
-import { calculateForecastEngine, syncCashflowWithPayment } from './cashflow-calc.js';
+import { calculateForecastEngine, syncCashflowWithPayment, calculatePackageTotalPlanned } from './cashflow-calc.js';
 import { createCashflowRowNode } from './cashflow-ui-row.js';
 
 let currentSelectedPackageId = null;
@@ -14,14 +14,17 @@ export function updateCashflowSubtotal() {
     let total = 0;
 
     rows.forEach(tr => {
-        const valInput = tr.querySelector('.cf-value');
-        if (valInput) {
-            const val = parseFloat(valInput.value.replace(/,/g, ''));
+        // Only sum the actual Net Payable text elements.
+        // During edit, the input value is Gross Work Done, which shouldn't be added to Net Payable.
+        const textEl = tr.querySelector('.cf-text-value');
+        if (textEl) {
+            const val = parseFloat(textEl.textContent.replace(/,/g, ''));
             if (!isNaN(val)) total += val;
         } else {
-            const textEl = tr.querySelector('.cf-text-value');
-            if (textEl) {
-                const val = parseFloat(textEl.textContent.replace(/,/g, ''));
+            // For non-construction or missing text elements, fallback to input if it's not construction
+            const valInput = tr.querySelector('.cf-value');
+            if (valInput && !tr.querySelector('.col-amount').innerHTML.includes('WD:')) {
+                const val = parseFloat(valInput.value.replace(/,/g, ''));
                 if (!isNaN(val)) total += val;
             }
         }
@@ -82,11 +85,10 @@ function renderPackageList(contracts, cashflows) {
     contracts.forEach(c => {
         const cCashflows = cashflows.filter(cf => cf.package_name === c.package_name || cf.contract === c.package_name);
         
-        let totalPlan = 0;
+        let totalPlan = calculatePackageTotalPlanned(cCashflows);
         let totalPaid = 0;
         cCashflows.forEach(cf => {
-            const val = parseFloat(cf.value) || 0;
-            totalPlan += val;
+            const val = parseFloat(cf.netPayable) || parseFloat(cf.total_cert) || parseFloat(cf.value) || 0;
             if (cf.status === 'Paid') totalPaid += val;
         });
 
@@ -137,10 +139,10 @@ function renderRightPane(contractId, contracts, allCashflows) {
 
     const contractValue = parseFloat(contract.total_value) || parseFloat(contract.budget_value) || 0;
     
-    let totalPlan = 0, totalCert = 0, totalPaid = 0;
+    let totalPlan = calculatePackageTotalPlanned(contractCashflows);
+    let totalCert = 0, totalPaid = 0;
     contractCashflows.forEach(cf => {
-        const val = parseFloat(cf.value) || 0;
-        totalPlan += val;
+        const val = parseFloat(cf.netPayable) || parseFloat(cf.total_cert) || parseFloat(cf.value) || 0;
         if (cf.status === 'Certified') totalCert += val;
         if (cf.status === 'Paid') totalPaid += val;
     });
@@ -164,17 +166,14 @@ function renderRightPane(contractId, contracts, allCashflows) {
         alertEl.style.border = '1px solid #fcd34d'; // amber-300
         alertText.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="margin-right: 8px;"></i>Tổng Cashflow ${formatCurrencyDetailed(totalPlan)} chưa khớp với Giá trị Hợp đồng ${formatCurrencyDetailed(contractValue)}. Lệch ${formatCurrencyDetailed(diff)}.`;
     } else {
-        alertEl.style.display = 'flex';
-        alertEl.style.backgroundColor = '#ecfdf5'; // emerald-50
-        alertEl.style.color = '#047857'; // emerald-700
-        alertEl.style.border = '1px solid #6ee7b7'; // emerald-300
-        alertText.innerHTML = `<i class="fa-solid fa-check-circle" style="margin-right: 8px;"></i>Tổng Cashflow đã khớp 100% với Giá trị Hợp đồng (${formatCurrencyDetailed(contractValue)}).`;
+        alertEl.style.display = 'none';
+        alertText.innerHTML = '';
     }
 
     // Sub-KPIs
-    document.getElementById('cf-kpi-card-planned').textContent = formatCurrency(totalPlan);
-    document.getElementById('cf-kpi-card-certified').textContent = formatCurrency(totalCert);
-    document.getElementById('cf-kpi-card-paid').textContent = formatCurrency(totalPaid);
+    document.getElementById('cf-kpi-card-planned').innerHTML = `${formatCurrencyVND(totalPlan)} <span>VNĐ</span>`;
+    document.getElementById('cf-kpi-card-certified').innerHTML = `${formatCurrencyVND(totalCert)} <span>VNĐ</span>`;
+    document.getElementById('cf-kpi-card-paid').innerHTML = `${formatCurrencyVND(totalPaid)} <span>VNĐ</span>`;
 
     // Progress Bar
     const totalDivisor = Math.max(contractValue, totalPlan) || 1;

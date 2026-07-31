@@ -11,21 +11,27 @@ async function authFetch(url, options = {}) {
         headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const res = await fetch(url, { ...options, headers });
-    
-    if (res.status === 401) {
-        localStorage.removeItem('jwt_token');
-        // Let app.js handle showing the modal or we can dispatch an event
-        window.dispatchEvent(new Event('auth-unauthorized'));
+    try {
+        const res = await fetch(url, { ...options, headers });
+        
+        if (res.status === 401) {
+            localStorage.removeItem('jwt_token');
+            // Let app.js handle showing the modal or we can dispatch an event
+            window.dispatchEvent(new Event('auth-unauthorized'));
+            return res;
+        }
+        
+        if (res.status === 403) {
+            alert('Lỗi phân quyền: Bạn không có quyền thực hiện thao tác này (Role manager chỉ được xem)!');
+            return res;
+        }
+        
         return res;
+    } catch (error) {
+        console.warn(`[Network Error] Failed to fetch ${url}`, error);
+        // Mock a failed response to allow fallbacks to trigger
+        return { ok: false, status: 503, statusText: 'Service Unavailable' };
     }
-    
-    if (res.status === 403) {
-        alert('Lỗi phân quyền: Bạn không có quyền thực hiện thao tác này (Role manager chỉ được xem)!');
-        return res;
-    }
-    
-    return res;
 }
 
 export async function apiLogin(username, password) {

@@ -1,4 +1,4 @@
-import { state, formatCurrency, formatCurrencyVND, formatDate } from '../app.js';
+import { state, formatCurrency, formatCurrencyVND, formatCurrencyDetailed, formatDate, parseBudget } from '../app.js';
 import { tenderState } from './tender-state.js';
 import { recalculateCBA, parseFormattedNumber } from './tender-calc.js';
 
@@ -13,8 +13,10 @@ function isConsultancyTender(tender) {
 export function renderTenders() {
     try {
         if (!state.appData.Tenders) state.appData.Tenders = [];
+        const projectId = state.currentProjectId;
+        if (!projectId) return;
 
-        const tenders = state.appData.Tenders.filter(t => t.project_id === state.currentProjectId);
+        const tenders = state.appData.Tenders.filter(t => t.project_id === projectId);
 
         let totalBudget = 0;
         
@@ -28,12 +30,6 @@ export function renderTenders() {
         let awardedVal = 0;
 
         let notOpenedVal = 0;
-
-        const parseBudget = (val) => {
-            if (!val) return 0;
-            if (typeof val === 'number') return val;
-            return Number(String(val).replace(/,/g, '')) || 0;
-        };
 
         tenders.forEach(t => {
             // Chuẩn hóa budget
@@ -57,22 +53,22 @@ export function renderTenders() {
         });
 
         const elTotalVal = document.getElementById('tender-kpi-total-val');
-        if (elTotalVal) elTotalVal.textContent = formatCurrency(totalBudget);
+        if (elTotalVal) elTotalVal.innerHTML = `${formatCurrencyVND(totalBudget)} <span>VNĐ</span>`;
 
         const elFloatingCount = document.getElementById('tender-kpi-floating-count');
         const elFloatingVal = document.getElementById('tender-kpi-floating-val');
         if (elFloatingCount) elFloatingCount.textContent = floatingCount;
-        if (elFloatingVal) elFloatingVal.textContent = `(${formatCurrency(floatingVal)})`;
+        if (elFloatingVal) elFloatingVal.innerHTML = `${formatCurrencyVND(floatingVal)} <span>VNĐ</span>`;
 
         const elEvaluatingCount = document.getElementById('tender-kpi-evaluating-count');
         const elEvaluatingVal = document.getElementById('tender-kpi-evaluating-val');
         if (elEvaluatingCount) elEvaluatingCount.textContent = evaluatingCount;
-        if (elEvaluatingVal) elEvaluatingVal.textContent = `(${formatCurrency(evaluatingVal)})`;
+        if (elEvaluatingVal) elEvaluatingVal.innerHTML = `${formatCurrencyVND(evaluatingVal)} <span>VNĐ</span>`;
 
         const elAwardedCount = document.getElementById('tender-kpi-awarded-count');
         const elAwardedVal = document.getElementById('tender-kpi-awarded-val');
         if (elAwardedCount) elAwardedCount.textContent = awardedCount;
-        if (elAwardedVal) elAwardedVal.textContent = `(${formatCurrency(awardedVal)})`;
+        if (elAwardedVal) elAwardedVal.innerHTML = `${formatCurrencyVND(awardedVal)} <span>VNĐ</span>`;
 
         // Render Charts
         chartInstances.forEach(c => {
@@ -182,11 +178,6 @@ export function renderTenderTableModal() {
 
     const createRow = (t) => {
         const tr = document.createElement('tr');
-        const parseBudget = (val) => {
-            if (!val) return 0;
-            if (typeof val === 'number') return val;
-            return Number(String(val).replace(/,/g, '')) || 0;
-        };
         const budget = parseBudget(t.budgetAmount || t.estimatedValue || t.approved_budget);
         tr.innerHTML = `
             <td>${t.tender_id || '-'}</td>
@@ -244,6 +235,16 @@ export function openTenderDetail(tenderId) {
         tenderState.currentRoundIndex = 0;
         renderTenderRoundTabs();
         renderCBATable();
+    }
+
+    // Show/hide "Chuyển Sang Hợp Đồng" button based on awarded status
+    const btnConvert = document.getElementById('btn-convert-to-contract');
+    if (btnConvert) {
+        if (tender.status === 'Awarded') {
+            btnConvert.classList.remove('hidden');
+        } else {
+            btnConvert.classList.add('hidden');
+        }
     }
 
     // Open Layer 3 as inline workspace

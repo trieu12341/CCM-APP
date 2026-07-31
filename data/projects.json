@@ -2,9 +2,17 @@
   "Projects": [
     {
       "project_id": "P001",
-      "project_name": "Olimpic Stadium",
+      "project_name": "THE WESTIQUE RESIDENCES",
       "total_budget": 240000000000,
-      "contingency_budget": 5000000000
+      "contingency_budget": 5000000000,
+      "scale": "15 tầng gồm 11 tầng căn hộ, 1 tầng tiện ích",
+      "location": "289 Kinh Dương Vương An Lạc TP Hồ Chí Minh",
+      "start_date": "2026-03-11",
+      "end_date": "2027-08-10",
+      "cfa": "12595",
+      "consultants": "",
+      "main_contractor": "WEALTHCONS",
+      "image_url": ""
     },
     {
       "project_id": "P002",

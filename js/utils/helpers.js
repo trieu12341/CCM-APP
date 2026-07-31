@@ -1,3 +1,17 @@
+window.bindEvent = function(id, event, handler) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.addEventListener(event, handler);
+    }
+};
+
+window.isConsultancyContract = function(contractOrTender) {
+    if (!contractOrTender) return false;
+    if (contractOrTender.type) return contractOrTender.type === 'Consultancy';
+    const name = (contractOrTender.contract_name || contractOrTender.package_name || contractOrTender.tender_name || '').toLowerCase();
+    return name.includes('tư vấn') || name.includes('tv');
+};
+
 window.collapseSidebar = function() {
     const sidebar = document.getElementById('sidebar');
     if (sidebar) sidebar.classList.add('sidebar-collapsed');
@@ -52,6 +66,16 @@ window.closeInlineWorkspace = function() {
     
     // 3. Expand Sidebar
     window.expandSidebar();
+
+    // 4. Khôi phục cuộn
+    document.body.classList.remove('overflow-hidden', 'modal-open');
+    document.body.style.overflow = '';
+    
+    const mainContent = document.getElementById('main-content') || document.querySelector('.main-content') || document.querySelector('.content-wrapper');
+    if (mainContent) {
+        mainContent.classList.remove('overflow-hidden');
+        mainContent.style.overflowY = 'auto';
+    }
 };
 
 document.addEventListener('componentsLoaded', () => {

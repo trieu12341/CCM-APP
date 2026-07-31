@@ -1,4 +1,4 @@
-﻿:root {
+:root {
     --sidebar-bg: #1e293b;
     --sidebar-hover: #334155;
     --sidebar-text: #94a3b8;
@@ -30,5 +30,10 @@ body {
     display: flex;
     height: 100vh;
     overflow: hidden;
+}
+
+#main-content, .content-wrapper, .main-content {
+    overflow-y: auto !important;
+    height: 100vh;
 }
 

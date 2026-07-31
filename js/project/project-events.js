@@ -55,8 +55,8 @@ export function setupProjectSummaryEvents() {
     }
 
     if (btnSave) {
-        btnSave.addEventListener('click', () => {
-            saveSummaryData();
+        btnSave.addEventListener('click', async () => {
+            await saveSummaryData();
         });
     }
 

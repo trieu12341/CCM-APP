@@ -1,11 +1,13 @@
 import { state, formatCurrency } from '../app.js';
-import { updateTender, saveTender } from '../api.js';
+import { updateTender, saveTender, saveBudget } from '../api.js';
 import { tenderState } from './tender-state.js';
 import { renderTenders, initCBA, renderTenderRoundTabs, renderCBATable, renderTenderTableModal, closeTenderDetailModal } from './tender-ui.js';
 import { parseFormattedNumber } from './tender-calc.js';
 import { handleExcelUpload } from './tender-excel.js';
 import { getLocalContracts, saveLocalContracts } from '../contract/contract-state.js';
+import { openContractModal, renderContractTableModal } from '../contract/contract-ui.js';
 import { generateCashflowForContract } from '../cashflow/cashflow-calc.js';
+import { createDraftContractFromTender } from '../contract/contract-actions.js';
 
 function addRound() {
     const tender = state.appData.Tenders.find(t => t.tender_id === tenderState.currentTenderDetailId);
@@ -57,7 +59,6 @@ export function setupTenderEvents() {
     if (btnOpenList) {
         btnOpenList.addEventListener('click', () => {
             renderTenderTableModal();
-            document.body.classList.add('modal-open');
         });
     }
     if (closeListBtn) {
@@ -118,16 +119,13 @@ export function setupTenderEvents() {
             const tender = state.appData.Tenders.find(t => t.tender_id === tenderState.currentTenderDetailId);
             if (!tender) return;
             
-            const selectWinner = document.getElementById('award-winner');
-            selectWinner.innerHTML = '';
-            
-            if (tender.cba && tender.cba.bidders) {
-                tender.cba.bidders.forEach(bidder => {
-                    const opt = document.createElement('option');
-                    opt.value = bidder;
-                    opt.textContent = bidder;
-                    selectWinner.appendChild(opt);
-                });
+            // Pre-fill with existing winner or first bidder name if available
+            const winnerInput = document.getElementById('award-winner');
+            if (winnerInput) {
+                const defaultName = tender.winner 
+                    || (tender.cba && tender.cba.bidders && tender.cba.bidders[0]) 
+                    || '';
+                winnerInput.value = defaultName;
             }
             
             document.getElementById('award-price').value = '';
@@ -157,26 +155,50 @@ export function setupTenderEvents() {
                     document.getElementById('detail-tender-winner').textContent = tender.winner;
                     document.getElementById('detail-tender-final-price').textContent = formatCurrency(tender.final_price);
                     
-                    // Workflow 2 & 3: Sync to Contract and Cashflow
+                    // ── Workflow: Sync to Contract ──────────────────────────
                     let allContracts = getLocalContracts();
-                    let contractIndex = allContracts.findIndex(c => c.contract_id === tender.tender_id);
+                    // Tìm Contract đã link với tender này (qua contract_id hoặc from_tender_id)
+                    let contractIndex = allContracts.findIndex(
+                        c => c.contract_id === tender.tender_id || c.from_tender_id === tender.tender_id
+                    );
                     if (contractIndex >= 0) {
+                        // Cập nhật contract đã có
                         let contract = allContracts[contractIndex];
                         contract.total_value = tender.final_price;
-                        contract.contractor = tender.winner;
-                        contract.status = 'Active';
+                        contract.contractor  = tender.winner;
+                        contract.status      = 'Active';
+                        contract.budget_id   = tender.budget_id || contract.budget_id; // ← giữ link
                         allContracts[contractIndex] = contract;
                         saveLocalContracts(allContracts);
-                        
-                        // Sync to Cashflow
                         generateCashflowForContract(contract);
+                    } else if (tender.budget_id) {
+                        // Chưa có Contract → tự tạo Draft có budget_id
+                        createDraftContractFromTender(tender);
                     }
+
+                    // ── Cập nhật committed trên Budget item ─────────────────
+                    if (tender.budget_id && state.appData.Budgets) {
+                        const budgetIdx = state.appData.Budgets.findIndex(b => b.id === tender.budget_id);
+                        if (budgetIdx !== -1) {
+                            state.appData.Budgets[budgetIdx].cached_committed = Number(tender.final_price || 0);
+                            // Persist vào server để survive reload
+                            saveBudget({
+                                Budgets:        state.appData.Budgets,
+                                Contracts:      state.appData.Contracts,
+                                Payment_Claims: state.appData.Payment_Claims,
+                                Variations:     state.appData.Variations,
+                                Documents:      state.appData.Documents
+                            }).catch(err => console.error('[award] saveBudget failed:', err));
+                        }
+                    }
+
+                    // Show "Chuyển Sang Hợp Đồng" button after successful award
+                    const btnConvert = document.getElementById('btn-convert-to-contract');
+                    if (btnConvert) btnConvert.classList.remove('hidden');
 
                     awardModal.classList.add('hidden');
                     alert('Đã chốt thầu thành công!');
                     renderTenders();
-                    // Optionally dispatch event to trigger Budget dashboard update if visible
-                    document.dispatchEvent(new Event('dashboardStateChanged'));
                 } else {
                     alert('Lỗi khi chốt thầu');
                 }
@@ -185,7 +207,42 @@ export function setupTenderEvents() {
             }
         });
     }
-    
+
+    // ─────────────────────────────────────────────────────────────
+    // Nút "Chuyển Sang Hợp Đồng" — Awarded Tender → Contract Draft
+    // ─────────────────────────────────────────────────────────────
+    const btnConvertToContract = document.getElementById('btn-convert-to-contract');
+    if (btnConvertToContract) {
+        btnConvertToContract.addEventListener('click', () => {
+            const tender = state.appData.Tenders.find(t => t.tender_id === tenderState.currentTenderDetailId);
+            if (!tender) return;
+
+            // 1. Kiểm tra trùng lặp dựa vào from_tender_id
+            const allContracts = getLocalContracts();
+            const existing = allContracts.find(c => c.from_tender_id === tender.tender_id);
+
+            if (existing) {
+                // Đã tồn tại → chuyển tab và mở luôn contract đó
+                const menuContract = document.getElementById('menu-contract');
+                if (menuContract) menuContract.click();
+                setTimeout(() => openContractModal(existing), 200);
+                return;
+            }
+
+            // 2. Tạo Contract Draft mới
+            const newContract = createDraftContractFromTender(tender);
+
+            // 5. Chuyển sang Tab Contract và mở detail modal
+            const menuContract = document.getElementById('menu-contract');
+            if (menuContract) menuContract.click();
+
+            setTimeout(() => {
+                renderContractTableModal();
+                setTimeout(() => openContractModal(newContract), 100);
+            }, 200);
+        });
+    }
+
     const btnImportExcel = document.getElementById('btn-import-excel');
     const excelUploadInput = document.getElementById('excel-upload-input');
     if (btnImportExcel && excelUploadInput) {
