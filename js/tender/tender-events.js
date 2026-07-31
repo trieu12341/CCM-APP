@@ -62,8 +62,7 @@ export function setupTenderEvents() {
     }
     if (closeListBtn) {
         closeListBtn.addEventListener('click', () => {
-            if (listModal) listModal.classList.add('hidden');
-            document.body.classList.remove('modal-open');
+            window.closeInlineWorkspace();
         });
     }
 

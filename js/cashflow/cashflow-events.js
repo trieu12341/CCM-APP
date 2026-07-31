@@ -41,7 +41,7 @@ export function setupCashflowEvents() {
             if (filterContract) {
                 filterContract.innerHTML = getContractOptions();
             }
-            modal.classList.remove('hidden');
+            window.openInlineWorkspace('cashflow-detail-modal');
             crossCheckValidation();
             renderCashflowTable();
         });
@@ -53,7 +53,7 @@ export function setupCashflowEvents() {
         });
     }
 
-    const closeFn = () => modal.classList.add('hidden');
+    const closeFn = () => window.closeInlineWorkspace();
     if (closeBtn) closeBtn.addEventListener('click', closeFn);
     if (cancelBtn) cancelBtn.addEventListener('click', closeFn);
 

@@ -1,4 +1,4 @@
-﻿import { state } from '../app.js';
+import { state } from '../app.js';
 import { getLocalCashflow, saveLocalCashflow } from './cashflow-state.js';
 import { renderCashflowTable } from './cashflow-ui-table.js';
 import { formatToMonthYear, crossCheckValidation } from './cashflow-ui-utils.js';
@@ -96,7 +96,7 @@ export function handleExcelImport(e) {
             });
             
             document.getElementById('cf-import-count').textContent = newItems.length;
-            document.getElementById('cashflow-detail-modal').classList.add('hidden'); 
+            window.closeInlineWorkspace(); // Hide cashflow detail
             document.getElementById('cashflow-import-modal').classList.remove('hidden'); 
             
         } else {
@@ -140,7 +140,7 @@ export function saveImportedCashflow() {
     
     pendingImportCashflow = [];
     document.getElementById('cashflow-import-modal').classList.add('hidden');
-    document.getElementById('cashflow-detail-modal').classList.remove('hidden');
+    window.openInlineWorkspace('cashflow-detail-modal');
     
     renderCashflowTable();
     crossCheckValidation();

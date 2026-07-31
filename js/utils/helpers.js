@@ -8,36 +8,67 @@ window.expandSidebar = function() {
     if (sidebar) sidebar.classList.remove('sidebar-collapsed');
 };
 
+window.openInlineWorkspace = function(workspaceId) {
+    // 1. Hide Dashboard / Layer 1
+    const m1 = document.getElementById('modules-1-container');
+    const header = document.getElementById('project-header-container');
+    const tabs = document.getElementById('project-tabs-container');
+    if (m1) m1.classList.add('hidden');
+    if (header) header.classList.add('hidden');
+    if (tabs) tabs.classList.add('hidden');
+    
+    // 2. Hide all other Layer 2/3
+    document.querySelectorAll('.modal-overlay.layer-2, .modal-overlay.layer-3').forEach(el => {
+        el.classList.add('hidden');
+    });
+
+    // 3. Show target workspace
+    const workspace = document.getElementById(workspaceId);
+    if (workspace) {
+        workspace.classList.remove('hidden');
+    }
+
+    // 4. Collapse Sidebar
+    window.collapseSidebar();
+    
+    // Scroll top
+    const mainContent = document.querySelector('.main-content');
+    if (mainContent) mainContent.scrollTop = 0;
+};
+
+window.closeInlineWorkspace = function() {
+    // 1. Hide all Layer 2/3
+    document.querySelectorAll('.modal-overlay.layer-2, .modal-overlay.layer-3').forEach(el => {
+        el.classList.add('hidden');
+    });
+    
+    // 2. Show Dashboard / Layer 1
+    const m1 = document.getElementById('modules-1-container');
+    const header = document.getElementById('project-header-container');
+    const tabs = document.getElementById('project-tabs-container');
+    if (m1) m1.classList.remove('hidden');
+    if (header) header.classList.remove('hidden');
+    if (tabs) tabs.classList.remove('hidden');
+    
+    // 3. Expand Sidebar
+    window.expandSidebar();
+};
+
 document.addEventListener('componentsLoaded', () => {
-    // Scenario 1 & 2: Observe modals
-    const observer = new MutationObserver(() => {
-        const openModals = document.querySelectorAll('.modal-overlay:not(.hidden)');
-        // Ignore small modals if needed, but for now collapse on any open modal
-        if (openModals.length > 0) {
-            window.collapseSidebar();
-        } else {
-            window.expandSidebar();
-        }
-    });
-
-    observer.observe(document.body, {
-        attributes: true,
-        attributeFilter: ['class'],
-        subtree: true
-    });
-
     // Scenario 3: Click on menu-item while collapsed
     const menuItems = document.querySelectorAll('.menu-item');
     menuItems.forEach(item => {
         item.addEventListener('click', () => {
             const sidebar = document.getElementById('sidebar');
             if (sidebar && sidebar.classList.contains('sidebar-collapsed')) {
-                // Close all modals
-                document.querySelectorAll('.modal-overlay').forEach(modal => {
+                // Close all Layer 1 popups
+                document.querySelectorAll('.modal-overlay:not(.layer-2):not(.layer-3)').forEach(modal => {
                     modal.classList.add('hidden');
                 });
                 document.body.classList.remove('modal-open');
-                window.expandSidebar();
+                
+                // Return to Dashboard Layer 1
+                window.closeInlineWorkspace();
             }
         });
     });

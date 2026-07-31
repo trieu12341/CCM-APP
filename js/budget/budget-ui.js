@@ -390,7 +390,7 @@ export function renderBudgetTableModal() {
         </tr>
     `;
 
-    document.getElementById('budget-list-modal').classList.remove('hidden');
+    window.openInlineWorkspace('budget-list-modal');
 }
 
 export function renderActivities() {

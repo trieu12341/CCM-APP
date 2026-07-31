@@ -176,7 +176,7 @@ export function renderTenderTableModal() {
 
     if (tenders.length === 0) {
         tbodyConstruction.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">Không có Gói thầu nào.</td></tr>`;
-        document.getElementById('tender-list-modal').classList.remove('hidden');
+        window.openInlineWorkspace('tender-list-modal');
         return;
     }
 
@@ -218,7 +218,7 @@ export function renderTenderTableModal() {
         constructions.forEach(t => tbodyConstruction.appendChild(createRow(t)));
     }
 
-    document.getElementById('tender-list-modal').classList.remove('hidden');
+    window.openInlineWorkspace('tender-list-modal');
 }
 
 export function openTenderDetail(tenderId) {
@@ -246,24 +246,12 @@ export function openTenderDetail(tenderId) {
         renderCBATable();
     }
 
-    // Open Layer 3 overlay modal (on top of tender-list-modal)
-    const detailModal = document.getElementById('tender-detail-modal');
-    if (detailModal) {
-        detailModal.classList.remove('hidden');
-        document.body.classList.add('modal-open');
-    }
+    // Open Layer 3 as inline workspace
+    window.openInlineWorkspace('tender-detail-modal');
 }
 
 export function closeTenderDetailModal() {
-    const detailModal = document.getElementById('tender-detail-modal');
-    if (detailModal) {
-        detailModal.classList.add('hidden');
-    }
-    // Remove modal-open only if no other modal is visible
-    const anyVisible = document.querySelector(
-        '#tender-list-modal:not(.hidden), #contract-list-modal:not(.hidden), #contract-detail-modal:not(.hidden)'
-    );
-    if (!anyVisible) document.body.classList.remove('modal-open');
+    window.openInlineWorkspace('tender-list-modal');
 }
 
 

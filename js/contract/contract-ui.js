@@ -174,7 +174,7 @@ export function renderContractTableModal() {
     
     if (contracts.length === 0) {
         tbodyConstruction.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:2rem; color:var(--text-muted);">Không có Hợp đồng nào.</td></tr>`;
-        document.getElementById('contract-list-modal').classList.remove('hidden');
+        window.openInlineWorkspace('contract-list-modal');
         return;
     }
 
@@ -263,7 +263,7 @@ export function renderContractTableModal() {
         });
     });
 
-    document.getElementById('contract-list-modal').classList.remove('hidden');
+    window.openInlineWorkspace('contract-list-modal');
 }
 
 export function openContractModal(contract = null) {
@@ -310,18 +310,9 @@ export function openContractModal(contract = null) {
         toggleDynamicFields('Construction'); 
     }
     
-    modal.classList.remove('hidden');
-    document.body.classList.add('modal-open');
+    window.openInlineWorkspace('contract-detail-modal');
 }
 
 export function closeContractDetailModal() {
-    const modal = document.getElementById('contract-detail-modal');
-    if (modal) {
-        modal.classList.add('hidden');
-    }
-    // Remove modal-open only if no other list modal is visible
-    const anyVisible = document.querySelector(
-        '#contract-list-modal:not(.hidden), #tender-list-modal:not(.hidden), #budget-list-modal:not(.hidden), #tender-detail-modal:not(.hidden)'
-    );
-    if (!anyVisible) document.body.classList.remove('modal-open');
+    window.openInlineWorkspace('contract-list-modal');
 }

@@ -18,13 +18,12 @@ export function setupContractEvents() {
     if (btnOpenList) {
         btnOpenList.addEventListener('click', () => {
             renderContractTableModal();
-            document.body.classList.add('modal-open');
+            window.openInlineWorkspace('contract-list-modal');
         });
     }
     if (closeListBtn) {
         closeListBtn.addEventListener('click', () => {
-            if (listModal) listModal.classList.add('hidden');
-            document.body.classList.remove('modal-open');
+            window.closeInlineWorkspace();
         });
     }
 

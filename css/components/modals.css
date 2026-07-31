@@ -1,10 +1,10 @@
 /* ─── Layer 1: Base overlays (login, payment, entry modals) ─── */
 .modal-overlay {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     background: rgba(0, 0, 0, 0.55);
     display: flex;
     align-items: center;
@@ -17,26 +17,38 @@
     display: none !important;
 }
 
-/* ─── Layer 2: List Modals (Tender list, Contract list, Budget list) ─── */
-.modal-overlay.layer-2 {
-    z-index: 1050;
-}
-.modal-overlay.layer-2 .modal-content {
-    z-index: 1051;
-    position: relative;
+/* ─── Layer 2: List Workspaces (Tender list, Contract list, Budget list) ─── */
+.modal-overlay.layer-2,
+.modal-overlay.layer-3 {
+    position: static;
+    width: 100%;
+    height: auto;
+    background: transparent;
+    backdrop-filter: none;
+    z-index: auto;
+    display: none;
 }
 
-/* ─── Layer 3: Detail Modals (Contract detail, Tender detail) ─── */
-.modal-overlay.layer-3 {
-    z-index: 1150;
+.modal-overlay.layer-2:not(.hidden),
+.modal-overlay.layer-3:not(.hidden) {
+    display: block !important;
 }
+
+.modal-overlay.layer-2 .modal-content,
 .modal-overlay.layer-3 .modal-content {
-    z-index: 1151;
-    position: relative;
+    width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+    max-height: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
 }
 
 /* ─── Body scroll lock when any modal is open ─── */
-body.modal-open {
+body.modal-open .main-content {
     overflow: hidden;
 }
 
