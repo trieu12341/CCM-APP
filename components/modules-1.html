@@ -132,81 +132,9 @@
                                 <div id="tender-chart-pie" style="height: 350px;"></div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Tender Detail View -->
-                    <div id="tender-detail-view" class="hidden">
-                        <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-                            <button class="btn btn-secondary" id="btn-back-tender"><i class="fa-solid fa-arrow-left"></i> Quay lại Danh sách Gói thầu</button>
-                            <div style="display: flex; gap: 1rem;" class="manager-hide">
-                                <button class="btn btn-primary" id="btn-award-tender" style="background-color: var(--primary-green); border-color: var(--primary-green);">🏆 Chốt Chọn Nhà Thầu</button>
-                                <button class="btn btn-primary" id="btn-save-cba"><i class="fa-solid fa-floppy-disk"></i> Lưu Cập Nhật</button>
-                            </div>
-                        </div>
-
-                        <!-- Detail Overview -->
-                        <div class="metrics-grid" style="background: white; padding: 1.5rem; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 2rem;">
-                            <div style="flex: 1; border-right: 1px solid #e2e8f0; padding-right: 1.5rem;">
-                                <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Gói thầu</div>
-                                <div id="detail-tender-name" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--primary-blue);">...</div>
-                                <div id="detail-tender-code" style="font-size: 0.9rem; font-weight: 500;">...</div>
-                            </div>
-                            <div style="flex: 1; border-right: 1px solid #e2e8f0; padding: 0 1.5rem;">
-                                <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Thông tin nộp thầu</div>
-                                <div style="margin-top: 0.5rem; font-size: 0.9rem;"><strong>Trạng thái:</strong> <span id="detail-tender-status">...</span></div>
-                                <div style="margin-top: 0.25rem; font-size: 0.9rem;"><strong>Hạn nộp:</strong> <span id="detail-tender-deadline">...</span></div>
-                            </div>
-                            <div style="flex: 1; padding-left: 1.5rem;">
-                                <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Kết quả / Nhà thầu</div>
-                                <div style="margin-top: 0.5rem; font-size: 0.9rem;"><strong>Trúng thầu:</strong> <span id="detail-tender-winner" style="color: var(--primary-green); font-weight: 600;">...</span></div>
-                                <div style="margin-top: 0.25rem; font-size: 0.9rem;"><strong>Giá chốt:</strong> <span id="detail-tender-final-price">...</span></div>
-                            </div>
-                        </div>
-
-                        <!-- Tabs for Rounds -->
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color);">
-                            <div class="tabs" id="tender-rounds-tabs" style="border-bottom: none; margin-bottom: 0;">
-                                <!-- JS injected -->
-                            </div>
-                            <button class="btn btn-secondary manager-hide" id="btn-add-round" style="height: 36px; padding: 0 1rem; font-size: 0.8rem;">+ Thêm Đợt Nộp Thầu</button>
-                        </div>
-
-                        <!-- CBA Empty State -->
-                        <div id="cba-empty-state" class="hidden" style="text-align: center; padding: 4rem 2rem; background: white; border: 1px dashed var(--border-color); border-radius: 8px;">
-                            <i class="fa-solid fa-file-invoice-dollar" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
-                            <h3 style="margin-bottom: 0.5rem;">Chưa có dữ liệu Bảng So Sánh Giá</h3>
-                            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Khởi tạo bảng CBA để bắt đầu phân tích giá thầu.</p>
-                            <button class="btn btn-primary manager-hide" id="btn-init-cba" style="margin: 0 auto;">+ Khởi tạo Bảng So Sánh Giá (CBA)</button>
-                        </div>
-
-                        <!-- CBA Table View -->
-                        <div id="cba-table-view" class="hidden">
-                            <div style="display: flex; gap: 1rem; margin-bottom: 1rem;" class="manager-hide">
-                                <button class="btn btn-secondary" id="btn-add-bidder">+ Thêm Nhà thầu</button>
-                                <button class="btn btn-secondary" id="btn-add-item">+ Thêm Hạng mục</button>
-                                <div style="width: 1px; background: #e2e8f0; margin: 0 0.5rem;"></div>
-                                <input type="file" id="excel-upload-input" accept=".xlsx, .xls" class="hidden" style="display: none;">
-                                <button class="btn btn-secondary" id="btn-import-excel" style="color: #10b981; border-color: #10b981;"><i class="fa-solid fa-file-excel"></i> Import từ file Excel</button>
-                            </div>
-                            <div class="table-container" style="overflow-x: auto;">
-                                <table class="data-table editable-table" id="cba-table">
-                                    <thead>
-                                        <tr id="cba-thead-tr">
-                                            <!-- JS injected -->
-                                        </tr>
-                                    </thead>
-                                    <tbody id="cba-tbody">
-                                        <!-- JS injected -->
-                                    </tbody>
-                                    <tfoot id="cba-tfoot" style="background: #f8fafc; font-weight: bold;">
-                                        <!-- JS injected -->
-                                    </tfoot>
-                                </table>
-                            </div>
-                        </div>
-
-                    </div>
+    
                 </div>
+
 
                 <!-- Skeleton Modules for other sections -->
                 <!-- Contract Module -->

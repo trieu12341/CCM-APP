@@ -1,19 +1,45 @@
-﻿.modal-overlay {
+/* ─── Layer 1: Base overlays (login, payment, entry modals) ─── */
+.modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.55);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    backdrop-filter: blur(2px);
 }
 
 .modal-overlay.hidden, .hidden {
     display: none !important;
 }
+
+/* ─── Layer 2: List Modals (Tender list, Contract list, Budget list) ─── */
+.modal-overlay.layer-2 {
+    z-index: 1050;
+}
+.modal-overlay.layer-2 .modal-content {
+    z-index: 1051;
+    position: relative;
+}
+
+/* ─── Layer 3: Detail Modals (Contract detail, Tender detail) ─── */
+.modal-overlay.layer-3 {
+    z-index: 1150;
+}
+.modal-overlay.layer-3 .modal-content {
+    z-index: 1151;
+    position: relative;
+}
+
+/* ─── Body scroll lock when any modal is open ─── */
+body.modal-open {
+    overflow: hidden;
+}
+
 
 .modal-content {
     background: white;

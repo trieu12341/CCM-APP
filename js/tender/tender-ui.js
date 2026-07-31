@@ -176,9 +176,7 @@ export function openTenderDetail(tenderId) {
     const tender = state.appData.Tenders.find(t => t.tender_id === tenderId);
     if (!tender) return;
 
-    document.getElementById('tender-list-view').classList.add('hidden');
-    document.getElementById('tender-detail-view').classList.remove('hidden');
-
+    // Populate detail fields
     document.getElementById('detail-tender-name').textContent = tender.tender_name || '-';
     document.getElementById('detail-tender-code').textContent = tender.tender_id || '-';
     document.getElementById('detail-tender-status').textContent = tender.status || '-';
@@ -197,7 +195,27 @@ export function openTenderDetail(tenderId) {
         renderTenderRoundTabs();
         renderCBATable();
     }
+
+    // Open Layer 3 overlay modal (on top of tender-list-modal)
+    const detailModal = document.getElementById('tender-detail-modal');
+    if (detailModal) {
+        detailModal.classList.remove('hidden');
+        document.body.classList.add('modal-open');
+    }
 }
+
+export function closeTenderDetailModal() {
+    const detailModal = document.getElementById('tender-detail-modal');
+    if (detailModal) {
+        detailModal.classList.add('hidden');
+    }
+    // Remove modal-open only if no other modal is visible
+    const anyVisible = document.querySelector(
+        '#tender-list-modal:not(.hidden), #contract-list-modal:not(.hidden), #contract-detail-modal:not(.hidden)'
+    );
+    if (!anyVisible) document.body.classList.remove('modal-open');
+}
+
 
 export function initCBA() {
     const tender = state.appData.Tenders.find(t => t.tender_id === tenderState.currentTenderDetailId);

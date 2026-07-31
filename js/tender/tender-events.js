@@ -1,7 +1,7 @@
 import { state, formatCurrency } from '../app.js';
 import { updateTender, saveTender } from '../api.js';
 import { tenderState } from './tender-state.js';
-import { renderTenders, initCBA, renderTenderRoundTabs, renderCBATable, renderTenderTableModal } from './tender-ui.js';
+import { renderTenders, initCBA, renderTenderRoundTabs, renderCBATable, renderTenderTableModal, closeTenderDetailModal } from './tender-ui.js';
 import { parseFormattedNumber } from './tender-calc.js';
 import { handleExcelUpload } from './tender-excel.js';
 import { getLocalContracts, saveLocalContracts } from '../contract/contract-state.js';
@@ -55,20 +55,47 @@ export function setupTenderEvents() {
     const closeListBtn = document.getElementById('close-tender-list-modal');
 
     if (btnOpenList) {
-        btnOpenList.addEventListener('click', renderTenderTableModal);
-    }
-    if (closeListBtn) {
-        closeListBtn.addEventListener('click', () => listModal.classList.add('hidden'));
-    }
-
-    const btnBackTender = document.getElementById('btn-back-tender');
-    if (btnBackTender) {
-        btnBackTender.addEventListener('click', () => {
-            document.getElementById('tender-detail-view').classList.add('hidden');
-            document.getElementById('tender-list-view').classList.remove('hidden');
-            tenderState.currentTenderDetailId = null;
+        btnOpenList.addEventListener('click', () => {
+            renderTenderTableModal();
+            document.body.classList.add('modal-open');
         });
     }
+    if (closeListBtn) {
+        closeListBtn.addEventListener('click', () => {
+            if (listModal) listModal.classList.add('hidden');
+            document.body.classList.remove('modal-open');
+        });
+    }
+
+    const btnBackTender = document.getElementById('btn-back-tender-modal');
+    if (btnBackTender) {
+        btnBackTender.addEventListener('click', () => {
+            closeTenderDetailModal();
+            // Re-open the list modal if it was closed
+            const listModal = document.getElementById('tender-list-modal');
+            if (listModal) listModal.classList.remove('hidden');
+        });
+    }
+
+    // Close Tender Detail Modal via ✕ button
+    document.getElementById('close-tender-detail-modal')?.addEventListener('click', closeTenderDetailModal);
+
+    // Close Tender Detail Modal via ESC key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const detailModal = document.getElementById('tender-detail-modal');
+            if (detailModal && !detailModal.classList.contains('hidden')) {
+                closeTenderDetailModal();
+            }
+        }
+    });
+
+    // Close Tender Detail Modal via clicking backdrop
+    document.getElementById('tender-detail-modal')?.addEventListener('click', (e) => {
+        if (e.target === document.getElementById('tender-detail-modal')) {
+            closeTenderDetailModal();
+        }
+    });
 
     const btnInitCBA = document.getElementById('btn-init-cba');
     if (btnInitCBA) btnInitCBA.addEventListener('click', initCBA);
