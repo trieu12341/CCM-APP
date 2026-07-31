@@ -8,12 +8,34 @@ export function setupProjectSummaryEvents() {
     if (projectNameEl) {
         projectNameEl.addEventListener('click', () => {
             openSummaryModal();
+            document.body.classList.add('modal-open');
         });
     }
 
     if (closeBtn) {
         closeBtn.addEventListener('click', () => {
             modal.classList.add('hidden');
+            document.body.classList.remove('modal-open');
+        });
+    }
+
+    // Close Modal via ESC key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            if (modal && !modal.classList.contains('hidden')) {
+                modal.classList.add('hidden');
+                document.body.classList.remove('modal-open');
+            }
+        }
+    });
+
+    // Close Modal via clicking backdrop
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+                document.body.classList.remove('modal-open');
+            }
         });
     }
 

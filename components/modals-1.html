@@ -254,3 +254,58 @@
                         <div style="margin-bottom: 1rem;">
                             <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Diện tích CFA (m2)</div>
                             <div id="summary-cfa-view" style="font-weight: 500;">-</div>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Nhà thầu chính</div>
+                            <div id="summary-contractor-view" style="font-weight: 500;">-</div>
+                        </div>
+                    </div>
+
+                    <!-- Edit Mode -->
+                    <div id="summary-edit-mode" class="hidden">
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label>Tên dự án</label>
+                            <input type="text" id="summary-name-input" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label>Quy mô</label>
+                            <input type="text" id="summary-scale-input">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label>Địa điểm</label>
+                            <input type="text" id="summary-location-input">
+                        </div>
+                        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                            <div class="form-group" style="flex: 1;">
+                                <label>Ngày bắt đầu</label>
+                                <input type="date" id="summary-start-date-input">
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>Ngày kết thúc</label>
+                                <input type="date" id="summary-end-date-input">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label>Diện tích CFA (m2)</label>
+                            <input type="number" id="summary-cfa-input">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label>Danh sách Tư vấn</label>
+                            <textarea id="summary-consultants-input" rows="3"
+                                style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; font-family: inherit; resize: vertical;"></textarea>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label>Nhà thầu chính</label>
+                            <input type="text" id="summary-contractor-input">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer"
+                style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                <button type="button" class="btn btn-secondary" id="btn-edit-summary">Sửa Thông Tin</button>
+                <button type="button" class="btn btn-primary hidden" id="btn-save-summary">Lưu Cập Nhật</button>
+            </div>
+        </div>
+    </div>

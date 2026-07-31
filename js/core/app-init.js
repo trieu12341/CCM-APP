@@ -59,6 +59,7 @@ export async function initApp() {
     // NO bypass code — login is always required.
     // ─────────────────────────────────────────────────────
     const checkAuth = async () => {
+        console.log("Current Auth State:", localStorage.getItem('jwt_token') ? "LOGGED IN" : "NOT LOGGED IN");
         const token = localStorage.getItem('jwt_token');
         if (!token) {
             if (loginModal) loginModal.classList.remove('hidden');
