@@ -17,29 +17,6 @@ export async function initApp() {
     });
 
     const checkAuth = async () => {
-        // --- BYPASS LOGIN FOR LOCAL DEV & LIVE PREVIEW ---
-        const isLocalDev = window.location.hostname === 'localhost' || 
-                           window.location.hostname === '127.0.0.1' || 
-                           window.location.protocol === 'file:';
-                           
-        if (isLocalDev) {
-            if (!localStorage.getItem('jwt_token')) {
-                localStorage.setItem('jwt_token', 'dev-bypass-token-2026');
-            }
-            state.user = { username: 'qs', role: 'admin', name: 'Triều QS' };
-            
-            if (loginModal) loginModal.classList.add('hidden');
-            
-            const userNameEl = document.getElementById('user-name');
-            const userRoleEl = document.getElementById('user-role');
-            if (userNameEl) userNameEl.textContent = state.user.name;
-            if (userRoleEl) userRoleEl.textContent = state.user.role;
-            
-            document.body.classList.add('is-manager');
-            return true;
-        }
-        // -------------------------------------------------
-
         if (!localStorage.getItem('jwt_token')) {
             if (loginModal) loginModal.classList.remove('hidden');
             return false;
@@ -171,15 +148,23 @@ async function loadAppData() {
             state.currentProjectId = state.appData.Projects[0].project_id;
         }
 
-        renderProjectTabs();
-        renderDashboard();
-        
+        // 2. Setup Events
         setupSidebarEvents();
         setupBudgetEvents();
         setupTenderEvents();
         setupContractEvents();
         setupCashflowEvents();
         setupProjectSummaryEvents();
+
+        // 3. Render UI
+        renderProjectTabs();
+        renderDashboard();
+        
+        // Trigger initial active tab
+        const activeTab = document.querySelector('.menu-item.active');
+        if (activeTab) {
+            activeTab.click();
+        }
         
     } catch (error) {
         console.error('Error loading data:', error);
