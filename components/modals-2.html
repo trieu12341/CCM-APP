@@ -458,9 +458,14 @@
 <!-- Layer 2: Budget List Modal -->
 <div id="budget-list-modal" class="modal-overlay layer-2 hidden" style="z-index: 1050;">
     <div class="modal-content" style="max-width: 1400px; width: 95%; max-height: 90vh; overflow-y: auto;">
-        <div class="modal-header">
+        <div class="modal-header" style="display: flex; align-items: center; justify-content: space-between;">
             <h2>Bảng Chi Tiết Phân Bổ Ngân Sách</h2>
-            <button id="close-budget-list-modal" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <input type="file" id="budget-excel-upload" accept=".xlsx, .xls" style="display: none;">
+                <button id="btnImportBudget" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-lg shadow"><i class="fa-solid fa-file-excel"></i> Import Excel</button>
+                <button id="btnAddNewBudget" class="bg-amber-700 hover:bg-amber-800 text-white font-semibold px-4 py-2 rounded-lg shadow">+ Thêm Hạng Mục Ngân Sách</button>
+                <button id="close-budget-list-modal" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
         </div>
         <div class="table-container" style="margin-top: 1rem;">
             <table class="data-table" id="budget-tracker-table">
@@ -489,5 +494,42 @@
                 </tfoot>
             </table>
         </div>
+    </div>
+</div>
+
+<!-- Budget Form Modal -->
+<div id="budgetFormModal" class="modal-overlay hidden" style="z-index: 2000;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="budgetFormTitle">Thêm Hạng Mục Ngân Sách</h2>
+            <button id="close-budget-form-modal" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <form id="budgetForm">
+            <input type="hidden" id="budget-id">
+            <div class="form-group">
+                <label for="budget-category">Phân loại Hạng mục</label>
+                <select id="budget-category" required>
+                    <option value="Consultancy">I. Tư vấn (Soft Cost)</option>
+                    <option value="Construction">II. Thi công / M&E (Hard Cost)</option>
+                    <option value="Contingency">III. Dự phòng (Contingency)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="budget-packageName">Tên Hạng mục/Gói thầu</label>
+                <input type="text" id="budget-packageName" required>
+            </div>
+            <div class="form-group">
+                <label for="budget-budgeted">Giá trị Ngân sách duyệt ($)</label>
+                <input type="text" id="budget-budgeted" onblur="window.formatInputNumber(this)" required>
+            </div>
+            <div class="form-group">
+                <label for="budget-notes">Ghi chú / Mô tả</label>
+                <textarea id="budget-notes" rows="3"></textarea>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" id="cancel-budget-form-modal">Hủy</button>
+                <button type="submit" class="btn btn-primary bg-amber-700 hover:bg-amber-800 border-none">Lưu Ngân Sách</button>
+            </div>
+        </form>
     </div>
 </div>

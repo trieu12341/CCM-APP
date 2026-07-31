@@ -21,13 +21,13 @@ export function setupBudgetEvents() {
     });
 
     // --- Workflow 1: Create Tender from Budget line ---
-    window.createTenderFromBudget = async (contract) => {
+    window.createTenderFromBudget = async (budget) => {
         const newTender = {
-            tender_id: contract.contract_id,
-            project_id: contract.project_id,
-            tender_name: contract.package_name || contract.contract_name,
-            type: contract.type,
-            approved_budget: contract.budget_value || contract.original_value,
+            tender_id: 'T' + (state.appData.Tenders.length + 1).toString().padStart(3, '0'),
+            project_id: budget.project_id,
+            tender_name: budget.packageName,
+            type: budget.category,
+            approved_budget: budget.budgeted,
             status: 'Floating',
             deadline: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
             winner: ''
@@ -59,6 +59,184 @@ export function setupBudgetEvents() {
         document.body.classList.remove('modal-open');
     });
 
+    // --- Budget CRUD Logic ---
+    bindEvent('btnAddNewBudget', 'click', () => {
+        document.getElementById('budgetFormTitle').textContent = 'Thêm Hạng Mục Ngân Sách';
+        document.getElementById('budget-id').value = '';
+        document.getElementById('budget-category').value = 'Consultancy';
+        document.getElementById('budget-packageName').value = '';
+        document.getElementById('budget-budgeted').value = '';
+        document.getElementById('budget-notes').value = '';
+        document.getElementById('budgetFormModal').classList.remove('hidden');
+    });
+
+    bindEvent('close-budget-form-modal', 'click', () => {
+        document.getElementById('budgetFormModal').classList.add('hidden');
+    });
+
+    bindEvent('cancel-budget-form-modal', 'click', () => {
+        document.getElementById('budgetFormModal').classList.add('hidden');
+    });
+
+    bindEvent('budgetForm', 'submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('budget-id').value;
+        const category = document.getElementById('budget-category').value;
+        const packageName = document.getElementById('budget-packageName').value;
+        const budgetedStr = document.getElementById('budget-budgeted').value.replace(/,/g, '');
+        const budgeted = parseFloat(budgetedStr) || 0;
+        const notes = document.getElementById('budget-notes').value;
+
+        if (!state.appData.Budgets) state.appData.Budgets = [];
+
+        if (id) {
+            // Edit existing
+            const index = state.appData.Budgets.findIndex(b => b.id === id);
+            if (index !== -1) {
+                state.appData.Budgets[index] = { ...state.appData.Budgets[index], category, packageName, budgeted, notes };
+                mockActivities.unshift({ text: `Đã cập nhật ngân sách: ${packageName}`, date: new Date().toISOString() });
+            }
+        } else {
+            // Create new
+            const newId = 'B' + (state.appData.Budgets.length + 1).toString().padStart(3, '0') + '-' + Date.now();
+            const newItem = {
+                id: newId,
+                project_id: state.currentProjectId,
+                category,
+                packageName,
+                budgeted,
+                notes
+            };
+            state.appData.Budgets.push(newItem);
+            mockActivities.unshift({ text: `Đã thêm hạng mục ngân sách mới: ${packageName}`, date: new Date().toISOString() });
+        }
+
+        await saveBudget({
+            Budgets: state.appData.Budgets,
+            Contracts: state.appData.Contracts,
+            Payment_Claims: state.appData.Payment_Claims,
+            Variations: state.appData.Variations,
+            Documents: state.appData.Documents
+        });
+        
+        renderDashboard();
+        renderBudgetTableModal();
+        document.getElementById('budgetFormModal').classList.add('hidden');
+    });
+
+    // Event Delegation for Edit/Delete Budget
+    const budgetTrackerTable = document.getElementById('budget-tracker-table');
+    if (budgetTrackerTable) {
+        budgetTrackerTable.addEventListener('click', async (e) => {
+            const btnEdit = e.target.closest('.btn-edit-budget');
+            const btnDelete = e.target.closest('.btn-delete-budget');
+
+            if (btnEdit) {
+                const id = btnEdit.getAttribute('data-id');
+                const budgetItem = (state.appData.Budgets || []).find(b => b.id === id);
+                if (budgetItem) {
+                    document.getElementById('budgetFormTitle').textContent = 'Sửa Hạng Mục Ngân Sách';
+                    document.getElementById('budget-id').value = budgetItem.id;
+                    document.getElementById('budget-category').value = budgetItem.category || 'Consultancy';
+                    document.getElementById('budget-packageName').value = budgetItem.packageName || '';
+                    document.getElementById('budget-budgeted').value = (budgetItem.budgeted || 0).toLocaleString('en-US');
+                    document.getElementById('budget-notes').value = budgetItem.notes || '';
+                    document.getElementById('budgetFormModal').classList.remove('hidden');
+                }
+            }
+
+            if (btnDelete) {
+                const id = btnDelete.getAttribute('data-id');
+                if (confirm('Bạn có chắc chắn muốn xóa hạng mục ngân sách này không?')) {
+                    state.appData.Budgets = state.appData.Budgets.filter(b => b.id !== id);
+                    mockActivities.unshift({ text: `Đã xóa hạng mục ngân sách`, date: new Date().toISOString() });
+                    await saveBudget({
+                        Budgets: state.appData.Budgets,
+                        Contracts: state.appData.Contracts,
+                        Payment_Claims: state.appData.Payment_Claims,
+                        Variations: state.appData.Variations,
+                        Documents: state.appData.Documents
+                    });
+                    renderDashboard();
+                    renderBudgetTableModal();
+                }
+            }
+        });
+    }
+
+    // --- Excel Import Logic ---
+    bindEvent('btnImportBudget', 'click', () => {
+        const fileInput = document.getElementById('budget-excel-upload');
+        if (fileInput) fileInput.click();
+    });
+
+    bindEvent('budget-excel-upload', 'change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async function(event) {
+            try {
+                const data = new Uint8Array(event.target.result);
+                const workbook = window.XLSX.read(data, {type: 'array'});
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const rows = window.XLSX.utils.sheet_to_json(worksheet, {header: 1});
+                
+                let addedCount = 0;
+                
+                // Giả định form chuẩn: Category | Package Name | Budgeted
+                // Nếu header ở dòng 0, loop từ dòng 1
+                for (let i = 1; i < rows.length; i++) {
+                    const row = rows[i];
+                    if (!row || row.length < 2) continue;
+                    
+                    const catRaw = (row[0] || '').toString().toLowerCase();
+                    let category = 'Construction';
+                    if (catRaw.includes('tư vấn') || catRaw.includes('soft')) category = 'Consultancy';
+                    else if (catRaw.includes('dự phòng') || catRaw.includes('contingency')) category = 'Contingency';
+                    
+                    const packageName = row[1] || 'Unknown';
+                    const budgeted = parseFloat(row[2]) || 0;
+                    
+                    if (packageName.trim() !== '') {
+                        const newId = 'B' + Date.now() + Math.floor(Math.random()*1000);
+                        state.appData.Budgets.push({
+                            id: newId,
+                            project_id: state.currentProjectId,
+                            category,
+                            packageName,
+                            budgeted,
+                            notes: ''
+                        });
+                        addedCount++;
+                    }
+                }
+
+                if (addedCount > 0) {
+                    await saveBudget({
+                        Budgets: state.appData.Budgets,
+                        Contracts: state.appData.Contracts,
+                        Payment_Claims: state.appData.Payment_Claims,
+                        Variations: state.appData.Variations,
+                        Documents: state.appData.Documents
+                    });
+                    mockActivities.unshift({ text: `Import thành công ${addedCount} hạng mục ngân sách`, date: new Date().toISOString() });
+                    renderDashboard();
+                    renderBudgetTableModal();
+                    alert(`Import thành công ${addedCount} hạng mục ngân sách!`);
+                } else {
+                    alert('Không tìm thấy dữ liệu ngân sách hợp lệ trong file Excel.');
+                }
+            } catch (err) {
+                console.error('Error importing Excel:', err);
+                alert('Có lỗi xảy ra khi đọc file Excel.');
+            }
+            e.target.value = ''; // Reset
+        };
+        reader.readAsArrayBuffer(file);
+    });
+
     // --- Payment Modal ---
     const paymentModal = document.getElementById('payment-modal');
     if (paymentModal) {
@@ -85,6 +263,7 @@ export function setupBudgetEvents() {
             const contractId = document.getElementById('contract-select')?.value;
             const amount = parseFloat(document.getElementById('payment-amount')?.value);
             if (!amount || amount <= 0) return;
+            if (!state.appData.Payment_Claims) state.appData.Payment_Claims = [];
             state.appData.Payment_Claims.push({
                 claim_id: 'PC' + (state.appData.Payment_Claims.length + 1).toString().padStart(3, '0'),
                 contract_id: contractId,
@@ -96,13 +275,14 @@ export function setupBudgetEvents() {
             });
             const contractName = state.appData.Contracts.find(c => c.contract_id === contractId)?.contract_name;
             mockActivities.unshift({ text: `Payment Claim Approved: ${amount.toLocaleString()} VNĐ for ${contractName}`, date: new Date().toISOString() });
-            await saveBudget({ Contracts: state.appData.Contracts, Payment_Claims: state.appData.Payment_Claims, Variations: state.appData.Variations, Documents: state.appData.Documents });
+            await saveBudget({ Budgets: state.appData.Budgets, Contracts: state.appData.Contracts, Payment_Claims: state.appData.Payment_Claims, Variations: state.appData.Variations, Documents: state.appData.Documents });
             renderDashboard();
+            renderBudgetTableModal();
             paymentModal.classList.add('hidden');
         });
     }
 
-    // --- New Budget Entry Modal ---
+    // --- New Entry Modal (Legacy, replaced by New Budget Entry Modal, but kept for compatibility) ---
     const newEntryModal = document.getElementById('new-entry-modal');
     if (newEntryModal) {
         bindEvent('btn-new-entry', 'click', () => {
@@ -132,10 +312,12 @@ export function setupBudgetEvents() {
                 advance_rate: 0,
                 retention_rate: 0
             };
+            if (!state.appData.Contracts) state.appData.Contracts = [];
             state.appData.Contracts.push(newContract);
-            mockActivities.unshift({ text: `New Budget Entry added: ${categoryName} for ${amount.toLocaleString()} VNĐ`, date: new Date().toISOString() });
-            await saveBudget({ Contracts: state.appData.Contracts, Payment_Claims: state.appData.Payment_Claims, Variations: state.appData.Variations, Documents: state.appData.Documents });
+            mockActivities.unshift({ text: `New Contract Entry added: ${categoryName}`, date: new Date().toISOString() });
+            await saveBudget({ Budgets: state.appData.Budgets, Contracts: state.appData.Contracts, Payment_Claims: state.appData.Payment_Claims, Variations: state.appData.Variations, Documents: state.appData.Documents });
             renderDashboard();
+            renderBudgetTableModal();
             newEntryModal.classList.add('hidden');
         });
     }
@@ -159,8 +341,9 @@ export function setupBudgetEvents() {
             if (success) {
                 state.appData.Projects.push(newProject);
                 state.currentProjectId = newId;
-                renderProjectTabs();
+                if (typeof renderProjectTabs === 'function') renderProjectTabs();
                 renderDashboard();
+                renderBudgetTableModal();
                 newProjectModal.classList.add('hidden');
             } else {
                 console.error('Lỗi khi thêm dự án');

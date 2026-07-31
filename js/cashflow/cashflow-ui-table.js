@@ -155,12 +155,20 @@ function renderRightPane(contractId, contracts, allCashflows) {
     // Smart Alert
     const alertEl = document.getElementById('cf-smart-alert');
     const alertText = document.getElementById('cf-smart-alert-text');
-    if (totalPlan !== contractValue) {
-        const diff = Math.abs(contractValue - totalPlan);
+    const diff = Math.abs(Math.round(contractValue) - Math.round(totalPlan));
+    
+    if (diff > 1) {
         alertEl.style.display = 'flex';
-        alertText.textContent = `Tổng Cashflow ${formatCurrencyDetailed(totalPlan)} chưa khớp với Giá trị Hợp đồng ${formatCurrencyDetailed(contractValue)}. Lệch ${formatCurrencyDetailed(diff)}.`;
+        alertEl.style.backgroundColor = '#fffbeb'; // amber-50
+        alertEl.style.color = '#b45309'; // amber-700
+        alertEl.style.border = '1px solid #fcd34d'; // amber-300
+        alertText.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="margin-right: 8px;"></i>Tổng Cashflow ${formatCurrencyDetailed(totalPlan)} chưa khớp với Giá trị Hợp đồng ${formatCurrencyDetailed(contractValue)}. Lệch ${formatCurrencyDetailed(diff)}.`;
     } else {
-        alertEl.style.display = 'none';
+        alertEl.style.display = 'flex';
+        alertEl.style.backgroundColor = '#ecfdf5'; // emerald-50
+        alertEl.style.color = '#047857'; // emerald-700
+        alertEl.style.border = '1px solid #6ee7b7'; // emerald-300
+        alertText.innerHTML = `<i class="fa-solid fa-check-circle" style="margin-right: 8px;"></i>Tổng Cashflow đã khớp 100% với Giá trị Hợp đồng (${formatCurrencyDetailed(contractValue)}).`;
     }
 
     // Sub-KPIs

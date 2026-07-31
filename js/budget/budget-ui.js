@@ -44,21 +44,28 @@ export function renderDashboard() {
     const project = state.appData.Projects.find(p => p.project_id === state.currentProjectId);
     if (!project) return;
 
-    document.getElementById('project-name').innerHTML = `${project.project_name} <i class="fa-solid fa-circle-info" style="color: var(--primary-blue); font-size: 1.2rem;"></i>`;
+    document.getElementById('project-name').innerHTML = `${project.project_name} <i class="fa-solid fa-gear" style="color: var(--primary-blue); font-size: 1.2rem;"></i>`;
     
-    const metaElement = document.querySelector('.project-meta');
+    const metaElement = document.getElementById('project-meta-info') || document.querySelector('.project-meta');
     if (metaElement) {
         const start = project.start_date ? new Date(project.start_date).toLocaleDateString('en-GB') : '1 January 2024';
         const end = project.end_date ? new Date(project.end_date).toLocaleDateString('en-GB') : '1 December 2024';
         const loc = project.location || 'Belgrade, Serbia';
-        metaElement.textContent = `${start} - ${end} • ${loc}`;
+        metaElement.textContent = `${loc} • ${start} - ${end}`;
     }
     
-    const totalBudget = (project.total_budget || 0) + (project.contingency_budget || 0);
-    document.getElementById('metric-total-budget').textContent = formatCurrency(totalBudget);
+
+    const heroCfa = document.getElementById('hero-cfa');
+    if (heroCfa) heroCfa.textContent = project.cfa ? `${project.cfa} m²` : '0 m²';
+
+    const heroScale = document.getElementById('hero-scale');
+    if (heroScale) heroScale.textContent = project.scale || 'N/A';
+
+    const heroStatus = document.getElementById('hero-status');
+    if (heroStatus) heroStatus.textContent = project.status || 'Đang thực hiện';
     
     let allocatedBudget = 0;
-    const projectContracts = state.appData.Contracts.filter(c => c.project_id === state.currentProjectId);
+    const projectBudgets = (state.appData.Budgets || []).filter(b => b.project_id === state.currentProjectId);
 
     let consultancyBudget = 0;
     let consultancyCommitted = 0;
@@ -68,41 +75,71 @@ export function renderDashboard() {
     let constructionCommitted = 0;
     let constructionExpended = 0;
 
-    projectContracts.forEach(contract => {
-        const budgeted = contract.budget_value || contract.original_value || 0;
-        let committed = (contract.total_value || contract.original_value || 0);
-        
-        const variations = state.appData.Variations.filter(v => v.contract_id === contract.contract_id && v.status === 'Approved');
-        variations.forEach(v => committed += v.vo_amount);
+    let contingencyBudget = 0;
+    let contingencyCommitted = 0;
+    let contingencyExpended = 0;
 
+    projectBudgets.forEach(budget => {
+        const budgeted = Number(budget.budgeted) || 0;
+        
+        let committed = 0;
         let expended = 0;
-        state.appData.Payment_Claims.filter(p => p.contract_id === contract.contract_id && p.status === 'Approved').forEach(p => {
-            expended += p.claimed_amount;
+        
+        const linkedContracts = (state.appData.Contracts || []).filter(c => c.budget_id === budget.id);
+        linkedContracts.forEach(contract => {
+            let contractCommitted = Number(contract.total_value || contract.original_value || 0);
+            const variations = (state.appData.Variations || []).filter(v => v.contract_id === contract.contract_id && v.status === 'Approved');
+            variations.forEach(v => contractCommitted += Number(v.vo_amount || 0));
+            
+            let contractExpended = 0;
+            (state.appData.Payment_Claims || []).filter(p => p.contract_id === contract.contract_id && p.status === 'Approved').forEach(p => {
+                contractExpended += Number(p.claimed_amount || 0);
+            });
+            
+            committed += contractCommitted;
+            expended += contractExpended;
         });
 
         allocatedBudget += committed;
 
-        if (contract.type === 'Consultancy') {
+        if (budget.category === 'Consultancy') {
             consultancyBudget += budgeted;
             consultancyCommitted += committed;
             consultancyExpended += expended;
-        } else {
+        } else if (budget.category === 'Construction') {
             constructionBudget += budgeted;
             constructionCommitted += committed;
             constructionExpended += expended;
+        } else if (budget.category === 'Contingency') {
+            contingencyBudget += budgeted;
+            contingencyCommitted += committed;
+            contingencyExpended += expended;
         }
     });
 
     document.getElementById('metric-allocated').textContent = formatCurrency(allocatedBudget);
     
-    const contingencyBudget = project.contingency_budget || 0;
-    const contingencyRemaining = contingencyBudget; // Assuming not spent yet unless modeled
-    const contingencyPct = totalBudget > 0 ? ((contingencyRemaining / totalBudget) * 100).toFixed(1) : 0;
+    // Fallback contingency if not modeled in budgets
+    if (contingencyBudget === 0) {
+        contingencyBudget = project.contingency_budget || 0;
+    }
+    const contingencyRemaining = contingencyBudget - contingencyExpended; 
+    
+    const totalBudget = consultancyBudget + constructionBudget + contingencyBudget;
+    const totalBudgetFallback = totalBudget > 0 ? totalBudget : (project.total_budget || 0) + contingencyBudget;
+
+    document.getElementById('metric-total-budget').textContent = formatCurrency(totalBudgetFallback);
+    
+    const heroBudget = document.getElementById('hero-total-budget');
+    if (heroBudget) heroBudget.textContent = formatCurrency(totalBudgetFallback);
+
+    const contingencyPct = totalBudgetFallback > 0 ? ((contingencyRemaining / totalBudgetFallback) * 100).toFixed(1) : 0;
     
     document.getElementById('metric-contingency').textContent = `${formatCurrency(contingencyRemaining)} (${contingencyPct}%)`;
     
     const totalPayments = consultancyExpended + constructionExpended;
-    document.getElementById('metric-payments').textContent = formatCurrency(totalPayments);
+    const metricPayments = document.getElementById('metric-payments');
+    if (metricPayments) metricPayments.textContent = formatCurrency(totalPayments);
     
     const projectedFinalCost = allocatedBudget + contingencyRemaining;
     document.getElementById('metric-projected').textContent = formatCurrency(projectedFinalCost);
@@ -201,30 +238,41 @@ export function renderBudgetTableModal() {
     const project = state.appData.Projects.find(p => p.project_id === state.currentProjectId);
     if (!project) return;
 
-    const projectContracts = state.appData.Contracts.filter(c => c.project_id === state.currentProjectId);
+    const projectBudgets = (state.appData.Budgets || []).filter(b => b.project_id === state.currentProjectId);
 
-    const createRow = (contract) => {
-        const budgeted = contract.budget_value || contract.original_value || 0;
-        let committed = (contract.total_value || contract.original_value || 0);
-        
-        const variations = state.appData.Variations.filter(v => v.contract_id === contract.contract_id && v.status === 'Approved');
-        variations.forEach(v => committed += v.vo_amount);
-
+    const createRow = (budget) => {
+        const budgeted = Number(budget.budgeted) || 0;
+        let committed = 0;
         let expended = 0;
-        state.appData.Payment_Claims.filter(p => p.contract_id === contract.contract_id && p.status === 'Approved').forEach(p => {
-            expended += p.claimed_amount;
+        
+        const linkedContracts = (state.appData.Contracts || []).filter(c => c.budget_id === budget.id);
+        linkedContracts.forEach(contract => {
+            let contractCommitted = Number(contract.total_value || contract.original_value || 0);
+            const variations = (state.appData.Variations || []).filter(v => v.contract_id === contract.contract_id && v.status === 'Approved');
+            variations.forEach(v => contractCommitted += Number(v.vo_amount || 0));
+            
+            let contractExpended = 0;
+            (state.appData.Payment_Claims || []).filter(p => p.contract_id === contract.contract_id && p.status === 'Approved').forEach(p => {
+                contractExpended += Number(p.claimed_amount || 0);
+            });
+            
+            committed += contractCommitted;
+            expended += contractExpended;
         });
 
         const varianceVal = budgeted - committed - expended;
         const progress = committed > 0 ? (expended / committed) * 100 : 0;
-        const isTendered = state.appData.Tenders.some(t => t.tender_id === contract.contract_id);
-        const actionHtml = isTendered 
-            ? `<span style="color: var(--text-muted); font-size: 0.85rem;"><i class="fa-solid fa-check"></i> Đã Tạo ĐT</span>`
-            : `<button class="btn-create-tender" data-id="${contract.contract_id}" style="padding: 4px 8px; font-size: 0.85rem; background: var(--primary-blue); color: white; border: none; border-radius: 4px; cursor: pointer;">Tạo Đấu thầu</button>`;
+        const actionHtml = `
+            <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+                <button class="btn-create-tender bg-amber-700 hover:bg-amber-800 text-white px-2 py-1 rounded" data-id="${budget.id}" style="font-size: 0.85rem; border: none; cursor: pointer;">Tạo Thầu</button>
+                <button class="btn-edit-budget text-gray-500 hover:text-blue-600" data-id="${budget.id}" style="background: none; border: none; cursor: pointer; padding: 4px;" title="Sửa"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn-delete-budget text-gray-500 hover:text-red-600" data-id="${budget.id}" style="background: none; border: none; cursor: pointer; padding: 4px;" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+            </div>
+        `;
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>${contract.package_name || contract.contract_name || 'Unnamed Package'}</td>
+            <td>${budget.packageName || 'Unnamed Package'}</td>
             <td>${formatCurrency(budgeted)}</td>
             <td>${formatCurrency(committed)}</td>
             <td>${formatCurrency(expended)}</td>
@@ -241,7 +289,7 @@ export function renderBudgetTableModal() {
         if (btnCreateTender) {
             btnCreateTender.addEventListener('click', () => {
                 if (window.createTenderFromBudget) {
-                    window.createTenderFromBudget(contract);
+                    window.createTenderFromBudget(budget);
                 }
             });
         }
@@ -257,15 +305,16 @@ export function renderBudgetTableModal() {
     let totalCommitted = 0;
     let totalExpended = 0;
 
-    const consultancies = projectContracts.filter(c => c.type === 'Consultancy');
-    const constructions = projectContracts.filter(c => c.type !== 'Consultancy');
+    const consultancies = projectBudgets.filter(b => b.category === 'Consultancy');
+    const constructions = projectBudgets.filter(b => b.category === 'Construction');
+    const contingencies = projectBudgets.filter(b => b.category === 'Contingency');
 
     if (consultancies.length > 0) {
         const headerTR = document.createElement('tr');
-        headerTR.innerHTML = `<td colspan="6" style="background-color: #f1f5f9; font-weight: bold; padding: 0.75rem;">I. Tư vấn (Soft Cost)</td>`;
+        headerTR.innerHTML = `<td colspan="7" style="background-color: #f1f5f9; font-weight: bold; padding: 0.75rem;">I. Tư vấn (Soft Cost)</td>`;
         tbodyConsultancy.appendChild(headerTR);
-        consultancies.forEach(c => {
-            const rowData = createRow(c);
+        consultancies.forEach(b => {
+            const rowData = createRow(b);
             tbodyConsultancy.appendChild(rowData.element);
             totalBudgeted += rowData.budgeted;
             totalCommitted += rowData.committed;
@@ -275,10 +324,10 @@ export function renderBudgetTableModal() {
 
     if (constructions.length > 0) {
         const headerTR = document.createElement('tr');
-        headerTR.innerHTML = `<td colspan="6" style="background-color: #f1f5f9; font-weight: bold; padding: 0.75rem;">II. Xây dựng / M&E (Hard Cost)</td>`;
+        headerTR.innerHTML = `<td colspan="7" style="background-color: #f1f5f9; font-weight: bold; padding: 0.75rem;">II. Xây dựng / M&E (Hard Cost)</td>`;
         tbodyConstruction.appendChild(headerTR);
-        constructions.forEach(c => {
-            const rowData = createRow(c);
+        constructions.forEach(b => {
+            const rowData = createRow(b);
             tbodyConstruction.appendChild(rowData.element);
             totalBudgeted += rowData.budgeted;
             totalCommitted += rowData.committed;
@@ -286,28 +335,46 @@ export function renderBudgetTableModal() {
         });
     }
 
-    // Contingency Row
-    const contingencyBudget = project.contingency_budget || 0;
-    totalBudgeted += contingencyBudget;
+    if (contingencies.length > 0) {
+        const contHeaderTR = document.createElement('tr');
+        contHeaderTR.innerHTML = `<td colspan="7" style="background-color: #f1f5f9; font-weight: bold; padding: 0.75rem;">III. Dự phòng (Contingency)</td>`;
+        tbodyContingency.appendChild(contHeaderTR);
+        contingencies.forEach(b => {
+            const rowData = createRow(b);
+            tbodyContingency.appendChild(rowData.element);
+            totalBudgeted += rowData.budgeted;
+            totalCommitted += rowData.committed;
+            totalExpended += rowData.expended;
+        });
+    } else {
+        // Fallback static contingency row if not modeled in budgets
+        const contingencyBudget = project.contingency_budget || 0;
+        totalBudgeted += contingencyBudget;
 
-    const contHeaderTR = document.createElement('tr');
-    contHeaderTR.innerHTML = `<td colspan="6" style="background-color: #f1f5f9; font-weight: bold; padding: 0.75rem;">III. Dự phòng (Contingency)</td>`;
-    tbodyContingency.appendChild(contHeaderTR);
+        const contHeaderTR = document.createElement('tr');
+        contHeaderTR.innerHTML = `<td colspan="7" style="background-color: #f1f5f9; font-weight: bold; padding: 0.75rem;">III. Dự phòng (Contingency)</td>`;
+        tbodyContingency.appendChild(contHeaderTR);
 
-    const contTR = document.createElement('tr');
-    contTR.innerHTML = `
-        <td>Dự phòng (Contingency)</td>
-        <td>${formatCurrency(contingencyBudget)}</td>
-        <td>${formatCurrency(0)}</td>
-        <td>${formatCurrency(0)}</td>
-        <td class="text-blue">${formatCurrency(contingencyBudget)}</td>
-        <td>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: 0%"></div>
-            </div>
-        </td>
-    `;
-    tbodyContingency.appendChild(contTR);
+        const contTR = document.createElement('tr');
+        contTR.innerHTML = `
+            <td>Dự phòng (Contingency)</td>
+            <td>${formatCurrency(contingencyBudget)}</td>
+            <td>${formatCurrency(0)}</td>
+            <td>${formatCurrency(0)}</td>
+            <td class="text-blue">${formatCurrency(contingencyBudget)}</td>
+            <td>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%"></div>
+                </div>
+            </td>
+            <td style="text-align: center;">
+                <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+                    <button class="btn-create-tender bg-amber-700 hover:bg-amber-800 text-white px-2 py-1 rounded" style="font-size: 0.85rem; border: none; cursor: pointer;">Tạo Thầu</button>
+                </div>
+            </td>
+        `;
+        tbodyContingency.appendChild(contTR);
+    }
 
     // Total Footer
     const totalVariance = totalBudgeted - totalCommitted - totalExpended;
@@ -318,6 +385,7 @@ export function renderBudgetTableModal() {
             <td>${formatCurrency(totalCommitted)}</td>
             <td>${formatCurrency(totalExpended)}</td>
             <td class="${totalVariance < 0 ? 'text-red' : 'text-blue'}">${totalVariance < 0 ? '-' : ''}${formatCurrency(Math.abs(totalVariance))}</td>
+            <td></td>
             <td></td>
         </tr>
     `;

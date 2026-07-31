@@ -3,8 +3,8 @@
     {
       "project_id": "P001",
       "project_name": "Olimpic Stadium",
-      "total_budget": 50000000,
-      "contingency_budget": 5000000
+      "total_budget": 145000000000,
+      "contingency_budget": 5000000000
     },
     {
       "project_id": "P002",
@@ -22,7 +22,7 @@
       "project_id": "P001",
       "contract_name": "Main Construction Works",
       "vendor_name": "Alpha Builders Co.",
-      "original_value": 30000000,
+      "original_value": 65000000000,
       "advance_rate": 0.1,
       "retention_rate": 0.05
     },
@@ -31,7 +31,7 @@
       "project_id": "P001",
       "contract_name": "MEP Installation",
       "vendor_name": "Beta Engineering",
-      "original_value": 15000000,
+      "original_value": 30000000000,
       "advance_rate": 0.15,
       "retention_rate": 0.05
     },
@@ -40,7 +40,7 @@
       "project_id": "P001",
       "contract_name": "Piling & Struture work",
       "vendor_name": "TBD",
-      "original_value": 50000000,
+      "original_value": 50000000000,
       "advance_rate": 0,
       "retention_rate": 0
     }

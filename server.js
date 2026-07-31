@@ -116,7 +116,7 @@ app.get('/api/projects', async (req, res) => {
 });
 
 app.get('/api/budget', async (req, res) => {
-    res.json(await readJson(paths.budget, { Contracts: [], Payment_Claims: [], Variations: [], Documents: [] }));
+    res.json(await readJson(paths.budget, { Budgets: [], Contracts: [], Payment_Claims: [], Variations: [], Documents: [] }));
 });
 
 app.get('/api/tenders', async (req, res) => {

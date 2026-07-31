@@ -32,6 +32,36 @@
       "status": "Evaluating",
       "deadline": "2026-07-13",
       "winner": ""
+    },
+    {
+      "tender_id": "c-1784821897645-31",
+      "project_id": "P001",
+      "tender_name": "MEP Works",
+      "type": "Construction",
+      "approved_budget": 55424050218.04675,
+      "status": "Floating",
+      "deadline": "2026-08-14",
+      "winner": ""
+    },
+    {
+      "tender_id": "c-1784821897645-32",
+      "project_id": "P001",
+      "tender_name": "Finishing",
+      "type": "Construction",
+      "approved_budget": 61159148755.9616,
+      "status": "Floating",
+      "deadline": "2026-08-14",
+      "winner": ""
+    },
+    {
+      "tender_id": "c-1784821897645-33",
+      "project_id": "P001",
+      "tender_name": "OTHERS MINOR WORKS",
+      "type": "Construction",
+      "approved_budget": 1790607160.7708423,
+      "status": "Floating",
+      "deadline": "2026-08-14",
+      "winner": ""
     }
   ]
 }

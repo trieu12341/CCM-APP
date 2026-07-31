@@ -1,24 +1,35 @@
                 <!-- Project Header -->
-                <div class="project-header">
-                    <div class="project-title-area">
-                        <div class="status-dot"></div>
-                        <div>
-                            <h1 id="project-name" style="cursor: pointer; display: flex; align-items: center; gap: 8px;" title="Xem thông tin dự án">
-                                Olimpic Stadium 
-                                <i class="fa-solid fa-circle-info" style="color: var(--primary-blue); font-size: 1.2rem;"></i>
-                            </h1>
-                            <p class="project-meta">1 January - 1 December 2024 • Belgrade, Serbia</p>
+                <div class="project-header" style="background: white; padding: 1.25rem; border-radius: 12px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); border: 1px solid #f3f4f6; margin-bottom: 1.5rem;">
+                    <!-- Tier 1: TOP HEADER -->
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+                        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                            <div style="width: 12px; height: 12px; border-radius: 50%; background-color: #10b981; margin-top: 8px;"></div>
+                            <div>
+                                <h1 id="project-name" style="font-size: 24px; font-weight: bold; margin: 0; display: flex; align-items: center; gap: 8px; cursor: pointer;" title="Chỉnh sửa thông tin dự án">
+                                    Dự án
+                                </h1>
+                                <p class="project-meta" id="project-meta-info" style="font-size: 0.875rem; color: #6b7280; margin: 4px 0 0 0;"></p>
+                            </div>
                         </div>
                     </div>
-                    <div class="project-actions manager-hide">
-                        <button class="btn btn-primary" id="btn-new-entry">+ New Entry</button>
-                        <button class="btn btn-primary">+ Create Report</button>
-                        <button class="btn btn-secondary"><i class="fa-solid fa-right-left"></i> Currency Converter</button>
-                        <div class="team-avatars">
-                            <img src="https://i.pravatar.cc/150?img=1" alt="Team">
-                            <img src="https://i.pravatar.cc/150?img=2" alt="Team">
-                            <img src="https://i.pravatar.cc/150?img=3" alt="Team">
-                            <div class="avatar-more">+</div>
+                    
+                    <!-- Tier 2: QUICK METADATA STRIP -->
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; border-top: 1px solid #f3f4f6; padding-top: 1.25rem;">
+                        <div>
+                            <div style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">📊 Tổng Ngân Sách</div>
+                            <div id="hero-total-budget" style="font-size: 1.125rem; font-weight: 700; color: #111827;">-</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">🏗️ Diện tích CFA</div>
+                            <div id="hero-cfa" style="font-size: 1.125rem; font-weight: 700; color: #111827;">-</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">🏢 Quy mô Dự án</div>
+                            <div id="hero-scale" style="font-size: 1.125rem; font-weight: 700; color: #111827;">-</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">⏱️ Tiến độ Dự án</div>
+                            <div id="hero-status" style="font-size: 1.125rem; font-weight: 700; color: #111827;">-</div>
                         </div>
                     </div>
                 </div>
