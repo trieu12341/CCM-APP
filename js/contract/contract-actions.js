@@ -1,6 +1,6 @@
 import { state } from '../app.js';
 import { getLocalContracts, saveLocalContracts } from './contract-state.js';
-import { renderContracts } from './contract-ui.js';
+import { renderContracts, closeContractDetailModal } from './contract-ui.js';
 import { generateCashflowForContract } from '../cashflow/cashflow-calc.js';
 
 export function saveContract() {
@@ -50,7 +50,8 @@ export function saveContract() {
     saveLocalContracts(allContracts);
     generateCashflowForContract(updatedContract);
 
-    document.getElementById('contract-detail-modal').classList.add('hidden');
+    // Close modal via helper
+    closeContractDetailModal();
     renderContracts();
     document.dispatchEvent(new Event('dashboardStateChanged'));
 }
@@ -64,7 +65,8 @@ export function deleteContract() {
         allContracts = allContracts.filter(c => c.contract_id !== contractId);
         
         saveLocalContracts(allContracts);
-        document.getElementById('contract-detail-modal').classList.add('hidden');
+        // Close modal via helper to handle body scroll lock
+        closeContractDetailModal();
         renderContracts();
     }
 }

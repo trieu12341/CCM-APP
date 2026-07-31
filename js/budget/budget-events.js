@@ -49,10 +49,14 @@ export function setupBudgetEvents() {
     };
 
     // --- Budget List Modal ---
-    bindEvent('btn-open-budget-list', 'click', renderBudgetTableModal);
+    bindEvent('btn-open-budget-list', 'click', () => {
+        renderBudgetTableModal();
+        document.body.classList.add('modal-open');
+    });
     bindEvent('close-budget-list-modal', 'click', () => {
         const modal = document.getElementById('budget-list-modal');
         if (modal) modal.classList.add('hidden');
+        document.body.classList.remove('modal-open');
     });
 
     // --- Payment Modal ---

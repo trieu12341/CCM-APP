@@ -262,4 +262,17 @@ export function openContractModal(contract = null) {
     }
     
     modal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+}
+
+export function closeContractDetailModal() {
+    const modal = document.getElementById('contract-detail-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+    // Remove modal-open only if no other list modal is visible
+    const anyVisible = document.querySelector(
+        '#contract-list-modal:not(.hidden), #tender-list-modal:not(.hidden), #budget-list-modal:not(.hidden), #tender-detail-modal:not(.hidden)'
+    );
+    if (!anyVisible) document.body.classList.remove('modal-open');
 }

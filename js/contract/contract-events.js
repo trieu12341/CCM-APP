@@ -1,4 +1,4 @@
-import { renderContracts, openContractModal, toggleDynamicFields, renderContractTableModal } from './contract-ui.js';
+import { renderContracts, openContractModal, toggleDynamicFields, renderContractTableModal, closeContractDetailModal } from './contract-ui.js';
 import { saveContract, deleteContract, bulkDeleteContracts, handleContractExcelImport } from './contract-actions.js';
 
 export function setupContractEvents() {
@@ -16,10 +16,16 @@ export function setupContractEvents() {
     const closeListBtn = document.getElementById('close-contract-list-modal');
 
     if (btnOpenList) {
-        btnOpenList.addEventListener('click', renderContractTableModal);
+        btnOpenList.addEventListener('click', () => {
+            renderContractTableModal();
+            document.body.classList.add('modal-open');
+        });
     }
     if (closeListBtn) {
-        closeListBtn.addEventListener('click', () => listModal.classList.add('hidden'));
+        closeListBtn.addEventListener('click', () => {
+            if (listModal) listModal.classList.add('hidden');
+            document.body.classList.remove('modal-open');
+        });
     }
 
     if (btnNewContract) {
@@ -28,9 +34,26 @@ export function setupContractEvents() {
         });
     }
 
-    const closeFn = () => modal.classList.add('hidden');
+    const closeFn = () => closeContractDetailModal();
     if (closeBtn) closeBtn.addEventListener('click', closeFn);
     if (cancelBtn) cancelBtn.addEventListener('click', closeFn);
+
+    // Close Modal via ESC key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const detailModal = document.getElementById('contract-detail-modal');
+            if (detailModal && !detailModal.classList.contains('hidden')) {
+                closeContractDetailModal();
+            }
+        }
+    });
+
+    // Close Modal via clicking backdrop
+    document.getElementById('contract-detail-modal')?.addEventListener('click', (e) => {
+        if (e.target === document.getElementById('contract-detail-modal')) {
+            closeContractDetailModal();
+        }
+    });
 
     if (typeSelect) {
         typeSelect.addEventListener('change', (e) => {
