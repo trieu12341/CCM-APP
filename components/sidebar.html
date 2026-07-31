@@ -1,43 +1,43 @@
-<aside class="sidebar">
+<aside class="sidebar" id="sidebar">
     <div class="sidebar-header" style="flex-direction: column; align-items: flex-start; padding-top: 1.5rem; gap: 8px;">
         <div style="display: flex; gap: 4px;">
             <div style="background-color: var(--primary-blue); color: white; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.25rem;">V</div>
-            <div style="background-color: var(--primary-blue); color: white; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.25rem;">C</div>
-            <div style="background-color: var(--primary-blue); color: white; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.25rem;">R</div>
-            <div style="background-color: var(--primary-blue); color: white; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.25rem;">E</div>
+            <div class="sidebar-text" style="background-color: var(--primary-blue); color: white; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.25rem;">C</div>
+            <div class="sidebar-text" style="background-color: var(--primary-blue); color: white; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.25rem;">R</div>
+            <div class="sidebar-text" style="background-color: var(--primary-blue); color: white; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.25rem;">E</div>
         </div>
-        <div style="font-size: 0.8rem; font-weight: 700; color: var(--primary-blue); letter-spacing: 0.5px;">VIET CAPITAL REAL ESTATE</div>
-        <div style="font-size: 0.7rem; color: #94a3b8; margin-top: -2px;">COST & CONTRACT MANAGEMENT</div>
+        <div class="sidebar-text" style="font-size: 0.8rem; font-weight: 700; color: var(--primary-blue); letter-spacing: 0.5px;">VIET CAPITAL REAL ESTATE</div>
+        <div class="sidebar-text" style="font-size: 0.7rem; color: #94a3b8; margin-top: -2px;">COST & CONTRACT MANAGEMENT</div>
     </div>
     
     <div class="sidebar-menu">
-        <a href="#" class="menu-item"><i class="fa-regular fa-bell"></i> System Alerts <span class="badge">5</span></a>
+        <a href="#" class="menu-item" title="System Alerts"><i class="fa-regular fa-bell"></i> <span class="sidebar-text">System Alerts</span> <span class="badge sidebar-text">5</span></a>
         
         <div class="menu-section">
-            <h4>COST MANAGEMENT</h4>
-            <a href="#" class="menu-item" id="menu-overview"><i class="fa-solid fa-chart-line"></i> 0. Overview</a>
-            <a href="#" class="menu-item active" id="menu-budget"><i class="fa-solid fa-wallet"></i> 1. Budget</a>
-            <a href="#" class="menu-item" id="menu-tender"><i class="fa-solid fa-file-contract"></i> 2. Tender</a>
-            <a href="#" class="menu-item" id="menu-contract">📄 3. Contract</a>
-            <a href="#" class="menu-item" id="menu-cashflow">💸 4. Cashflow</a>
-            <a href="#" class="menu-item" id="menu-payment"><i class="fa-solid fa-money-bill-transfer"></i> 5. Payment</a>
-            <a href="#" class="menu-item" id="menu-vo"><i class="fa-solid fa-code-branch"></i> 6. Variation Order</a>
-            <a href="#" class="menu-item" id="menu-final"><i class="fa-solid fa-file-invoice-dollar"></i> 7. Final Statement</a>
+            <h4 class="sidebar-text">COST MANAGEMENT</h4>
+            <a href="#" class="menu-item" id="menu-overview" title="Overview"><i class="fa-solid fa-chart-line"></i> <span class="sidebar-text">0. Overview</span></a>
+            <a href="#" class="menu-item active" id="menu-budget" title="Budget"><i class="fa-solid fa-wallet"></i> <span class="sidebar-text">1. Budget</span></a>
+            <a href="#" class="menu-item" id="menu-tender" title="Tender"><i class="fa-solid fa-file-contract"></i> <span class="sidebar-text">2. Tender</span></a>
+            <a href="#" class="menu-item" id="menu-contract" title="Contract">📄 <span class="sidebar-text">3. Contract</span></a>
+            <a href="#" class="menu-item" id="menu-cashflow" title="Cashflow">💸 <span class="sidebar-text">4. Cashflow</span></a>
+            <a href="#" class="menu-item" id="menu-payment" title="Payment"><i class="fa-solid fa-money-bill-transfer"></i> <span class="sidebar-text">5. Payment</span></a>
+            <a href="#" class="menu-item" id="menu-vo" title="Variation Order"><i class="fa-solid fa-code-branch"></i> <span class="sidebar-text">6. Variation Order</span></a>
+            <a href="#" class="menu-item" id="menu-final" title="Final Statement"><i class="fa-solid fa-file-invoice-dollar"></i> <span class="sidebar-text">7. Final Statement</span></a>
         </div>
     </div>
     
     <div class="sidebar-footer">
-        <div class="savings-card">
+        <div class="savings-card sidebar-text">
             <span>PROJECTED SAVINGS</span>
             <span class="savings-value">+2%</span>
         </div>
         <div class="user-info">
             <img src="https://i.pravatar.cc/150?img=11" alt="Triều QS">
-            <div class="user-details">
+            <div class="user-details sidebar-text">
                 <strong id="user-name">Triều</strong>
                 <span id="user-role">Quantity Surveyor</span>
             </div>
-            <i class="fa-solid fa-ellipsis" id="btn-logout" style="cursor:pointer;" title="Logout"></i>
+            <i class="fa-solid fa-ellipsis sidebar-text" id="btn-logout" style="cursor:pointer;" title="Logout"></i>
         </div>
     </div>
 </aside>

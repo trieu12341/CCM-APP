@@ -1,4 +1,4 @@
-﻿.sidebar {
+.sidebar {
     width: 260px;
     background-color: var(--sidebar-bg);
     color: var(--sidebar-text);
@@ -30,6 +30,7 @@
 .sidebar-menu::-webkit-scrollbar {
     width: 6px;
 }
+
 .sidebar-menu::-webkit-scrollbar-thumb {
     background: #334155;
     border-radius: 4px;
@@ -83,11 +84,11 @@
 
 .sidebar-footer {
     padding: 1rem;
-    border-top: 1px solid rgba(255,255,255,0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .savings-card {
-    background-color: rgba(255,255,255,0.05);
+    background-color: rgba(255, 255, 255, 0.05);
     padding: 0.75rem;
     border-radius: 6px;
     display: flex;
@@ -127,6 +128,35 @@
 
 .user-details span {
     font-size: 0.75rem;
+}
+
+/* Collapsed State */
+#sidebar {
+    transition: width 0.25s ease-in-out;
+}
+
+#sidebar.sidebar-collapsed {
+    width: 4.5rem !important;
+}
+
+#sidebar.sidebar-collapsed .sidebar-text {
+    display: none !important;
+    opacity: 0;
+}
+
+#sidebar.sidebar-collapsed .menu-item {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#sidebar.sidebar-collapsed .sidebar-header {
+    padding: 1.5rem 0;
+    align-items: center !important;
+}
+
+#sidebar.sidebar-collapsed .user-info {
+    justify-content: center;
 }
 
 /* Main Content */

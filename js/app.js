@@ -1,4 +1,5 @@
 import { initApp } from './core/app-init.js';
+import './utils/helpers.js';
 export { formatCurrency, formatCurrencyVND, formatCurrencyShort, formatCurrencyDetailed, formatDate } from './utils/formatters.js';
 
 export const state = {
