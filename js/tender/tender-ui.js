@@ -29,27 +29,20 @@ export function renderTenders() {
 
         let notOpenedVal = 0;
 
-        let consultancyVal = 0;
-        let constructionVal = 0;
-
         tenders.forEach(t => {
-            const budget = Number(t.approved_budget) || 0;
+            // Chuẩn hóa budget
+            const budget = Number(t.budgetAmount || t.estimatedValue || t.approved_budget) || 0;
             totalBudget += budget;
 
-            if (isConsultancyTender(t)) {
-                consultancyVal += budget;
-            } else {
-                constructionVal += budget;
-            }
-
-            const status = t.status || '';
-            if (status === 'Floating') {
+            // Chuẩn hóa status (case-insensitive)
+            const status = (t.status || '').toLowerCase();
+            if (status === 'floating' || status === 'bidding') {
                 floatingCount++;
                 floatingVal += budget;
-            } else if (status === 'Evaluating' || status === 'Bidding') {
+            } else if (status === 'evaluating') {
                 evaluatingCount++;
                 evaluatingVal += budget;
-            } else if (status === 'Awarded') {
+            } else if (status === 'awarded') {
                 awardedCount++;
                 awardedVal += budget;
             } else {
@@ -76,51 +69,71 @@ export function renderTenders() {
         if (elAwardedVal) elAwardedVal.textContent = `(${formatCurrency(awardedVal)})`;
 
         // Render Charts
-        chartInstances.forEach(c => c.destroy());
+        chartInstances.forEach(c => {
+            if (c && typeof c.destroy === 'function') c.destroy();
+        });
         chartInstances = [];
 
-        // Chart 1: Bar Chart (Budget by Status)
-        const barOptions = {
-            series: [{
-                name: 'Ngân sách (Tỷ VNĐ)',
-                data: [notOpenedVal / 1e9, floatingVal / 1e9, evaluatingVal / 1e9, awardedVal / 1e9]
-            }],
-            chart: { type: 'bar', height: 350, toolbar: { show: false } },
-            colors: ['#94a3b8', '#f97316', '#3b82f6', '#10b981'],
-            plotOptions: { bar: { horizontal: false, columnWidth: '50%', endingShape: 'rounded', distributed: true } },
-            dataLabels: { enabled: false },
-            legend: { show: false },
-            xaxis: { categories: ['Chưa mở / Nháp', 'Đang phát hành', 'Đang chấm thầu', 'Đã trao thầu'] },
-            yaxis: { labels: { formatter: (val) => val.toFixed(1) + ' Tỷ' } },
-            tooltip: {
-                y: { formatter: function (val) { return formatCurrency(val * 1e9); } }
+        // Chart 1: Doughnut Chart (Cơ cấu theo Trạng thái)
+        const allLabels = ['Floating (Phát hành)', 'Evaluating (Chấm thầu)', 'Awarded (Đã trao thầu)', 'Chưa mở/Nháp'];
+        const allColors = ['#f97316', '#3b82f6', '#10b981', '#94a3b8'];
+        const allVals = [floatingVal, evaluatingVal, awardedVal, notOpenedVal];
+        
+        const validSeries = [];
+        const validLabels = [];
+        const validColors = [];
+        allVals.forEach((val, idx) => {
+            if (val > 0) {
+                validSeries.push(val);
+                validLabels.push(allLabels[idx]);
+                validColors.push(allColors[idx]);
             }
-        };
-        const barEl = document.querySelector("#tender-chart-bar");
-        if (barEl) {
-            chartInstances.push(new ApexCharts(barEl, barOptions));
-        }
+        });
 
-        // Chart 2: Pie Chart (Budget by Type)
-        const pieOptions = {
-            series: [consultancyVal, constructionVal],
+        const doughnutOptions = {
+            series: validSeries,
             chart: { type: 'donut', height: 350 },
-            labels: ['Tư vấn (Consultancy)', 'Xây dựng / M&E'],
-            colors: ['#a855f7', '#3b82f6'],
-            dataLabels: { enabled: true, formatter: function (val, opts) { return opts.w.globals.seriesTotals[opts.seriesIndex] > 0 ? val.toFixed(1) + "%" : "" } },
+            labels: validLabels,
+            colors: validColors,
+            dataLabels: { enabled: true, formatter: function (val, opts) { return val.toFixed(1) + "%" } },
             legend: { position: 'bottom' },
             tooltip: {
                 y: { formatter: function (val) { return formatCurrency(val); } }
             }
         };
         const pieEl = document.querySelector("#tender-chart-pie");
-        if (pieEl) {
-            chartInstances.push(new ApexCharts(pieEl, pieOptions));
+        if (pieEl && validSeries.length > 0) {
+            chartInstances.push(new ApexCharts(pieEl, doughnutOptions));
+        }
+
+        // Chart 2: Bar Chart (Ngân sách theo Gói thầu)
+        const tenderNames = tenders.map(t => t.tender_id || t.tender_name || 'Unknown');
+        const tenderBudgets = tenders.map(t => (Number(t.budgetAmount || t.estimatedValue || t.approved_budget) || 0) / 1e9);
+        
+        const barOptions = {
+            series: [{
+                name: 'Ngân sách dự toán',
+                data: tenderBudgets
+            }],
+            chart: { type: 'bar', height: 350, toolbar: { show: false } },
+            colors: ['#3b82f6'],
+            plotOptions: { bar: { horizontal: false, columnWidth: '50%', distributed: true } },
+            dataLabels: { enabled: false },
+            legend: { show: false },
+            xaxis: { categories: tenderNames },
+            yaxis: { labels: { formatter: (val) => val.toFixed(1) + ' Tỷ' } },
+            tooltip: {
+                y: { formatter: function (val) { return formatCurrency(val * 1e9); } }
+            }
+        };
+        const barEl = document.querySelector("#tender-chart-bar");
+        if (barEl && tenderBudgets.length > 0) {
+            chartInstances.push(new ApexCharts(barEl, barOptions));
         }
 
         chartInstances.forEach(c => c.render());
 
-        // Render Summary Table
+        // Render Summary Table (Layer 1)
         const tbody = document.getElementById('tender-summary-tbody');
         if (tbody) {
             tbody.innerHTML = '';
@@ -129,11 +142,12 @@ export function renderTenders() {
             } else {
                 tenders.forEach(t => {
                     const tr = document.createElement('tr');
+                    const budget = Number(t.budgetAmount || t.estimatedValue || t.approved_budget) || 0;
                     tr.innerHTML = `
+                        <td style="padding: 0.75rem; border-bottom: 1px solid var(--border-color); font-weight: 500;">${t.tender_id || '-'}</td>
                         <td style="padding: 0.75rem; border-bottom: 1px solid var(--border-color);">${t.tender_name || '-'}</td>
-                        <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--border-color); font-weight: 500;">${formatCurrency(t.approved_budget || 0)}</td>
+                        <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--border-color); font-weight: 500;">${formatCurrency(budget)}</td>
                         <td style="text-align: center; padding: 0.75rem; border-bottom: 1px solid var(--border-color);"><span class="status-badge ${t.status ? t.status.toLowerCase() : ''}">${t.status || '-'}</span></td>
-                        <td style="text-align: center; padding: 0.75rem; border-bottom: 1px solid var(--border-color);">${t.deadline ? formatDate(t.deadline) : '-'}</td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -162,10 +176,11 @@ export function renderTenderTableModal() {
 
     const createRow = (t) => {
         const tr = document.createElement('tr');
+        const budget = Number(t.budgetAmount || t.estimatedValue || t.approved_budget) || 0;
         tr.innerHTML = `
             <td>${t.tender_id || '-'}</td>
             <td>${t.tender_name || '-'}</td>
-            <td style="font-weight: 600;">${formatCurrency(t.approved_budget || 0)}</td>
+            <td style="font-weight: 600;">${formatCurrency(budget)}</td>
             <td>${t.deadline ? formatDate(t.deadline) : '-'}</td>
             <td><span class="status-badge ${t.status ? t.status.toLowerCase() : ''}">${t.status || '-'}</span></td>
             <td>${t.winner || '-'}</td>
