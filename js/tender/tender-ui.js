@@ -29,9 +29,15 @@ export function renderTenders() {
 
         let notOpenedVal = 0;
 
+        const parseBudget = (val) => {
+            if (!val) return 0;
+            if (typeof val === 'number') return val;
+            return Number(String(val).replace(/,/g, '')) || 0;
+        };
+
         tenders.forEach(t => {
             // Chuẩn hóa budget
-            const budget = Number(t.budgetAmount || t.estimatedValue || t.approved_budget) || 0;
+            const budget = parseBudget(t.budgetAmount || t.estimatedValue || t.approved_budget);
             totalBudget += budget;
 
             // Chuẩn hóa status (case-insensitive)
@@ -108,7 +114,7 @@ export function renderTenders() {
 
         // Chart 2: Bar Chart (Ngân sách theo Gói thầu)
         const tenderNames = tenders.map(t => t.tender_id || t.tender_name || 'Unknown');
-        const tenderBudgets = tenders.map(t => (Number(t.budgetAmount || t.estimatedValue || t.approved_budget) || 0) / 1e9);
+        const tenderBudgets = tenders.map(t => parseBudget(t.budgetAmount || t.estimatedValue || t.approved_budget) / 1e9);
         
         const barOptions = {
             series: [{
@@ -142,7 +148,7 @@ export function renderTenders() {
             } else {
                 tenders.forEach(t => {
                     const tr = document.createElement('tr');
-                    const budget = Number(t.budgetAmount || t.estimatedValue || t.approved_budget) || 0;
+                    const budget = parseBudget(t.budgetAmount || t.estimatedValue || t.approved_budget);
                     tr.innerHTML = `
                         <td style="padding: 0.75rem; border-bottom: 1px solid var(--border-color); font-weight: 500;">${t.tender_id || '-'}</td>
                         <td style="padding: 0.75rem; border-bottom: 1px solid var(--border-color);">${t.tender_name || '-'}</td>
@@ -176,7 +182,12 @@ export function renderTenderTableModal() {
 
     const createRow = (t) => {
         const tr = document.createElement('tr');
-        const budget = Number(t.budgetAmount || t.estimatedValue || t.approved_budget) || 0;
+        const parseBudget = (val) => {
+            if (!val) return 0;
+            if (typeof val === 'number') return val;
+            return Number(String(val).replace(/,/g, '')) || 0;
+        };
+        const budget = parseBudget(t.budgetAmount || t.estimatedValue || t.approved_budget);
         tr.innerHTML = `
             <td>${t.tender_id || '-'}</td>
             <td>${t.tender_name || '-'}</td>

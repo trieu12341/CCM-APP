@@ -259,6 +259,16 @@ function setupSidebarEvents() {
             const modEl = document.getElementById(m.mod);
             if (modEl) {
                 modEl.classList.remove('hidden');
+
+                // Force re-render of tenders to fix chart issues when hidden
+                if (m.menu === 'menu-tender') {
+                    import('../tender.js').then(module => {
+                        if (typeof module.renderTenders === 'function') {
+                            module.renderTenders();
+                        }
+                    });
+                }
+                
                 // Cashflow charts need a tick to measure container size
                 if (m.mod === 'cashflow-view') {
                     setTimeout(() => { try { renderCashflow(); } catch(e) { console.error(e); } }, 50);
