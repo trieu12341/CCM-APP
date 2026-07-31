@@ -19,95 +19,118 @@ export function toggleDynamicFields(type) {
 let chartInstances = [];
 
 export function renderContracts() {
-    const projectId = state.currentProjectId;
-    if (!projectId) return;
+    try {
+        const projectId = state.currentProjectId;
+        if (!projectId) return;
 
-    const contracts = getLocalContracts().filter(c => c.project_id === projectId);
-
-    // Calculate KPIs
-    let totalBudget = 0;
-    let totalCommitted = 0;
-    let consultancyBudget = 0;
-    let consultancyCommitted = 0;
-    let constructionBudget = 0;
-    let constructionCommitted = 0;
-
-    contracts.forEach(c => {
-        const budget = Number(c.budget_value) || 0;
-        const committed = Number(c.total_value) || 0;
-        
-        totalBudget += budget;
-        totalCommitted += committed;
-        
-        if (c.type === 'Consultancy') {
-            consultancyBudget += budget;
-            consultancyCommitted += committed;
-        } else {
-            constructionBudget += budget;
-            constructionCommitted += committed;
+        // Ensure Contracts array exists
+        if (!state.appData.Contracts) {
+            state.appData.Contracts = [];
         }
-    });
 
-    const variance = totalBudget - totalCommitted;
-    const awardedRate = totalBudget > 0 ? ((totalCommitted / totalBudget) * 100).toFixed(1) : 0;
+        const contracts = getLocalContracts().filter(c => c.project_id === projectId);
 
-    // Update KPI DOM
-    document.getElementById('contract-kpi-budget').textContent = formatCurrency(totalBudget);
-    document.getElementById('contract-kpi-committed').textContent = formatCurrency(totalCommitted);
-    
-    const varianceEl = document.getElementById('contract-kpi-variance');
-    varianceEl.textContent = formatCurrency(Math.abs(variance));
-    if (variance < 0) {
-        varianceEl.style.color = '#ef4444'; // Red for negative savings
-        varianceEl.textContent = '-' + varianceEl.textContent;
-    } else {
-        varianceEl.style.color = '#3b82f6'; // Blue for positive savings
+        // Calculate KPIs
+        let totalBudget = 0;
+        let totalCommitted = 0;
+        let consultancyBudget = 0;
+        let consultancyCommitted = 0;
+        let constructionBudget = 0;
+        let constructionCommitted = 0;
+
+        contracts.forEach(c => {
+            const budget = Number(c.budget_value) || 0;
+            const committed = Number(c.total_value) || 0;
+            
+            totalBudget += budget;
+            totalCommitted += committed;
+            
+            if (c.type === 'Consultancy') {
+                consultancyBudget += budget;
+                consultancyCommitted += committed;
+            } else {
+                constructionBudget += budget;
+                constructionCommitted += committed;
+            }
+        });
+
+        const variance = totalBudget - totalCommitted;
+        const awardedRate = totalBudget > 0 ? ((totalCommitted / totalBudget) * 100).toFixed(1) : 0;
+
+        // Update KPI DOM safely
+        const elBudget = document.getElementById('contract-kpi-budget');
+        const elCommitted = document.getElementById('contract-kpi-committed');
+        const varianceEl = document.getElementById('contract-kpi-variance');
+        const elAwardedRate = document.getElementById('contract-kpi-awarded-rate');
+
+        if (elBudget) elBudget.textContent = formatCurrency(totalBudget);
+        if (elCommitted) elCommitted.textContent = formatCurrency(totalCommitted);
+        
+        if (varianceEl) {
+            varianceEl.textContent = formatCurrency(Math.abs(variance));
+            if (variance < 0) {
+                varianceEl.style.color = '#ef4444'; // Red for negative savings
+                varianceEl.textContent = '-' + varianceEl.textContent;
+            } else {
+                varianceEl.style.color = '#3b82f6'; // Blue for positive savings
+            }
+        }
+        
+        if (elAwardedRate) elAwardedRate.textContent = `${awardedRate}%`;
+
+        // Safe Chart Initialization
+        chartInstances.forEach(c => {
+            if (c && typeof c.destroy === 'function') c.destroy();
+        });
+        chartInstances = [];
+
+        // Chart 1: Grouped Bar Chart
+        const barEl = document.querySelector("#contract-chart-bar");
+        if (barEl) {
+            const barOptions = {
+                series: [{
+                    name: 'Budget',
+                    data: [consultancyBudget / 1e9, constructionBudget / 1e9]
+                }, {
+                    name: 'Actual Contract',
+                    data: [consultancyCommitted / 1e9, constructionCommitted / 1e9]
+                }],
+                chart: { type: 'bar', height: 350, toolbar: { show: false } },
+                colors: ['#cbd5e1', '#3b82f6'],
+                plotOptions: { bar: { horizontal: false, columnWidth: '50%', endingShape: 'rounded' } },
+                dataLabels: { enabled: false },
+                stroke: { show: true, width: 2, colors: ['transparent'] },
+                xaxis: { categories: ['Tư vấn (Consultancy)', 'Thi công (Construction)'] },
+                yaxis: { labels: { formatter: (val) => val.toFixed(1) + ' Tỷ' } },
+                fill: { opacity: 1 },
+                tooltip: {
+                    y: { formatter: function (val) { return formatCurrency(val * 1e9); } }
+                }
+            };
+            chartInstances.push(new ApexCharts(barEl, barOptions));
+        }
+
+        // Chart 2: Doughnut Chart
+        const pieEl = document.querySelector("#contract-chart-pie");
+        if (pieEl) {
+            const pieOptions = {
+                series: [consultancyCommitted, constructionCommitted],
+                chart: { type: 'donut', height: 350 },
+                labels: ['Tư vấn (Consultancy)', 'Thi công (Construction)'],
+                colors: ['#a855f7', '#3b82f6'],
+                dataLabels: { enabled: true, formatter: function (val, opts) { return opts.w.globals.seriesTotals[opts.seriesIndex] > 0 ? val.toFixed(1) + "%" : "" } },
+                legend: { position: 'bottom' },
+                tooltip: {
+                    y: { formatter: function (val) { return formatCurrency(val); } }
+                }
+            };
+            chartInstances.push(new ApexCharts(pieEl, pieOptions));
+        }
+
+        chartInstances.forEach(c => c.render());
+    } catch (error) {
+        console.error('[renderContracts] Exception occurred:', error);
     }
-    
-    document.getElementById('contract-kpi-awarded-rate').textContent = `${awardedRate}%`;
-
-    // Render Charts
-    chartInstances.forEach(c => c.destroy());
-    chartInstances = [];
-
-    // Chart 1: Grouped Bar Chart
-    const barOptions = {
-        series: [{
-            name: 'Budget',
-            data: [consultancyBudget / 1e9, constructionBudget / 1e9]
-        }, {
-            name: 'Actual Contract',
-            data: [consultancyCommitted / 1e9, constructionCommitted / 1e9]
-        }],
-        chart: { type: 'bar', height: 350, toolbar: { show: false } },
-        colors: ['#cbd5e1', '#3b82f6'],
-        plotOptions: { bar: { horizontal: false, columnWidth: '50%', endingShape: 'rounded' } },
-        dataLabels: { enabled: false },
-        stroke: { show: true, width: 2, colors: ['transparent'] },
-        xaxis: { categories: ['Tư vấn (Consultancy)', 'Thi công (Construction)'] },
-        yaxis: { labels: { formatter: (val) => val.toFixed(1) + ' Tỷ' } },
-        fill: { opacity: 1 },
-        tooltip: {
-            y: { formatter: function (val) { return formatCurrency(val * 1e9); } }
-        }
-    };
-    chartInstances.push(new ApexCharts(document.querySelector("#contract-chart-bar"), barOptions));
-
-    // Chart 2: Doughnut Chart
-    const pieOptions = {
-        series: [consultancyCommitted, constructionCommitted],
-        chart: { type: 'donut', height: 350 },
-        labels: ['Tư vấn (Consultancy)', 'Thi công (Construction)'],
-        colors: ['#a855f7', '#3b82f6'],
-        dataLabels: { enabled: true, formatter: function (val, opts) { return opts.w.globals.seriesTotals[opts.seriesIndex] > 0 ? val.toFixed(1) + "%" : "" } },
-        legend: { position: 'bottom' },
-        tooltip: {
-            y: { formatter: function (val) { return formatCurrency(val); } }
-        }
-    };
-    chartInstances.push(new ApexCharts(document.querySelector("#contract-chart-pie"), pieOptions));
-
-    chartInstances.forEach(c => c.render());
 }
 
 export function renderContractTableModal() {
