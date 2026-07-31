@@ -87,7 +87,7 @@
                         <div class="section-title" style="display: flex; justify-content: space-between; width: 100%;">
                             Tender Executive Dashboard
                             <div style="display: flex; gap: 1rem;">
-                                <button class="btn btn-primary" id="btn-open-tender-list" style="background-color: var(--primary-blue); font-weight: bold;">📋 Bảng Chi Tiết Tiến Độ Đấu Thầu</button>
+                                <button class="btn bg-amber-700 hover:bg-amber-800 text-white font-semibold px-4 py-2 rounded-lg shadow" id="btn-open-tender-list">📋 Bảng Chi Tiết Tiến Độ Đấu Thầu</button>
                                 <button class="btn btn-primary manager-hide" id="btn-new-tender">+ Tạo Gói thầu mới</button>
                             </div>
                         </div>
@@ -132,9 +132,28 @@
                                 <div id="tender-chart-pie" style="height: 350px;"></div>
                             </div>
                         </div>
-    
+                        
+                        <!-- LAYER 1: Summary Table -->
+                        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-top: 1.5rem; margin-bottom: 2rem;">
+                            <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 1.1rem;">Bảng Summary Danh sách Gói thầu</h3>
+                            <div style="overflow-x: auto;">
+                                <table class="table" style="width: 100%; border-collapse: collapse;">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align: left; padding: 0.75rem; border-bottom: 2px solid var(--border-color);">Tên Gói thầu</th>
+                                            <th style="text-align: right; padding: 0.75rem; border-bottom: 2px solid var(--border-color);">Ngân sách (VNĐ)</th>
+                                            <th style="text-align: center; padding: 0.75rem; border-bottom: 2px solid var(--border-color);">Trạng thái</th>
+                                            <th style="text-align: center; padding: 0.75rem; border-bottom: 2px solid var(--border-color);">Hạn nộp</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tender-summary-tbody">
+                                        <!-- Injected by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
 
                 <!-- Skeleton Modules for other sections -->
                 <!-- Contract Module -->
@@ -143,7 +162,7 @@
                         Contract Executive Dashboard
                         <div style="display: flex; gap: 1rem;">
                             <!-- Top action button for Layer 2 -->
-                            <button class="btn btn-primary" id="btn-open-contract-list" style="background-color: var(--primary-blue); font-weight: bold;">📋 Bảng Chi Tiết Hợp Đồng</button>
+                            <button class="btn bg-amber-700 hover:bg-amber-800 text-white font-semibold px-4 py-2 rounded-lg shadow" id="btn-open-contract-list">📋 Bảng Chi Tiết Hợp Đồng</button>
                             <div style="display: flex; gap: 1rem;" class="manager-hide">
                                 <button class="btn btn-secondary hidden" id="btn-bulk-delete-contract" style="color: var(--danger-color); border-color: var(--danger-color);"><i class="fa-solid fa-trash"></i> Xóa HĐ đã chọn</button>
                                 <input type="file" id="contract-excel-import" accept=".xlsx, .xls, .csv" hidden>
@@ -182,6 +201,26 @@
                         <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                             <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 1.1rem;">Contract Value Breakdown</h3>
                             <div id="contract-chart-pie" style="height: 350px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- LAYER 1: Summary Table -->
+                    <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-top: 1.5rem; margin-bottom: 2rem;">
+                        <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 1.1rem;">Bảng Summary Danh sách Hợp đồng</h3>
+                        <div style="overflow-x: auto;">
+                            <table class="table" style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align: left; padding: 0.75rem; border-bottom: 2px solid var(--border-color);">Tên Hợp đồng</th>
+                                        <th style="text-align: left; padding: 0.75rem; border-bottom: 2px solid var(--border-color);">Nhà thầu</th>
+                                        <th style="text-align: right; padding: 0.75rem; border-bottom: 2px solid var(--border-color);">Giá trị (VNĐ)</th>
+                                        <th style="text-align: center; padding: 0.75rem; border-bottom: 2px solid var(--border-color);">Loại</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="contract-summary-tbody">
+                                    <!-- Injected by JS -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>

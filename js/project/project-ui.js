@@ -58,7 +58,7 @@ export function openSummaryModal() {
     document.getElementById('btn-edit-summary').classList.remove('hidden');
     document.getElementById('btn-save-summary').classList.add('hidden');
 
-    document.getElementById('project-summary-modal').classList.remove('hidden');
+    document.getElementById('projectInfoModal').classList.remove('hidden');
 }
 
 export function saveSummaryData() {
@@ -99,7 +99,7 @@ export function saveSummaryData() {
         state.appData.Projects[stateProjIndex] = { ...state.appData.Projects[stateProjIndex], ...project };
     }
 
-    document.getElementById('project-summary-modal').classList.add('hidden');
+    document.getElementById('projectInfoModal').classList.add('hidden');
 
     renderProjectTabs();
     renderDashboard();

@@ -11,113 +11,137 @@ function isConsultancyTender(tender) {
 }
 
 export function renderTenders() {
-    if (!state.appData.Tenders) state.appData.Tenders = [];
+    try {
+        if (!state.appData.Tenders) state.appData.Tenders = [];
 
-    const tenders = state.appData.Tenders.filter(t => t.project_id === state.currentProjectId);
+        const tenders = state.appData.Tenders.filter(t => t.project_id === state.currentProjectId);
 
-    let totalBudget = 0;
-    
-    let floatingCount = 0;
-    let floatingVal = 0;
-    
-    let evaluatingCount = 0;
-    let evaluatingVal = 0;
-    
-    let awardedCount = 0;
-    let awardedVal = 0;
+        let totalBudget = 0;
+        
+        let floatingCount = 0;
+        let floatingVal = 0;
+        
+        let evaluatingCount = 0;
+        let evaluatingVal = 0;
+        
+        let awardedCount = 0;
+        let awardedVal = 0;
 
-    let notOpenedVal = 0;
+        let notOpenedVal = 0;
 
-    let consultancyVal = 0;
-    let constructionVal = 0;
+        let consultancyVal = 0;
+        let constructionVal = 0;
 
-    tenders.forEach(t => {
-        const budget = Number(t.approved_budget) || 0;
-        totalBudget += budget;
+        tenders.forEach(t => {
+            const budget = Number(t.approved_budget) || 0;
+            totalBudget += budget;
 
-        if (isConsultancyTender(t)) {
-            consultancyVal += budget;
-        } else {
-            constructionVal += budget;
+            if (isConsultancyTender(t)) {
+                consultancyVal += budget;
+            } else {
+                constructionVal += budget;
+            }
+
+            const status = t.status || '';
+            if (status === 'Floating') {
+                floatingCount++;
+                floatingVal += budget;
+            } else if (status === 'Evaluating' || status === 'Bidding') {
+                evaluatingCount++;
+                evaluatingVal += budget;
+            } else if (status === 'Awarded') {
+                awardedCount++;
+                awardedVal += budget;
+            } else {
+                notOpenedVal += budget;
+            }
+        });
+
+        const elTotalVal = document.getElementById('tender-kpi-total-val');
+        if (elTotalVal) elTotalVal.textContent = formatCurrency(totalBudget);
+
+        const elFloatingCount = document.getElementById('tender-kpi-floating-count');
+        const elFloatingVal = document.getElementById('tender-kpi-floating-val');
+        if (elFloatingCount) elFloatingCount.textContent = floatingCount;
+        if (elFloatingVal) elFloatingVal.textContent = `(${formatCurrency(floatingVal)})`;
+
+        const elEvaluatingCount = document.getElementById('tender-kpi-evaluating-count');
+        const elEvaluatingVal = document.getElementById('tender-kpi-evaluating-val');
+        if (elEvaluatingCount) elEvaluatingCount.textContent = evaluatingCount;
+        if (elEvaluatingVal) elEvaluatingVal.textContent = `(${formatCurrency(evaluatingVal)})`;
+
+        const elAwardedCount = document.getElementById('tender-kpi-awarded-count');
+        const elAwardedVal = document.getElementById('tender-kpi-awarded-val');
+        if (elAwardedCount) elAwardedCount.textContent = awardedCount;
+        if (elAwardedVal) elAwardedVal.textContent = `(${formatCurrency(awardedVal)})`;
+
+        // Render Charts
+        chartInstances.forEach(c => c.destroy());
+        chartInstances = [];
+
+        // Chart 1: Bar Chart (Budget by Status)
+        const barOptions = {
+            series: [{
+                name: 'Ngân sách (Tỷ VNĐ)',
+                data: [notOpenedVal / 1e9, floatingVal / 1e9, evaluatingVal / 1e9, awardedVal / 1e9]
+            }],
+            chart: { type: 'bar', height: 350, toolbar: { show: false } },
+            colors: ['#94a3b8', '#f97316', '#3b82f6', '#10b981'],
+            plotOptions: { bar: { horizontal: false, columnWidth: '50%', endingShape: 'rounded', distributed: true } },
+            dataLabels: { enabled: false },
+            legend: { show: false },
+            xaxis: { categories: ['Chưa mở / Nháp', 'Đang phát hành', 'Đang chấm thầu', 'Đã trao thầu'] },
+            yaxis: { labels: { formatter: (val) => val.toFixed(1) + ' Tỷ' } },
+            tooltip: {
+                y: { formatter: function (val) { return formatCurrency(val * 1e9); } }
+            }
+        };
+        const barEl = document.querySelector("#tender-chart-bar");
+        if (barEl) {
+            chartInstances.push(new ApexCharts(barEl, barOptions));
         }
 
-        const status = t.status || '';
-        if (status === 'Floating') {
-            floatingCount++;
-            floatingVal += budget;
-        } else if (status === 'Evaluating' || status === 'Bidding') {
-            evaluatingCount++;
-            evaluatingVal += budget;
-        } else if (status === 'Awarded') {
-            awardedCount++;
-            awardedVal += budget;
-        } else {
-            notOpenedVal += budget;
+        // Chart 2: Pie Chart (Budget by Type)
+        const pieOptions = {
+            series: [consultancyVal, constructionVal],
+            chart: { type: 'donut', height: 350 },
+            labels: ['Tư vấn (Consultancy)', 'Xây dựng / M&E'],
+            colors: ['#a855f7', '#3b82f6'],
+            dataLabels: { enabled: true, formatter: function (val, opts) { return opts.w.globals.seriesTotals[opts.seriesIndex] > 0 ? val.toFixed(1) + "%" : "" } },
+            legend: { position: 'bottom' },
+            tooltip: {
+                y: { formatter: function (val) { return formatCurrency(val); } }
+            }
+        };
+        const pieEl = document.querySelector("#tender-chart-pie");
+        if (pieEl) {
+            chartInstances.push(new ApexCharts(pieEl, pieOptions));
         }
-    });
 
-    const elTotalVal = document.getElementById('tender-kpi-total-val');
-    if (elTotalVal) elTotalVal.textContent = formatCurrency(totalBudget);
+        chartInstances.forEach(c => c.render());
 
-    const elFloatingCount = document.getElementById('tender-kpi-floating-count');
-    const elFloatingVal = document.getElementById('tender-kpi-floating-val');
-    if (elFloatingCount) elFloatingCount.textContent = floatingCount;
-    if (elFloatingVal) elFloatingVal.textContent = `(${formatCurrency(floatingVal)})`;
-
-    const elEvaluatingCount = document.getElementById('tender-kpi-evaluating-count');
-    const elEvaluatingVal = document.getElementById('tender-kpi-evaluating-val');
-    if (elEvaluatingCount) elEvaluatingCount.textContent = evaluatingCount;
-    if (elEvaluatingVal) elEvaluatingVal.textContent = `(${formatCurrency(evaluatingVal)})`;
-
-    const elAwardedCount = document.getElementById('tender-kpi-awarded-count');
-    const elAwardedVal = document.getElementById('tender-kpi-awarded-val');
-    if (elAwardedCount) elAwardedCount.textContent = awardedCount;
-    if (elAwardedVal) elAwardedVal.textContent = `(${formatCurrency(awardedVal)})`;
-
-    // Render Charts
-    chartInstances.forEach(c => c.destroy());
-    chartInstances = [];
-
-    // Chart 1: Bar Chart (Budget by Status)
-    const barOptions = {
-        series: [{
-            name: 'Ngân sách (Tỷ VNĐ)',
-            data: [notOpenedVal / 1e9, floatingVal / 1e9, evaluatingVal / 1e9, awardedVal / 1e9]
-        }],
-        chart: { type: 'bar', height: 350, toolbar: { show: false } },
-        colors: ['#94a3b8', '#f97316', '#3b82f6', '#10b981'],
-        plotOptions: { bar: { horizontal: false, columnWidth: '50%', endingShape: 'rounded', distributed: true } },
-        dataLabels: { enabled: false },
-        legend: { show: false },
-        xaxis: { categories: ['Chưa mở / Nháp', 'Đang phát hành', 'Đang chấm thầu', 'Đã trao thầu'] },
-        yaxis: { labels: { formatter: (val) => val.toFixed(1) + ' Tỷ' } },
-        tooltip: {
-            y: { formatter: function (val) { return formatCurrency(val * 1e9); } }
+        // Render Summary Table
+        const tbody = document.getElementById('tender-summary-tbody');
+        if (tbody) {
+            tbody.innerHTML = '';
+            if (tenders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:1rem; color:var(--text-muted);">Không có Gói thầu nào.</td></tr>`;
+            } else {
+                tenders.forEach(t => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="padding: 0.75rem; border-bottom: 1px solid var(--border-color);">${t.tender_name || '-'}</td>
+                        <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--border-color); font-weight: 500;">${formatCurrency(t.approved_budget || 0)}</td>
+                        <td style="text-align: center; padding: 0.75rem; border-bottom: 1px solid var(--border-color);"><span class="status-badge ${t.status ? t.status.toLowerCase() : ''}">${t.status || '-'}</span></td>
+                        <td style="text-align: center; padding: 0.75rem; border-bottom: 1px solid var(--border-color);">${t.deadline ? formatDate(t.deadline) : '-'}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
         }
-    };
-    const barEl = document.querySelector("#tender-chart-bar");
-    if (barEl) {
-        chartInstances.push(new ApexCharts(barEl, barOptions));
+    } catch (error) {
+        console.error('[renderTenders] Exception occurred:', error);
     }
-
-    // Chart 2: Pie Chart (Budget by Type)
-    const pieOptions = {
-        series: [consultancyVal, constructionVal],
-        chart: { type: 'donut', height: 350 },
-        labels: ['Tư vấn (Consultancy)', 'Xây dựng / M&E'],
-        colors: ['#a855f7', '#3b82f6'],
-        dataLabels: { enabled: true, formatter: function (val, opts) { return opts.w.globals.seriesTotals[opts.seriesIndex] > 0 ? val.toFixed(1) + "%" : "" } },
-        legend: { position: 'bottom' },
-        tooltip: {
-            y: { formatter: function (val) { return formatCurrency(val); } }
-        }
-    };
-    const pieEl = document.querySelector("#tender-chart-pie");
-    if (pieEl) {
-        chartInstances.push(new ApexCharts(pieEl, pieOptions));
-    }
-
-    chartInstances.forEach(c => c.render());
 }
 
 export function renderTenderTableModal() {

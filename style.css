@@ -12,3 +12,12 @@
 /* Pages */
 @import url('css/pages/project-view.css');
 @import url('css/pages/cashflow.css');
+/* Custom Amber Button Styles */
+.bg-amber-700 { background-color: #b45309 !important; border: none; }
+.hover\:bg-amber-800:hover { background-color: #92400e !important; }
+.text-white { color: #ffffff !important; }
+.font-semibold { font-weight: 600 !important; }
+.px-4 { padding-left: 1rem !important; padding-right: 1rem !important; }
+.py-2 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
+.rounded-lg { border-radius: 0.5rem !important; }
+.shadow { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important; }

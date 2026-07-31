@@ -1,8 +1,8 @@
 import { openSummaryModal, saveSummaryData } from './project-ui.js';
 
 export function setupProjectSummaryEvents() {
-    const modal = document.getElementById('project-summary-modal');
-    const closeBtn = document.getElementById('close-summary-modal');
+    const modal = document.getElementById('projectInfoModal');
+    const closeBtn = document.getElementById('closeProjectModalBtn');
     // Use Event Delegation for dynamically rendered project title/info icon
     document.addEventListener('click', (e) => {
         const projectTitleBtn = e.target.closest('#project-name, .fa-circle-info');

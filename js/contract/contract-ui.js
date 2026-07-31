@@ -16,6 +16,12 @@ export function toggleDynamicFields(type) {
     }
 }
 
+function isConsultancyContract(contract) {
+    if (contract.type) return contract.type === 'Consultancy';
+    const name = (contract.contract_name || '').toLowerCase();
+    return name.includes('tư vấn') || name.includes('tv');
+}
+
 let chartInstances = [];
 
 export function renderContracts() {
@@ -128,6 +134,26 @@ export function renderContracts() {
         }
 
         chartInstances.forEach(c => c.render());
+
+        // Render Summary Table
+        const tbody = document.getElementById('contract-summary-tbody');
+        if (tbody) {
+            tbody.innerHTML = '';
+            if (contracts.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:1rem; color:var(--text-muted);">Không có Hợp đồng nào.</td></tr>`;
+            } else {
+                contracts.forEach(c => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="padding: 0.75rem; border-bottom: 1px solid var(--border-color);">${c.contract_name || '-'}</td>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid var(--border-color);">${c.contractor || '-'}</td>
+                        <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--border-color); font-weight: 500;">${formatCurrency(c.value || 0)}</td>
+                        <td style="text-align: center; padding: 0.75rem; border-bottom: 1px solid var(--border-color);">${isConsultancyContract(c) ? 'Tư vấn' : 'Thi công'}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        }
     } catch (error) {
         console.error('[renderContracts] Exception occurred:', error);
     }
