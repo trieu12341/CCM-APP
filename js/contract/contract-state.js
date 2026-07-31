@@ -2,7 +2,7 @@ import { state } from '../app.js';
 import { saveContracts } from '../api.js';
 
 export function getLocalContracts() {
-    return [...state.appData.Contracts];
+    return state.appData.Contracts ? [...state.appData.Contracts] : [];
 }
 
 export function saveLocalContracts(contracts) {

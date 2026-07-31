@@ -3,14 +3,16 @@ import { openSummaryModal, saveSummaryData } from './project-ui.js';
 export function setupProjectSummaryEvents() {
     const modal = document.getElementById('project-summary-modal');
     const closeBtn = document.getElementById('close-summary-modal');
-    const projectNameEl = document.getElementById('project-name');
-    
-    if (projectNameEl) {
-        projectNameEl.addEventListener('click', () => {
+    // Use Event Delegation for dynamically rendered project title/info icon
+    document.addEventListener('click', (e) => {
+        const projectTitleBtn = e.target.closest('#project-name, .fa-circle-info');
+        if (projectTitleBtn) {
+            e.preventDefault();
             openSummaryModal();
             document.body.classList.add('modal-open');
-        });
-    }
+        }
+    });
+
 
     if (closeBtn) {
         closeBtn.addEventListener('click', () => {
