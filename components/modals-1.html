@@ -1,4 +1,4 @@
-    <div id="login-modal" class="modal-overlay" style="z-index: 9999; background-color: #f8fafc; display: flex; align-items: center; justify-content: center;">
+    <div id="login-modal" class="modal-overlay hidden" style="z-index: 9999; background-color: #f8fafc; display: flex; align-items: center; justify-content: center;">
         <div class="modal-content" style="max-width: 400px; width: 90%; padding: 2rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 12px; text-align: center;">
             <div style="margin-bottom: 2rem;">
                 <div style="display: flex; justify-content: center; gap: 4px; margin-bottom: 1rem;">
@@ -24,7 +24,10 @@
                 <button type="submit" class="btn btn-primary" id="btn-login-submit" style="width: 100%; padding: 0.75rem; font-size: 1rem; justify-content: center;">Đăng nhập</button>
             </form>
             
-            <div style="margin-top: 2rem; font-size: 0.8rem; color: var(--text-muted);">
+            <div style="margin-top: 1rem; font-size: 0.8rem; text-align:center;">
+                <a href="#" id="btn-clear-session" style="color: var(--text-muted); text-decoration: underline;">Xóa session cũ &amp; đăng nhập lại</a>
+            </div>
+            <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted);">
                 &copy; 2024 Viet Capital Real Estate
             </div>
         </div>

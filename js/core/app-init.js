@@ -21,13 +21,36 @@ function bindEvent(id, event, handler) {
 // ─────────────────────────────────────────────────────────────
 // MAIN ENTRY POINT — called after all HTML components are loaded
 // ─────────────────────────────────────────────────────────────
+
+function showApp() {
+    const container = document.getElementById('app-container');
+    if (container) container.style.display = '';
+    const loginModal = document.getElementById('login-modal');
+    if (loginModal) loginModal.classList.add('hidden');
+}
+
+function hideApp() {
+    const container = document.getElementById('app-container');
+    if (container) container.style.display = 'none';
+    const loginModal = document.getElementById('login-modal');
+    if (loginModal) loginModal.classList.remove('hidden');
+}
+
 export async function initApp() {
     const loginModal = document.getElementById('login-modal');
 
-    // ── Show login modal if token expires or 401 received ──
+    // ── 401 from API: force back to login ──
     window.addEventListener('auth-unauthorized', () => {
-        if (loginModal) loginModal.classList.remove('hidden');
+        hideApp();
         document.body.classList.remove('is-manager');
+    });
+
+    // ── Clear session link in login form ──
+    document.getElementById('btn-clear-session')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('jwt_token');
+        const errorEl = document.getElementById('login-error');
+        if (errorEl) { errorEl.style.display = 'block'; errorEl.textContent = 'Đã xóa session cũ. Vui lòng đăng nhập lại.'; }
     });
 
     // ─────────────────────────────────────────────────────
@@ -57,6 +80,7 @@ export async function initApp() {
                 // Role-based CSS
                 const isAdmin = ['manager', 'admin'].includes(state.user.role);
                 document.body.classList.toggle('is-manager', isAdmin);
+                showApp(); // Reveal main app only here
                 return true;
             } else {
                 if (loginModal) loginModal.classList.remove('hidden');
@@ -110,7 +134,7 @@ export async function initApp() {
     bindEvent('btn-logout', 'click', () => {
         localStorage.removeItem('jwt_token');
         state.user = null;
-        if (loginModal) loginModal.classList.remove('hidden');
+        hideApp();
         document.body.classList.remove('is-manager');
     });
 
