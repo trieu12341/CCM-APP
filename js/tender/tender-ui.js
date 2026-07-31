@@ -1,44 +1,174 @@
-﻿import { state, formatCurrency, formatCurrencyVND, formatDate } from '../app.js';
+import { state, formatCurrency, formatCurrencyVND, formatDate } from '../app.js';
 import { tenderState } from './tender-state.js';
 import { recalculateCBA, parseFormattedNumber } from './tender-calc.js';
+
+let chartInstances = [];
+
+function isConsultancyTender(tender) {
+    if (tender.type) return tender.type === 'Consultancy';
+    const name = (tender.tender_name || '').toLowerCase();
+    return name.includes('tư vấn') || name.includes('tv');
+}
 
 export function renderTenders() {
     if (!state.appData.Tenders) state.appData.Tenders = [];
 
     const tenders = state.appData.Tenders.filter(t => t.project_id === state.currentProjectId);
 
-    let total = tenders.length;
-    let floating = tenders.filter(t => t.status === 'Floating').length;
-    let evaluating = tenders.filter(t => t.status === 'Evaluating' || t.status === 'Bidding').length;
-    let awarded = tenders.filter(t => t.status === 'Awarded').length;
+    let totalBudget = 0;
+    
+    let floatingCount = 0;
+    let floatingVal = 0;
+    
+    let evaluatingCount = 0;
+    let evaluatingVal = 0;
+    
+    let awardedCount = 0;
+    let awardedVal = 0;
 
-    const elTotal = document.getElementById('tender-kpi-total');
-    if (elTotal) elTotal.textContent = total;
-    const elFloating = document.getElementById('tender-kpi-floating');
-    if (elFloating) elFloating.textContent = floating;
-    const elEvaluating = document.getElementById('tender-kpi-evaluating');
-    if (elEvaluating) elEvaluating.textContent = evaluating;
-    const elAwarded = document.getElementById('tender-kpi-awarded');
-    if (elAwarded) elAwarded.textContent = awarded;
+    let notOpenedVal = 0;
 
-    const tbody = document.getElementById('tender-tbody');
-    if (tbody) {
-        tbody.innerHTML = '';
-        tenders.forEach(t => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${t.tender_id}</td>
-                <td>${t.tender_name}</td>
-                <td>${formatCurrency(t.approved_budget)}</td>
-                <td>${formatDate(t.deadline)}</td>
-                <td><span class="status-badge ${t.status.toLowerCase()}">${t.status}</span></td>
-                <td>${t.winner || '-'}</td>
-            `;
-            tr.style.cursor = 'pointer';
-            tr.onclick = () => openTenderDetail(t.tender_id);
-            tbody.appendChild(tr);
-        });
+    let consultancyVal = 0;
+    let constructionVal = 0;
+
+    tenders.forEach(t => {
+        const budget = Number(t.approved_budget) || 0;
+        totalBudget += budget;
+
+        if (isConsultancyTender(t)) {
+            consultancyVal += budget;
+        } else {
+            constructionVal += budget;
+        }
+
+        const status = t.status || '';
+        if (status === 'Floating') {
+            floatingCount++;
+            floatingVal += budget;
+        } else if (status === 'Evaluating' || status === 'Bidding') {
+            evaluatingCount++;
+            evaluatingVal += budget;
+        } else if (status === 'Awarded') {
+            awardedCount++;
+            awardedVal += budget;
+        } else {
+            notOpenedVal += budget;
+        }
+    });
+
+    const elTotalVal = document.getElementById('tender-kpi-total-val');
+    if (elTotalVal) elTotalVal.textContent = formatCurrency(totalBudget);
+
+    const elFloatingCount = document.getElementById('tender-kpi-floating-count');
+    const elFloatingVal = document.getElementById('tender-kpi-floating-val');
+    if (elFloatingCount) elFloatingCount.textContent = floatingCount;
+    if (elFloatingVal) elFloatingVal.textContent = `(${formatCurrency(floatingVal)})`;
+
+    const elEvaluatingCount = document.getElementById('tender-kpi-evaluating-count');
+    const elEvaluatingVal = document.getElementById('tender-kpi-evaluating-val');
+    if (elEvaluatingCount) elEvaluatingCount.textContent = evaluatingCount;
+    if (elEvaluatingVal) elEvaluatingVal.textContent = `(${formatCurrency(evaluatingVal)})`;
+
+    const elAwardedCount = document.getElementById('tender-kpi-awarded-count');
+    const elAwardedVal = document.getElementById('tender-kpi-awarded-val');
+    if (elAwardedCount) elAwardedCount.textContent = awardedCount;
+    if (elAwardedVal) elAwardedVal.textContent = `(${formatCurrency(awardedVal)})`;
+
+    // Render Charts
+    chartInstances.forEach(c => c.destroy());
+    chartInstances = [];
+
+    // Chart 1: Bar Chart (Budget by Status)
+    const barOptions = {
+        series: [{
+            name: 'Ngân sách (Tỷ VNĐ)',
+            data: [notOpenedVal / 1e9, floatingVal / 1e9, evaluatingVal / 1e9, awardedVal / 1e9]
+        }],
+        chart: { type: 'bar', height: 350, toolbar: { show: false } },
+        colors: ['#94a3b8', '#f97316', '#3b82f6', '#10b981'],
+        plotOptions: { bar: { horizontal: false, columnWidth: '50%', endingShape: 'rounded', distributed: true } },
+        dataLabels: { enabled: false },
+        legend: { show: false },
+        xaxis: { categories: ['Chưa mở / Nháp', 'Đang phát hành', 'Đang chấm thầu', 'Đã trao thầu'] },
+        yaxis: { labels: { formatter: (val) => val.toFixed(1) + ' Tỷ' } },
+        tooltip: {
+            y: { formatter: function (val) { return formatCurrency(val * 1e9); } }
+        }
+    };
+    const barEl = document.querySelector("#tender-chart-bar");
+    if (barEl) {
+        chartInstances.push(new ApexCharts(barEl, barOptions));
     }
+
+    // Chart 2: Pie Chart (Budget by Type)
+    const pieOptions = {
+        series: [consultancyVal, constructionVal],
+        chart: { type: 'donut', height: 350 },
+        labels: ['Tư vấn (Consultancy)', 'Xây dựng / M&E'],
+        colors: ['#a855f7', '#3b82f6'],
+        dataLabels: { enabled: true, formatter: function (val, opts) { return opts.w.globals.seriesTotals[opts.seriesIndex] > 0 ? val.toFixed(1) + "%" : "" } },
+        legend: { position: 'bottom' },
+        tooltip: {
+            y: { formatter: function (val) { return formatCurrency(val); } }
+        }
+    };
+    const pieEl = document.querySelector("#tender-chart-pie");
+    if (pieEl) {
+        chartInstances.push(new ApexCharts(pieEl, pieOptions));
+    }
+
+    chartInstances.forEach(c => c.render());
+}
+
+export function renderTenderTableModal() {
+    const tbodyConsultancy = document.getElementById('tender-tbody-consultancy');
+    const tbodyConstruction = document.getElementById('tender-tbody-construction');
+    if (!tbodyConsultancy || !tbodyConstruction) return;
+
+    tbodyConsultancy.innerHTML = '';
+    tbodyConstruction.innerHTML = '';
+
+    const tenders = state.appData.Tenders.filter(t => t.project_id === state.currentProjectId);
+
+    if (tenders.length === 0) {
+        tbodyConstruction.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">Không có Gói thầu nào.</td></tr>`;
+        document.getElementById('tender-list-modal').classList.remove('hidden');
+        return;
+    }
+
+    const createRow = (t) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${t.tender_id || '-'}</td>
+            <td>${t.tender_name || '-'}</td>
+            <td style="font-weight: 600;">${formatCurrency(t.approved_budget || 0)}</td>
+            <td>${t.deadline ? formatDate(t.deadline) : '-'}</td>
+            <td><span class="status-badge ${t.status ? t.status.toLowerCase() : ''}">${t.status || '-'}</span></td>
+            <td>${t.winner || '-'}</td>
+        `;
+        tr.style.cursor = 'pointer';
+        tr.onclick = () => openTenderDetail(t.tender_id);
+        return tr;
+    };
+
+    const consultancies = tenders.filter(t => isConsultancyTender(t));
+    const constructions = tenders.filter(t => !isConsultancyTender(t));
+
+    if (consultancies.length > 0) {
+        const headerTR = document.createElement('tr');
+        headerTR.innerHTML = `<td colspan="6" style="background-color: #f1f5f9; font-weight: bold; padding: 0.75rem;">I. Gói thầu Tư vấn</td>`;
+        tbodyConsultancy.appendChild(headerTR);
+        consultancies.forEach(t => tbodyConsultancy.appendChild(createRow(t)));
+    }
+    
+    if (constructions.length > 0) {
+        const headerTR = document.createElement('tr');
+        headerTR.innerHTML = `<td colspan="6" style="background-color: #f1f5f9; font-weight: bold; padding: 0.75rem;">II. Gói thầu Xây dựng / M&E</td>`;
+        tbodyConstruction.appendChild(headerTR);
+        constructions.forEach(t => tbodyConstruction.appendChild(createRow(t)));
+    }
+
+    document.getElementById('tender-list-modal').classList.remove('hidden');
 }
 
 export function openTenderDetail(tenderId) {

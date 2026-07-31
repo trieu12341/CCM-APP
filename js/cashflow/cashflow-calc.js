@@ -1,6 +1,63 @@
 import { state } from '../app.js';
 import { getLocalCashflow, saveLocalCashflow } from './cashflow-state.js';
 
+export function generateCashflowForContract(contract) {
+    if (!contract || !contract.total_value) return;
+
+    let cashflows = getLocalCashflow();
+    // Remove old auto-generated cashflow for this contract
+    cashflows = cashflows.filter(cf => cf.contract_id !== contract.contract_id);
+
+    const totalValue = parseFloat(contract.total_value) || 0;
+    const apPercent = parseFloat(contract.advance_payment_percent) || 0;
+    const apValue = totalValue * (apPercent / 100);
+
+    const baseDate = new Date();
+    
+    // Period 1: Advance Payment
+    if (apValue > 0) {
+        cashflows.push({
+            id: 'cf-' + Date.now() + '-0',
+            project_id: contract.project_id,
+            contract_id: contract.contract_id,
+            package_name: contract.package_name || contract.contract_name,
+            code: 'AP',
+            date: baseDate.toISOString().split('T')[0],
+            value: 0,
+            workdone: 0,
+            retention: 0,
+            ap_recovery: 0,
+            total_cert: apValue,
+            status: 'Planned',
+            is_advance_payment: true
+        });
+    }
+
+    // Remaining periods (Spread over 5 months for demo)
+    const remainingValue = totalValue;
+    const months = 5;
+    const valuePerMonth = remainingValue / months;
+
+    for (let i = 1; i <= months; i++) {
+        const d = new Date(baseDate);
+        d.setMonth(d.getMonth() + i);
+        
+        cashflows.push({
+            id: 'cf-' + Date.now() + '-' + i,
+            project_id: contract.project_id,
+            contract_id: contract.contract_id,
+            package_name: contract.package_name || contract.contract_name,
+            code: 'Payment ' + i,
+            date: d.toISOString().split('T')[0],
+            value: valuePerMonth,
+            status: 'Planned',
+            is_construction: contract.type !== 'Consultancy'
+        });
+    }
+
+    saveLocalCashflow(cashflows);
+}
+
 export function syncCashflowWithPayment(projectId) {
     let cashflows = getLocalCashflow();
     

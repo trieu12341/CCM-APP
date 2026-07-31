@@ -15,48 +15,41 @@
                     </div>
 
                     <!-- Metrics -->
-                    <div class="section-title">Key Metrics Dashboard</div>
-                    <div class="metrics-grid">
-                        <div class="metric-card">
-                            <div class="metric-label">TOTAL ESTIMATED BUDGET</div>
-                            <div class="metric-value text-green" id="metric-total-budget">$0</div>
+                    <div class="section-title" style="display: flex; justify-content: space-between; width: 100%;">
+                        Budget Executive Dashboard
+                        <button class="btn btn-primary" id="btn-open-budget-list" style="background-color: var(--primary-blue); font-weight: bold;">📋 Bảng Chi Tiết Phân Bổ Ngân Sách</button>
+                    </div>
+
+                    <!-- LAYER 1: KPI Grid -->
+                    <div class="kpi-container" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                        <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <div style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Approved Budget Baseline</div>
+                            <div id="metric-total-budget" style="font-size: 1.5rem; font-weight: 700; color: var(--text-dark); margin-top: 0.5rem;">0 VNĐ</div>
                         </div>
-                        <div class="metric-card">
-                            <div class="metric-label">ALLOCATED BUDGET</div>
-                            <div class="metric-value text-green" id="metric-allocated">$0</div>
+                        <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <div style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Committed Cost</div>
+                            <div id="metric-allocated" style="font-size: 1.5rem; font-weight: 700; color: var(--primary-blue); margin-top: 0.5rem;">0 VNĐ</div>
                         </div>
-                        <div class="metric-card">
-                            <div class="metric-label">CONTINGENCY REMAINING</div>
-                            <div class="metric-value text-orange" id="metric-contingency">0</div>
+                        <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <div style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Projected Final Cost</div>
+                            <div id="metric-projected" style="font-size: 1.5rem; font-weight: 700; color: var(--text-dark); margin-top: 0.5rem;">0 VNĐ</div>
                         </div>
-                        <div class="metric-card">
-                            <div class="metric-label">TOTAL PAYMENTS TO DATE</div>
-                            <div class="metric-value text-green" id="metric-payments">$0</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-label">OVERALL PROJECTED COST</div>
-                            <div class="metric-value text-orange" id="metric-projected">$0</div>
+                        <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <div style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Remaining Contingency</div>
+                            <div id="metric-contingency" style="font-size: 1.5rem; font-weight: 700; color: #f97316; margin-top: 0.5rem;">0 VNĐ</div>
                         </div>
                     </div>
 
-                    <!-- Budget Breakdown Table -->
-                    <div class="section-title">Budget Breakdown by Category</div>
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Category</th>
-                                    <th>Budgeted</th>
-                                    <th>Committed</th>
-                                    <th>Expended</th>
-                                    <th>Variance</th>
-                                    <th>Progress</th>
-                                </tr>
-                            </thead>
-                            <tbody id="breakdown-tbody">
-                                <!-- JS injected -->
-                            </tbody>
-                        </table>
+                    <!-- LAYER 1: Charts Area -->
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+                        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 1.1rem;">Budget vs Committed vs Expended</h3>
+                            <div id="budget-chart-bar" style="height: 350px;"></div>
+                        </div>
+                        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 1.1rem;">Cơ cấu Phân bổ Ngân sách</h3>
+                            <div id="budget-chart-pie" style="height: 350px;"></div>
+                        </div>
                     </div>
 
                     <!-- Bottom Section Layout -->
@@ -92,46 +85,52 @@
                 <div id="module-tender" class="hidden">
                     <div id="tender-list-view">
                         <div class="section-title" style="display: flex; justify-content: space-between; width: 100%;">
-                            Tender Management
-                            <button class="btn btn-primary manager-hide" id="btn-new-tender">+ Tạo Gói thầu mới</button>
-                        </div>
-                        <!-- KPI Cards for Tender -->
-                        <div class="metrics-grid">
-                            <div class="metric-card">
-                                <div class="metric-label">TỔNG SỐ GÓI THẦU</div>
-                                <div class="metric-value" id="tender-kpi-total">0</div>
-                            </div>
-                            <div class="metric-card">
-                                <div class="metric-label">ĐANG PHÁT HÀNH HSMT (FLOATING)</div>
-                                <div class="metric-value text-orange" id="tender-kpi-floating">0</div>
-                            </div>
-                            <div class="metric-card">
-                                <div class="metric-label">ĐANG CHẤM THẦU (EVALUATING)</div>
-                                <div class="metric-value text-blue" id="tender-kpi-evaluating" style="color: #3b82f6;">0</div>
-                            </div>
-                            <div class="metric-card">
-                                <div class="metric-label">ĐÃ TRAO THẦU (AWARDED)</div>
-                                <div class="metric-value text-green" id="tender-kpi-awarded">0</div>
+                            Tender Executive Dashboard
+                            <div style="display: flex; gap: 1rem;">
+                                <button class="btn btn-primary" id="btn-open-tender-list" style="background-color: var(--primary-blue); font-weight: bold;">📋 Bảng Chi Tiết Tiến Độ Đấu Thầu</button>
+                                <button class="btn btn-primary manager-hide" id="btn-new-tender">+ Tạo Gói thầu mới</button>
                             </div>
                         </div>
                         
-                        <div class="section-title">Tender Tracker</div>
-                        <div class="table-container">
-                            <table class="data-table" id="tender-tracker-table">
-                                <thead>
-                                    <tr>
-                                        <th>Mã gói</th>
-                                        <th>Tên gói thầu</th>
-                                        <th>Giá gói thầu dự toán</th>
-                                        <th>Hạn nộp HSĐX</th>
-                                        <th>Trạng thái</th>
-                                        <th>Nhà thầu trúng thầu</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tender-tbody">
-                                    <!-- JS injected -->
-                                </tbody>
-                            </table>
+                        <!-- LAYER 1: KPI Grid -->
+                        <div class="kpi-container" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                            <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                <div style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Total Tender Budget</div>
+                                <div id="tender-kpi-total-val" style="font-size: 1.5rem; font-weight: 700; color: var(--text-dark); margin-top: 0.5rem;">0 VNĐ</div>
+                            </div>
+                            <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                <div style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Floating (Phát hành)</div>
+                                <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-top: 0.5rem;">
+                                    <div id="tender-kpi-floating-count" style="font-size: 1.5rem; font-weight: 700; color: #f97316;">0</div>
+                                    <div id="tender-kpi-floating-val" style="font-size: 0.9rem; font-weight: 600; color: #f97316;">(0 VNĐ)</div>
+                                </div>
+                            </div>
+                            <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                <div style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Evaluating (Chấm thầu)</div>
+                                <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-top: 0.5rem;">
+                                    <div id="tender-kpi-evaluating-count" style="font-size: 1.5rem; font-weight: 700; color: #3b82f6;">0</div>
+                                    <div id="tender-kpi-evaluating-val" style="font-size: 0.9rem; font-weight: 600; color: #3b82f6;">(0 VNĐ)</div>
+                                </div>
+                            </div>
+                            <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                <div style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Awarded (Đã trao thầu)</div>
+                                <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-top: 0.5rem;">
+                                    <div id="tender-kpi-awarded-count" style="font-size: 1.5rem; font-weight: 700; color: #10b981;">0</div>
+                                    <div id="tender-kpi-awarded-val" style="font-size: 0.9rem; font-weight: 600; color: #10b981;">(0 VNĐ)</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- LAYER 1: Charts Area -->
+                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+                            <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 1.1rem;">Ngân sách phân bổ theo Trạng thái</h3>
+                                <div id="tender-chart-bar" style="height: 350px;"></div>
+                            </div>
+                            <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 1.1rem;">Cơ cấu Ngân sách Đấu thầu</h3>
+                                <div id="tender-chart-pie" style="height: 350px;"></div>
+                            </div>
                         </div>
                     </div>
 
@@ -213,35 +212,49 @@
                 <!-- Contract Module -->
                 <div id="contract-view" class="hidden">
                     <div class="section-title" style="display: flex; justify-content: space-between; width: 100%;">
-                        Contract Management
-                        <div style="display: flex; gap: 1rem;" class="manager-hide">
-                            <button class="btn btn-secondary hidden" id="btn-bulk-delete-contract" style="color: var(--danger-color); border-color: var(--danger-color);"><i class="fa-solid fa-trash"></i> Xóa HĐ đã chọn</button>
-                            <input type="file" id="contract-excel-import" accept=".xlsx, .xls, .csv" hidden>
-                            <button class="btn btn-secondary" id="btn-import-contract" style="color: #10b981; border-color: #10b981;" onclick="document.getElementById('contract-excel-import').click()"><i class="fa-solid fa-file-excel"></i> Import Hợp đồng</button>
-                            <button class="btn btn-primary" id="btn-new-contract">+ Tạo Hợp đồng</button>
+                        Contract Executive Dashboard
+                        <div style="display: flex; gap: 1rem;">
+                            <!-- Top action button for Layer 2 -->
+                            <button class="btn btn-primary" id="btn-open-contract-list" style="background-color: var(--primary-blue); font-weight: bold;">📋 Bảng Chi Tiết Hợp Đồng</button>
+                            <div style="display: flex; gap: 1rem;" class="manager-hide">
+                                <button class="btn btn-secondary hidden" id="btn-bulk-delete-contract" style="color: var(--danger-color); border-color: var(--danger-color);"><i class="fa-solid fa-trash"></i> Xóa HĐ đã chọn</button>
+                                <input type="file" id="contract-excel-import" accept=".xlsx, .xls, .csv" hidden>
+                                <button class="btn btn-secondary" id="btn-import-contract" style="color: #10b981; border-color: #10b981;" onclick="document.getElementById('contract-excel-import').click()"><i class="fa-solid fa-file-excel"></i> Import Hợp đồng</button>
+                                <button class="btn btn-primary" id="btn-new-contract">+ Tạo Hợp đồng</button>
+                            </div>
                         </div>
                     </div>
-                    <div class="table-container">
-                        <table class="data-table" id="contract-table">
-                            <thead>
-                                <tr>
-                                    <th>Mã ngân sách</th>
-                                    <th>Mã HĐ</th>
-                                    <th>Loại HĐ</th>
-                                    <th>Tên Gói thầu</th>
-                                    <th>Nhà thầu</th>
-                                    <th>Ngân sách</th>
-                                    <th>Tổng giá trị</th>
-                                    <th>Trạng thái</th>
-                                    <th style="width: 50px; text-align: center;">
-                                        <input type="checkbox" id="cb-select-all-contracts" title="Chọn tất cả">
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody id="contract-tbody">
-                                <!-- JS injected -->
-                            </tbody>
-                        </table>
+
+                    <!-- LAYER 1: KPI Grid -->
+                    <div class="kpi-container" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                        <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <div style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Total Approved Budget</div>
+                            <div id="contract-kpi-budget" style="font-size: 1.5rem; font-weight: 700; color: var(--text-dark); margin-top: 0.5rem;">0 VNĐ</div>
+                        </div>
+                        <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <div style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Committed Contract Value</div>
+                            <div id="contract-kpi-committed" style="font-size: 1.5rem; font-weight: 700; color: #10b981; margin-top: 0.5rem;">0 VNĐ</div>
+                        </div>
+                        <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <div style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Budget Variance (Savings)</div>
+                            <div id="contract-kpi-variance" style="font-size: 1.5rem; font-weight: 700; color: #3b82f6; margin-top: 0.5rem;">0 VNĐ</div>
+                        </div>
+                        <div class="kpi-card" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <div style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Awarded Rate</div>
+                            <div id="contract-kpi-awarded-rate" style="font-size: 1.5rem; font-weight: 700; color: #f59e0b; margin-top: 0.5rem;">0%</div>
+                        </div>
+                    </div>
+
+                    <!-- LAYER 1: Charts Area -->
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+                        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 1.1rem;">Budget vs Actual by Category</h3>
+                            <div id="contract-chart-bar" style="height: 350px;"></div>
+                        </div>
+                        <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 1.1rem;">Contract Value Breakdown</h3>
+                            <div id="contract-chart-pie" style="height: 350px;"></div>
+                        </div>
                     </div>
                 </div>
                 

@@ -1,9 +1,11 @@
-﻿import { state, formatCurrency } from '../app.js';
+import { state, formatCurrency } from '../app.js';
 import { updateTender, saveTender } from '../api.js';
 import { tenderState } from './tender-state.js';
-import { renderTenders, initCBA, renderTenderRoundTabs, renderCBATable } from './tender-ui.js';
+import { renderTenders, initCBA, renderTenderRoundTabs, renderCBATable, renderTenderTableModal } from './tender-ui.js';
 import { parseFormattedNumber } from './tender-calc.js';
 import { handleExcelUpload } from './tender-excel.js';
+import { getLocalContracts, saveLocalContracts } from '../contract/contract-state.js';
+import { generateCashflowForContract } from '../cashflow/cashflow-calc.js';
 
 function addRound() {
     const tender = state.appData.Tenders.find(t => t.tender_id === tenderState.currentTenderDetailId);
@@ -48,6 +50,17 @@ async function saveTenderDetail() {
 }
 
 export function setupTenderEvents() {
+    const btnOpenList = document.getElementById('btn-open-tender-list');
+    const listModal = document.getElementById('tender-list-modal');
+    const closeListBtn = document.getElementById('close-tender-list-modal');
+
+    if (btnOpenList) {
+        btnOpenList.addEventListener('click', renderTenderTableModal);
+    }
+    if (closeListBtn) {
+        closeListBtn.addEventListener('click', () => listModal.classList.add('hidden'));
+    }
+
     const btnBackTender = document.getElementById('btn-back-tender');
     if (btnBackTender) {
         btnBackTender.addEventListener('click', () => {
@@ -118,9 +131,26 @@ export function setupTenderEvents() {
                     document.getElementById('detail-tender-winner').textContent = tender.winner;
                     document.getElementById('detail-tender-final-price').textContent = formatCurrency(tender.final_price);
                     
+                    // Workflow 2 & 3: Sync to Contract and Cashflow
+                    let allContracts = getLocalContracts();
+                    let contractIndex = allContracts.findIndex(c => c.contract_id === tender.tender_id);
+                    if (contractIndex >= 0) {
+                        let contract = allContracts[contractIndex];
+                        contract.total_value = tender.final_price;
+                        contract.contractor = tender.winner;
+                        contract.status = 'Active';
+                        allContracts[contractIndex] = contract;
+                        saveLocalContracts(allContracts);
+                        
+                        // Sync to Cashflow
+                        generateCashflowForContract(contract);
+                    }
+
                     awardModal.classList.add('hidden');
                     alert('Đã chốt thầu thành công!');
                     renderTenders();
+                    // Optionally dispatch event to trigger Budget dashboard update if visible
+                    document.dispatchEvent(new Event('dashboardStateChanged'));
                 } else {
                     alert('Lỗi khi chốt thầu');
                 }

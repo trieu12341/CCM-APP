@@ -1,4 +1,4 @@
-import { state } from '../app.js';
+import { state, formatCurrencyDetailed, formatCurrency } from '../app.js';
 import { getLocalCashflow } from './cashflow-state.js';
 import { calculateForecastEngine, syncCashflowWithPayment } from './cashflow-calc.js';
 import { createCashflowRowNode } from './cashflow-ui-row.js';
@@ -149,8 +149,8 @@ function renderRightPane(contractId, contracts, allCashflows) {
     document.getElementById('cf-detail-title').textContent = `Gói thầu: ${contract.package_name}`;
     document.getElementById('cf-detail-type').textContent = contract.type || 'N/A';
     document.getElementById('cf-detail-status').textContent = contract.status || 'N/A';
-    document.getElementById('cf-detail-contract-val').textContent = contractValue.toLocaleString('en-US');
-    document.getElementById('cf-detail-planned-val').textContent = totalPlan.toLocaleString('en-US');
+    document.getElementById('cf-detail-contract-val').textContent = formatCurrency(contractValue);
+    document.getElementById('cf-detail-planned-val').textContent = formatCurrency(totalPlan);
 
     // Smart Alert
     const alertEl = document.getElementById('cf-smart-alert');
@@ -158,15 +158,15 @@ function renderRightPane(contractId, contracts, allCashflows) {
     if (totalPlan !== contractValue) {
         const diff = Math.abs(contractValue - totalPlan);
         alertEl.style.display = 'flex';
-        alertText.textContent = `Tổng Cashflow (${(totalPlan/1e6).toFixed(0)}M) chưa khớp với Giá trị Hợp đồng (${(contractValue/1e6).toFixed(0)}M). Lệch ${(diff/1e6).toFixed(0)}M.`;
+        alertText.textContent = `Tổng Cashflow ${formatCurrencyDetailed(totalPlan)} chưa khớp với Giá trị Hợp đồng ${formatCurrencyDetailed(contractValue)}. Lệch ${formatCurrencyDetailed(diff)}.`;
     } else {
         alertEl.style.display = 'none';
     }
 
     // Sub-KPIs
-    document.getElementById('cf-kpi-card-planned').textContent = totalPlan.toLocaleString('en-US');
-    document.getElementById('cf-kpi-card-certified').textContent = totalCert.toLocaleString('en-US');
-    document.getElementById('cf-kpi-card-paid').textContent = totalPaid.toLocaleString('en-US');
+    document.getElementById('cf-kpi-card-planned').textContent = formatCurrency(totalPlan);
+    document.getElementById('cf-kpi-card-certified').textContent = formatCurrency(totalCert);
+    document.getElementById('cf-kpi-card-paid').textContent = formatCurrency(totalPaid);
 
     // Progress Bar
     const totalDivisor = Math.max(contractValue, totalPlan) || 1;

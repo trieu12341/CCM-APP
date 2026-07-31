@@ -1,4 +1,4 @@
-import { renderContracts, openContractModal, toggleDynamicFields } from './contract-ui.js';
+import { renderContracts, openContractModal, toggleDynamicFields, renderContractTableModal } from './contract-ui.js';
 import { saveContract, deleteContract, bulkDeleteContracts, handleContractExcelImport } from './contract-actions.js';
 
 export function setupContractEvents() {
@@ -9,6 +9,18 @@ export function setupContractEvents() {
     const typeSelect = document.getElementById('contract-type-select');
     const form = document.getElementById('contract-form');
     const deleteBtn = document.getElementById('btn-delete-contract');
+
+    // Layer 2 Modal
+    const btnOpenList = document.getElementById('btn-open-contract-list');
+    const listModal = document.getElementById('contract-list-modal');
+    const closeListBtn = document.getElementById('close-contract-list-modal');
+
+    if (btnOpenList) {
+        btnOpenList.addEventListener('click', renderContractTableModal);
+    }
+    if (closeListBtn) {
+        closeListBtn.addEventListener('click', () => listModal.classList.add('hidden'));
+    }
 
     if (btnNewContract) {
         btnNewContract.addEventListener('click', () => {

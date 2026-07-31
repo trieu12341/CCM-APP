@@ -1,6 +1,7 @@
-﻿import { state } from '../app.js';
+import { state } from '../app.js';
 import { getLocalContracts, saveLocalContracts } from './contract-state.js';
 import { renderContracts } from './contract-ui.js';
+import { generateCashflowForContract } from '../cashflow/cashflow-calc.js';
 
 export function saveContract() {
     const projectId = state.currentProjectId;
@@ -47,8 +48,11 @@ export function saveContract() {
     }
     
     saveLocalContracts(allContracts);
+    generateCashflowForContract(updatedContract);
+
     document.getElementById('contract-detail-modal').classList.add('hidden');
     renderContracts();
+    document.dispatchEvent(new Event('dashboardStateChanged'));
 }
 
 export function deleteContract() {

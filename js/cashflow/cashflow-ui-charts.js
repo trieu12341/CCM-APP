@@ -86,10 +86,10 @@ export function renderCashflow() {
         colors: ['#3b82f6', '#f97316'],
         plotOptions: { bar: { horizontal: false, columnWidth: '40%' } },
         dataLabels: { enabled: false },
-        xaxis: { categories: ['Total Value (Billion VNĐ)'] },
-        yaxis: { labels: { formatter: (val) => val.toFixed(1) + 'B' } },
+        xaxis: { categories: ['Total Value (Tỷ VNĐ)'] },
+        yaxis: { labels: { formatter: (val) => val.toFixed(1) + ' Tỷ' } },
         tooltip: {
-            y: { formatter: function (val) { return formatCurrency(val * 1000000000) + ' VNĐ' } }
+            y: { formatter: function (val) { return formatCurrency(val * 1000000000); } }
         }
     };
     chartInstances.push(new ApexCharts(document.querySelector("#cf-chart-1"), options1));
@@ -114,13 +114,13 @@ export function renderCashflow() {
         series: [{ name: 'No Data', data: [0] }],
         chart: { type: 'bar', height: 250, stacked: true, toolbar: { show: false } },
         xaxis: { categories: ['-'] },
-        yaxis: { labels: { formatter: (val) => val + 'B' } }
+        yaxis: { labels: { formatter: (val) => val + ' Tỷ' } }
     };
     chartInstances.push(new ApexCharts(document.querySelector("#cf-chart-2"), options2));
 
     var options3 = {
         series: [{
-            name: 'Planned Cumulative (Billion VNĐ)',
+            name: 'Planned Cumulative (Tỷ VNĐ)',
             type: 'line',
             data: cumulativePlanData
         }],
@@ -132,10 +132,10 @@ export function renderCashflow() {
         stroke: { width: [3], curve: 'smooth' },
         colors: ['#10b981'],
         xaxis: { categories: cumulativeLabels, tickAmount: Math.min(12, cumulativeLabels.length) },
-        yaxis: { labels: { formatter: (val) => val.toFixed(1) + 'B' } },
+        yaxis: { labels: { formatter: (val) => val.toFixed(1) + ' Tỷ' } },
         legend: { position: 'top' },
         tooltip: {
-            y: { formatter: function (val) { return formatCurrency(val * 1000000000) + ' VNĐ' } }
+            y: { formatter: function (val) { return formatCurrency(val * 1000000000); } }
         }
     };
     chartInstances.push(new ApexCharts(document.querySelector("#cf-chart-3"), options3));
@@ -152,10 +152,10 @@ export function renderCashflow() {
         colors: ['#f97316'],
         stroke: { curve: 'smooth', width: 3 },
         xaxis: { categories: cumulativeLabels, tickAmount: Math.min(12, cumulativeLabels.length) },
-        yaxis: { labels: { formatter: (val) => val.toFixed(1) + 'B' } },
+        yaxis: { labels: { formatter: (val) => val.toFixed(1) + ' Tỷ' } },
         legend: { position: 'top' },
         tooltip: {
-            y: { formatter: function (val) { return formatCurrency(val * 1000000000) + ' VNĐ' } }
+            y: { formatter: function (val) { return formatCurrency(val * 1000000000); } }
         }
     };
     chartInstances.push(new ApexCharts(document.querySelector("#cf-chart-4"), options4));

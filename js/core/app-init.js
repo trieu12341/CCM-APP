@@ -17,8 +17,31 @@ export async function initApp() {
     });
 
     const checkAuth = async () => {
+        // --- BYPASS LOGIN FOR LOCAL DEV & LIVE PREVIEW ---
+        const isLocalDev = window.location.hostname === 'localhost' || 
+                           window.location.hostname === '127.0.0.1' || 
+                           window.location.protocol === 'file:';
+                           
+        if (isLocalDev) {
+            if (!localStorage.getItem('jwt_token')) {
+                localStorage.setItem('jwt_token', 'dev-bypass-token-2026');
+            }
+            state.user = { username: 'qs', role: 'admin', name: 'Triều QS' };
+            
+            if (loginModal) loginModal.classList.add('hidden');
+            
+            const userNameEl = document.getElementById('user-name');
+            const userRoleEl = document.getElementById('user-role');
+            if (userNameEl) userNameEl.textContent = state.user.name;
+            if (userRoleEl) userRoleEl.textContent = state.user.role;
+            
+            document.body.classList.add('is-manager');
+            return true;
+        }
+        // -------------------------------------------------
+
         if (!localStorage.getItem('jwt_token')) {
-            loginModal.classList.remove('hidden');
+            if (loginModal) loginModal.classList.remove('hidden');
             return false;
         }
         
@@ -27,25 +50,27 @@ export async function initApp() {
             if (res.ok) {
                 const data = await res.json();
                 state.user = data.user;
-                loginModal.classList.add('hidden');
+                if (loginModal) loginModal.classList.add('hidden');
                 
                 // Update User Info in Header
-                document.getElementById('user-name').textContent = state.user.name || state.user.username;
-                document.getElementById('user-role').textContent = state.user.role;
+                const userNameEl = document.getElementById('user-name');
+                const userRoleEl = document.getElementById('user-role');
+                if (userNameEl) userNameEl.textContent = state.user.name || state.user.username;
+                if (userRoleEl) userRoleEl.textContent = state.user.role;
                 
                 // RBAC Logic
-                if (state.user.role === 'manager') {
+                if (state.user.role === 'manager' || state.user.role === 'admin') {
                     document.body.classList.add('is-manager');
                 } else {
                     document.body.classList.remove('is-manager');
                 }
                 return true;
             } else {
-                loginModal.classList.remove('hidden');
+                if (loginModal) loginModal.classList.remove('hidden');
                 return false;
             }
         } catch (error) {
-            loginModal.classList.remove('hidden');
+            if (loginModal) loginModal.classList.remove('hidden');
             return false;
         }
     };

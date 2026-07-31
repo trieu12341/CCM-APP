@@ -1,10 +1,49 @@
-﻿import { state, mockActivities } from '../app.js';
-import { saveProject, saveBudget } from '../api.js';
-import { renderProjectTabs, renderDashboard } from './budget-ui.js';
+import { state, mockActivities } from '../app.js';
+import { saveProject, saveBudget, saveTender } from '../api.js';
+import { renderProjectTabs, renderDashboard, renderBudgetTableModal } from './budget-ui.js';
+import { renderTenders } from '../tender.js';
 
 export function setupBudgetEvents() {
+    document.addEventListener('dashboardStateChanged', () => {
+        renderDashboard();
+        renderBudgetTableModal();
+    });
+    window.createTenderFromBudget = async (contract) => {
+        const newTender = {
+            tender_id: contract.contract_id,
+            project_id: contract.project_id,
+            tender_name: contract.package_name || contract.contract_name,
+            type: contract.type,
+            approved_budget: contract.budget_value || contract.original_value,
+            status: 'Floating',
+            deadline: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 14 days from now
+            winner: ""
+        };
+
+        const success = await saveTender(newTender);
+        if (success) {
+            state.appData.Tenders.push(newTender);
+            alert(`Đã tạo hồ sơ Đấu thầu cho gói: ${newTender.tender_name}`);
+            renderBudgetTableModal(); // Refresh to show "Đã Tạo ĐT"
+            if (typeof renderTenders === 'function') renderTenders(); // Refresh Tender Dash
+        } else {
+            alert('Lỗi khi tạo gói thầu!');
+        }
+    };
+
     const paymentModal = document.getElementById('payment-modal');
     const newEntryModal = document.getElementById('new-entry-modal');
+    
+    const btnOpenBudgetList = document.getElementById('btn-open-budget-list');
+    if (btnOpenBudgetList) {
+        btnOpenBudgetList.addEventListener('click', renderBudgetTableModal);
+    }
+    const closeBudgetListBtn = document.getElementById('close-budget-list-modal');
+    if (closeBudgetListBtn) {
+        closeBudgetListBtn.addEventListener('click', () => {
+            document.getElementById('budget-list-modal').classList.add('hidden');
+        });
+    }
     
     document.getElementById('btn-initiate-payment').addEventListener('click', () => {
         const select = document.getElementById('contract-select');
