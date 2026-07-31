@@ -108,8 +108,8 @@ export function setupTenderEvents() {
             awardModal.classList.remove('hidden');
         });
         
-        document.getElementById('close-award-modal').addEventListener('click', () => awardModal.classList.add('hidden'));
-        document.getElementById('cancel-award-modal').addEventListener('click', () => awardModal.classList.add('hidden'));
+        document.getElementById('close-award-modal')?.addEventListener('click', () => awardModal.classList.add('hidden'));
+        document.getElementById('cancel-award-modal')?.addEventListener('click', () => awardModal.classList.add('hidden'));
         
         document.getElementById('award-tender-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -176,10 +176,10 @@ export function setupTenderEvents() {
                 newTenderModal.classList.remove('hidden');
             });
         }
-        document.getElementById('close-tender-modal').addEventListener('click', () => newTenderModal.classList.add('hidden'));
-        document.getElementById('cancel-tender-modal').addEventListener('click', () => newTenderModal.classList.add('hidden'));
+        document.getElementById('close-tender-modal')?.addEventListener('click', () => newTenderModal.classList.add('hidden'));
+        document.getElementById('cancel-tender-modal')?.addEventListener('click', () => newTenderModal.classList.add('hidden'));
 
-        document.getElementById('new-tender-form').addEventListener('submit', async (e) => {
+        document.getElementById('new-tender-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!state.appData.Tenders) state.appData.Tenders = [];
             

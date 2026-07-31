@@ -6,105 +6,126 @@ import { setupContractEvents } from '../contract.js';
 import { setupCashflowEvents, renderCashflow } from '../cashflow.js';
 import { setupProjectSummaryEvents } from '../project.js';
 
+// ─────────────────────────────────────────────────────────────
+// Safe Event Binder — skips silently if element not in DOM
+// ─────────────────────────────────────────────────────────────
+function bindEvent(id, event, handler) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.addEventListener(event, handler);
+    } else {
+        console.warn(`[app-init] Element #${id} not found — skipping.`);
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// MAIN ENTRY POINT — called after all HTML components are loaded
+// ─────────────────────────────────────────────────────────────
 export async function initApp() {
-    // Check Auth
     const loginModal = document.getElementById('login-modal');
-    
-    // Auth Event Listener
+
+    // ── Show login modal if token expires or 401 received ──
     window.addEventListener('auth-unauthorized', () => {
-        loginModal.classList.remove('hidden');
+        if (loginModal) loginModal.classList.remove('hidden');
         document.body.classList.remove('is-manager');
     });
 
+    // ─────────────────────────────────────────────────────
+    // checkAuth: verifies existing JWT with /api/me
+    // Returns true if authenticated, false otherwise.
+    // NO bypass code — login is always required.
+    // ─────────────────────────────────────────────────────
     const checkAuth = async () => {
-        if (!localStorage.getItem('jwt_token')) {
+        const token = localStorage.getItem('jwt_token');
+        if (!token) {
             if (loginModal) loginModal.classList.remove('hidden');
             return false;
         }
-        
         try {
             const res = await apiGetMe();
             if (res.ok) {
                 const data = await res.json();
                 state.user = data.user;
                 if (loginModal) loginModal.classList.add('hidden');
-                
-                // Update User Info in Header
-                const userNameEl = document.getElementById('user-name');
-                const userRoleEl = document.getElementById('user-role');
-                if (userNameEl) userNameEl.textContent = state.user.name || state.user.username;
-                if (userRoleEl) userRoleEl.textContent = state.user.role;
-                
-                // RBAC Logic
-                if (state.user.role === 'manager' || state.user.role === 'admin') {
-                    document.body.classList.add('is-manager');
-                } else {
-                    document.body.classList.remove('is-manager');
-                }
+
+                // Update sidebar user info
+                const nameEl = document.getElementById('user-name');
+                const roleEl = document.getElementById('user-role');
+                if (nameEl) nameEl.textContent = state.user.name || state.user.username || 'Triều';
+                if (roleEl) roleEl.textContent = state.user.role || 'Quantity Surveyor';
+
+                // Role-based CSS
+                const isAdmin = ['manager', 'admin'].includes(state.user.role);
+                document.body.classList.toggle('is-manager', isAdmin);
                 return true;
             } else {
                 if (loginModal) loginModal.classList.remove('hidden');
                 return false;
             }
-        } catch (error) {
+        } catch (err) {
+            console.error('[checkAuth] Network error:', err);
             if (loginModal) loginModal.classList.remove('hidden');
             return false;
         }
     };
 
-    // Setup Login Form
+    // ─────────────────────────────────────────────────────
+    // Login Form submit handler
+    // ─────────────────────────────────────────────────────
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const username = document.getElementById('login-username').value;
-            const password = document.getElementById('login-password').value;
-            const errorMsg = document.getElementById('login-error');
+            const username  = document.getElementById('login-username')?.value;
+            const password  = document.getElementById('login-password')?.value;
+            const errorMsg  = document.getElementById('login-error');
             const submitBtn = document.getElementById('btn-login-submit');
-            
+
+            if (!username || !password) return;
+
             try {
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Đang đăng nhập...';
-                
+                if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Đang đăng nhập...'; }
                 const res = await apiLogin(username, password);
                 if (res.ok) {
                     const data = await res.json();
                     localStorage.setItem('jwt_token', data.token);
-                    errorMsg.style.display = 'none';
+                    if (errorMsg) errorMsg.style.display = 'none';
                     loginForm.reset();
-                    if (await checkAuth()) {
-                        await loadAppData();
-                    }
+                    const authed = await checkAuth();
+                    if (authed) await loadAppData();
                 } else {
-                    errorMsg.style.display = 'block';
+                    if (errorMsg) { errorMsg.style.display = 'block'; errorMsg.textContent = 'Sai tên đăng nhập hoặc mật khẩu.'; }
                 }
             } catch (err) {
-                errorMsg.style.display = 'block';
-                errorMsg.textContent = 'Lỗi kết nối máy chủ.';
+                if (errorMsg) { errorMsg.style.display = 'block'; errorMsg.textContent = 'Lỗi kết nối máy chủ.'; }
             } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Đăng nhập';
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Đăng nhập'; }
             }
         });
     }
 
-    // Setup Logout
-    const btnLogout = document.getElementById('btn-logout');
-    if (btnLogout) {
-        btnLogout.addEventListener('click', () => {
-            localStorage.removeItem('jwt_token');
-            state.user = null;
-            loginModal.classList.remove('hidden');
-            document.body.classList.remove('is-manager');
-        });
-    }
+    // ─────────────────────────────────────────────────────
+    // Logout handler
+    // ─────────────────────────────────────────────────────
+    bindEvent('btn-logout', 'click', () => {
+        localStorage.removeItem('jwt_token');
+        state.user = null;
+        if (loginModal) loginModal.classList.remove('hidden');
+        document.body.classList.remove('is-manager');
+    });
 
+    // ─────────────────────────────────────────────────────
+    // Initial auth check on page load
+    // ─────────────────────────────────────────────────────
     const isAuthenticated = await checkAuth();
     if (isAuthenticated) {
         await loadAppData();
     }
 }
 
+// ─────────────────────────────────────────────────────────────
+// LOAD APP DATA — fetch all data, then wire events, then render
+// ─────────────────────────────────────────────────────────────
 async function loadAppData() {
     try {
         const [projectsData, budgetData, tendersData, contractsData, cashflowData, paymentsData] = await Promise.all([
@@ -115,95 +136,109 @@ async function loadAppData() {
             fetchCashflow(),
             fetchPayments()
         ]);
-        
+
+        // ── 1. Hydrate state ──────────────────────────────
         let fetchedProjects = projectsData.Projects || [];
         if (fetchedProjects.length === 0) {
             try {
                 const lsProj = localStorage.getItem('vcre_projects');
                 if (lsProj) fetchedProjects = JSON.parse(lsProj);
-            } catch(e) {}
+            } catch (e) {}
         }
         if (fetchedProjects.length === 0) {
             fetchedProjects = [{
                 project_id: 'proj-1',
-                project_name: 'Olimpic Stadium',
+                project_name: 'Dự án Demo',
                 start_date: '2024-01-01',
-                end_date: '2024-12-01',
-                location: 'Belgrade, Serbia',
+                end_date: '2025-12-01',
+                location: 'Hà Nội, Việt Nam',
                 total_budget: 0,
                 contingency_budget: 0
             }];
         }
-        
-        state.appData.Projects = fetchedProjects;
-        state.appData.Contracts = (Array.isArray(contractsData) && contractsData.length > 0) ? contractsData : (budgetData.Contracts || []);
-        state.appData.Cashflow = Array.isArray(cashflowData) ? cashflowData : [];
-        state.appData.Payments = Array.isArray(paymentsData) ? paymentsData : [];
-        state.appData.Payment_Claims = budgetData.Payment_Claims || [];
-        state.appData.Variations = budgetData.Variations || [];
-        state.appData.Documents = budgetData.Documents || [];
-        state.appData.Tenders = tendersData.Tenders || [];
-        
+
+        state.appData.Projects       = fetchedProjects;
+        state.appData.Contracts      = (Array.isArray(contractsData) && contractsData.length > 0)
+                                         ? contractsData : (budgetData.Contracts || []);
+        state.appData.Cashflow       = Array.isArray(cashflowData)  ? cashflowData  : [];
+        state.appData.Payments       = Array.isArray(paymentsData)  ? paymentsData  : [];
+        state.appData.Payment_Claims = budgetData.Payment_Claims  || [];
+        state.appData.Variations     = budgetData.Variations      || [];
+        state.appData.Documents      = budgetData.Documents       || [];
+        state.appData.Tenders        = tendersData.Tenders        || [];
+
         if (state.appData.Projects.length > 0) {
             state.currentProjectId = state.appData.Projects[0].project_id;
         }
 
-        // 2. Setup Events
-        setupSidebarEvents();
-        setupBudgetEvents();
-        setupTenderEvents();
-        setupContractEvents();
-        setupCashflowEvents();
-        setupProjectSummaryEvents();
+        // ── 2. Wire all event listeners FIRST ────────────
+        // Each setup function is wrapped so one failure cannot crash the chain
+        const setupSteps = [
+            { name: 'Sidebar',         fn: setupSidebarEvents },
+            { name: 'Budget',          fn: setupBudgetEvents },
+            { name: 'Tender',          fn: setupTenderEvents },
+            { name: 'Contract',        fn: setupContractEvents },
+            { name: 'Cashflow',        fn: setupCashflowEvents },
+            { name: 'ProjectSummary',  fn: setupProjectSummaryEvents },
+        ];
 
-        // 3. Render UI
-        renderProjectTabs();
-        renderDashboard();
-        
-        // Trigger initial active tab
-        const activeTab = document.querySelector('.menu-item.active');
-        if (activeTab) {
-            activeTab.click();
+        for (const step of setupSteps) {
+            try {
+                step.fn();
+            } catch (err) {
+                console.error(`[loadAppData] setup${step.name}Events failed:`, err);
+            }
         }
-        
+
+        // ── 3. Render UI ──────────────────────────────────
+        try { renderProjectTabs(); } catch (e) { console.error('renderProjectTabs error:', e); }
+        try { renderDashboard();   } catch (e) { console.error('renderDashboard error:', e); }
+
+        // Activate default tab (menu-budget is marked active in sidebar.html)
+        const activeTab = document.querySelector('.menu-item.active');
+        if (activeTab) activeTab.click();
+
     } catch (error) {
-        console.error('Error loading data:', error);
+        console.error('[loadAppData] Fatal error loading app data:', error);
     }
 }
 
+// ─────────────────────────────────────────────────────────────
+// SIDEBAR NAVIGATION
+// ─────────────────────────────────────────────────────────────
 function setupSidebarEvents() {
     const modules = [
-        { menu: 'menu-overview', mod: 'module-overview' },
-        { menu: 'menu-budget', mod: 'module-budget' },
-        { menu: 'menu-tender', mod: 'module-tender' },
-        { menu: 'menu-contract', mod: 'contract-view' },
-        { menu: 'menu-cashflow', mod: 'cashflow-view' },
-        { menu: 'menu-payment', mod: 'module-payment' },
-        { menu: 'menu-vo', mod: 'module-vo' },
-        { menu: 'menu-final', mod: 'module-final' }
+        { menu: 'menu-overview',  mod: 'module-overview' },
+        { menu: 'menu-budget',    mod: 'module-budget' },
+        { menu: 'menu-tender',    mod: 'module-tender' },
+        { menu: 'menu-contract',  mod: 'contract-view' },
+        { menu: 'menu-cashflow',  mod: 'cashflow-view' },
+        { menu: 'menu-payment',   mod: 'module-payment' },
+        { menu: 'menu-vo',        mod: 'module-vo' },
+        { menu: 'menu-final',     mod: 'module-final' }
     ];
 
     modules.forEach(m => {
         const menuEl = document.getElementById(m.menu);
-        if (menuEl) {
-            menuEl.addEventListener('click', (e) => {
-                e.preventDefault();
-                modules.forEach(x => {
-                    const elMenu = document.getElementById(x.menu);
-                    const elMod = document.getElementById(x.mod);
-                    if (elMenu) elMenu.classList.remove('active');
-                    if (elMod) elMod.classList.add('hidden');
-                });
-                menuEl.classList.add('active');
-                const modEl = document.getElementById(m.mod);
-                if (modEl) {
-                    modEl.classList.remove('hidden');
-                    if (m.mod === 'cashflow-view') {
-                        // Small timeout to allow the display:block to take effect before rendering charts
-                        setTimeout(renderCashflow, 50);
-                    }
-                }
+        if (!menuEl) return;
+
+        menuEl.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Deactivate all
+            modules.forEach(x => {
+                document.getElementById(x.menu)?.classList.remove('active');
+                document.getElementById(x.mod)?.classList.add('hidden');
             });
-        }
+            // Activate clicked
+            menuEl.classList.add('active');
+            const modEl = document.getElementById(m.mod);
+            if (modEl) {
+                modEl.classList.remove('hidden');
+                // Cashflow charts need a tick to measure container size
+                if (m.mod === 'cashflow-view') {
+                    setTimeout(() => { try { renderCashflow(); } catch(e) { console.error(e); } }, 50);
+                }
+            }
+        });
     });
 }
