@@ -1,11 +1,12 @@
 import { state } from '../app.js';
 import { fetchProjects, fetchBudget, fetchTenders, fetchContracts, fetchCashflow, fetchPayments, apiLogin, apiGetMe } from '../api.js';
-import { loadBudgetsFromLS, loadTendersFromLS, loadContractsFromLS, loadCashflowFromLS } from '../core/data-store.js';
+import { loadBudgetsFromLS, loadTendersFromLS, loadContractsFromLS, loadCashflowFromLS, loadPaymentsFromLS } from '../core/data-store.js';
 import { setupBudgetEvents, renderProjectTabs, renderDashboard } from '../budget.js';
 import { setupTenderEvents } from '../tender.js';
 import { setupContractEvents } from '../contract.js';
 import { setupCashflowEvents, renderCashflow } from '../cashflow.js';
 import { setupProjectSummaryEvents } from '../project.js';
+import { setupPaymentEvents, renderPaymentDashboard } from '../payment.js';
 
 // ─────────────────────────────────────────────────────────────
 // MAIN ENTRY POINT — called after all HTML components are loaded
@@ -194,7 +195,19 @@ async function loadAppData() {
         }
         state.appData.Cashflow = fetchedCashflow;
 
-        state.appData.Payments       = Array.isArray(paymentsData)  ? paymentsData  : [];
+        state.appData.Payments = Array.isArray(paymentsData) ? paymentsData : [];
+
+        // PAYMENTS RECOVERY LOGIC — prioritize localStorage
+        const localPayments = localStorage.getItem('ccm_payments');
+        if (localPayments && localPayments !== '[]' && localPayments !== 'undefined') {
+            try {
+                const parsed = JSON.parse(localPayments);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    state.appData.Payments = parsed;
+                    console.log(`✅ Khôi phục ${parsed.length} IPC từ LocalStorage (ccm_payments)`);
+                }
+            } catch (e) { console.error('Lỗi khi khôi phục Payments:', e); }
+        }
         
         // Load Budgets with fallback to localStorage
         let fetchedBudgets = budgetData.Budgets || [];
@@ -233,6 +246,7 @@ async function loadAppData() {
             { name: 'Contract',        fn: setupContractEvents },
             { name: 'Cashflow',        fn: setupCashflowEvents },
             { name: 'ProjectSummary',  fn: setupProjectSummaryEvents },
+            { name: 'Payment',         fn: setupPaymentEvents },
         ];
 
         for (const step of setupSteps) {
@@ -300,6 +314,11 @@ function setupSidebarEvents() {
                 // Cashflow charts need a tick to measure container size
                 if (m.mod === 'cashflow-view') {
                     setTimeout(() => { try { renderCashflow(); } catch(e) { console.error(e); } }, 50);
+                }
+
+                // Payment dashboard re-render on tab switch
+                if (m.mod === 'module-payment') {
+                    setTimeout(() => { try { renderPaymentDashboard(); } catch(e) { console.error(e); } }, 50);
                 }
             }
         });

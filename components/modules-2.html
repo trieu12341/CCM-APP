@@ -78,11 +78,101 @@
                 </div>
 
                 <div id="module-payment" class="hidden">
-                    <div class="section-title">Payment Management</div>
-                    <div class="metrics-grid">
-                        <div class="metric-card"><div class="metric-label">Payment Features</div><div class="metric-value">Coming Soon</div></div>
+                    <!-- LAYER 1: PAYMENT EXECUTIVE DASHBOARD -->
+                    <div class="payment-section-header">
+                        <div class="payment-section-title">
+                            <i class="fa-solid fa-money-bill-transfer" style="color:var(--primary-blue);margin-right:8px;"></i>
+                            Payment Executive Dashboard
+                        </div>
+                        <button class="btn btn-primary" id="btn-open-payment-list" style="font-weight:600;">
+                            📂 Danh sách Tổng hợp Hồ sơ Thanh toán
+                        </button>
+                    </div>
+
+                    <!-- KPI Cards — 4 columns compact -->
+                    <div class="payment-kpi-grid">
+                        <!-- Card 1: Total Active Contracts -->
+                        <div class="kpi-card kpi-card-slate">
+                            <div class="kpi-header">
+                                <span class="kpi-title">TOTAL ACTIVE CONTRACTS</span>
+                            </div>
+                            <div class="kpi-value" id="pay-kpi-active-contracts">0 <span>VNĐ</span></div>
+                            <div class="kpi-sub" style="font-size:11px;opacity:0.65;margin-top:4px;">Tổng giá trị HĐ Active</div>
+                        </div>
+
+                        <!-- Card 2: Total Submitted -->
+                        <div class="kpi-card kpi-card-blue">
+                            <div class="kpi-header">
+                                <span class="kpi-title">TOTAL SUBMITTED</span>
+                                <span class="kpi-count" id="pay-kpi-ipc-count">0 IPC</span>
+                            </div>
+                            <div class="kpi-value" id="pay-kpi-submitted">0 <span>VNĐ</span></div>
+                            <div class="kpi-sub" style="font-size:11px;opacity:0.65;margin-top:4px;">Lũy kế NT đề nghị TT</div>
+                        </div>
+
+                        <!-- Card 3: Total Approved/Certified -->
+                        <div class="kpi-card kpi-card-emerald">
+                            <div class="kpi-header">
+                                <span class="kpi-title">TOTAL APPROVED / CERTIFIED</span>
+                                <span class="kpi-count" id="pay-kpi-pending-count" style="color:#f59e0b;">0 chờ duyệt</span>
+                            </div>
+                            <div class="kpi-value" id="pay-kpi-approved">0 <span>VNĐ</span></div>
+                            <div class="kpi-sub" style="font-size:11px;opacity:0.65;margin-top:4px;">QS/CĐT đã phê duyệt</div>
+                        </div>
+
+                        <!-- Card 4: Total Paid -->
+                        <div class="kpi-card kpi-card-amber">
+                            <div class="kpi-header">
+                                <span class="kpi-title">TOTAL PAID AMOUNT</span>
+                            </div>
+                            <div class="kpi-value" id="pay-kpi-paid">0 <span>VNĐ</span></div>
+                            <div class="kpi-sub" style="font-size:11px;opacity:0.65;margin-top:4px;">Kế toán đã chuyển khoản</div>
+                        </div>
+                    </div>
+
+                    <!-- Dashboard Widgets: Chart + Pending Table -->
+                    <div class="payment-widgets-grid">
+                        <!-- Widget 1: Payment Trend Chart -->
+                        <div class="payment-widget-card">
+                            <h3>
+                                <i class="fa-solid fa-chart-column" style="color:var(--primary-blue);"></i>
+                                Payment Trend — Submitted vs Certified vs Paid
+                            </h3>
+                            <div id="pay-trend-chart"></div>
+                        </div>
+
+                        <!-- Widget 2: Pending IPCs Table -->
+                        <div class="payment-widget-card">
+                            <h3>
+                                <i class="fa-solid fa-clock" style="color:#f59e0b;"></i>
+                                Gói thầu sắp đến hạn thanh toán
+                            </h3>
+                            <div style="overflow-x:auto;">
+                                <table class="pay-pending-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Mã IPC</th>
+                                            <th>Gói thầu</th>
+                                            <th style="text-align:center;">Đợt</th>
+                                            <th>Giá trị Trình</th>
+                                            <th style="text-align:center;">Đến hạn</th>
+                                            <th style="text-align:center;">Trạng thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="pay-pending-tbody">
+                                        <tr>
+                                            <td colspan="6" style="text-align:center;padding:24px 0;color:#94a3b8;">
+                                                <i class="fa-regular fa-circle-check" style="margin-right:6px;"></i>
+                                                Không có hồ sơ nào đang chờ xử lý
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
 
                 <div id="module-vo" class="hidden">
                     <div class="section-title">Variation Order</div>

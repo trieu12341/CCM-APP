@@ -12,6 +12,7 @@
 /* Pages */
 @import url('css/pages/project-view.css');
 @import url('css/pages/cashflow.css');
+@import url('css/pages/payment.css');
 /* Custom Amber Button Styles */
 .bg-amber-700 { background-color: #b45309 !important; border: none; }
 .hover\:bg-amber-800:hover { background-color: #92400e !important; }

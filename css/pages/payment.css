@@ -1,0 +1,742 @@
+/* ============================================================
+   payment.css  —  Tab 5 Payment Module Styles
+   3-Layer Enterprise Architecture: Dashboard | List | Detail
+   ============================================================ */
+
+/* ─────────────────────────────────────────────────────────────
+   LAYER 1: EXECUTIVE DASHBOARD
+   ───────────────────────────────────────────────────────────── */
+
+#module-payment .payment-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+#module-payment .payment-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-dark, #1e293b);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* KPI Grid — 4 columns compact */
+.payment-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 1.25rem;
+}
+
+/* Compact KPI Cards — overrides for Payment tab */
+.payment-kpi-grid .kpi-card {
+    padding: 12px 16px;
+    border-radius: 10px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.payment-kpi-grid .kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+
+.payment-kpi-grid .kpi-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    opacity: 0.75;
+    margin-bottom: 4px;
+}
+
+.payment-kpi-grid .kpi-value {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.payment-kpi-grid .kpi-value span {
+    font-size: 11px;
+    font-weight: 500;
+    opacity: 0.7;
+}
+
+.payment-kpi-grid .kpi-sub {
+    font-size: 11px;
+    margin-top: 4px;
+    opacity: 0.7;
+}
+
+/* Dashboard Widgets Grid */
+.payment-widgets-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.payment-widget-card {
+    background: #fff;
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.payment-widget-card h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dark, #1e293b);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Pending Table */
+.pay-pending-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.pay-pending-table th {
+    padding: 8px 10px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-muted, #64748b);
+    border-bottom: 1px solid var(--border-color, #e2e8f0);
+    background: #f8fafc;
+}
+
+.pay-pending-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.pay-pending-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.pay-pending-table .pending-row.urgency-overdue {
+    background: #fff5f5;
+}
+
+.pay-pending-table .pending-row.urgency-soon {
+    background: #fffbeb;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   STATUS BADGES
+   ───────────────────────────────────────────────────────────── */
+
+.status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.badge-draft {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.badge-reviewing {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.badge-approved {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.badge-paid {
+    background: #f3e8ff;
+    color: #7c3aed;
+}
+
+.overdue-badge {
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.urgency-badge-today {
+    background: #fef3c7;
+    color: #d97706;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.ipc-code {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary-blue, #2563eb);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   LAYER 2: MASTER IPC LIST (modal-overlay layer-2)
+   ───────────────────────────────────────────────────────────── */
+
+#payment-list-modal {
+    background: var(--bg-light, #f8fafc);
+    min-height: 100vh;
+}
+
+.payment-list-header {
+    background: #fff;
+    border-bottom: 1px solid var(--border-color, #e2e8f0);
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.payment-list-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.payment-list-header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.payment-list-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-dark, #1e293b);
+}
+
+.payment-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.payment-filter-bar input[type="text"] {
+    padding: 7px 12px;
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    width: 220px;
+    transition: border-color 0.2s;
+}
+
+.payment-filter-bar input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary-blue, #2563eb);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+}
+
+.payment-filter-bar select {
+    padding: 7px 10px;
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    background: #fff;
+}
+
+.payment-list-body {
+    padding: 20px 24px;
+}
+
+/* ─── Layer 2 standalone workspace ──────────────────────────
+   #payment-list-modal is displayed by toggling .hidden class
+   on #module-payment. It must fill the same content area.
+   ──────────────────────────────────────────────────────────── */
+#payment-list-modal {
+    position: absolute;
+    inset: 0;
+    min-height: 100%;
+    background: var(--bg-light, #f8fafc);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    animation: payL2FadeIn 0.18s ease;
+}
+
+#payment-list-modal.hidden {
+    display: none;
+}
+
+@keyframes payL2FadeIn {
+    from { opacity: 0; transform: translateX(12px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Ensure the content wrapper is position:relative so Layer 2 absolute positions correctly */
+.content-area,
+.module-container,
+.main-content,
+.content-wrapper {
+    position: relative;
+}
+
+/* IPC Master Table */
+.ipc-master-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.ipc-master-table thead th {
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-muted, #64748b);
+    background: #f8fafc;
+    border-bottom: 2px solid var(--border-color, #e2e8f0);
+    white-space: nowrap;
+}
+
+.ipc-master-table tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.ipc-master-table tbody tr:hover {
+    background: #f0f7ff;
+    cursor: pointer;
+}
+
+.ipc-master-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   LAYER 3: IPC DETAIL WORKSPACE
+   ───────────────────────────────────────────────────────────── */
+
+#payment-detail-workspace {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 680px;
+    max-width: 90vw;
+    height: 100vh;
+    background: #fff;
+    box-shadow: -4px 0 30px rgba(0,0,0,0.15);
+    z-index: 500;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#payment-detail-workspace.hidden {
+    display: none;
+}
+
+.detail-workspace-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color, #e2e8f0);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    flex-shrink: 0;
+}
+
+.detail-workspace-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.detail-workspace-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.detail-workspace-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.ipc-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.ipc-info-item {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 10px 14px;
+}
+
+.ipc-info-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted, #64748b);
+    margin-bottom: 4px;
+    letter-spacing: 0.3px;
+}
+
+.ipc-info-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dark, #1e293b);
+}
+
+/* Financial Breakdown Table */
+.breakdown-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted, #64748b);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--border-color, #e2e8f0);
+}
+
+.breakdown-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 20px;
+}
+
+.breakdown-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: top;
+}
+
+.breakdown-table .breakdown-total-row {
+    background: linear-gradient(135deg, #eff6ff, #f0fdf4);
+    border-top: 2px solid var(--primary-blue, #2563eb);
+}
+
+.breakdown-table .breakdown-total-row td {
+    border-bottom: none;
+    padding: 14px 12px;
+}
+
+.net-payable-card {
+    background: linear-gradient(135deg, #1d4ed8, #2563eb);
+    border-radius: 12px;
+    padding: 20px;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.net-payable-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.85;
+    margin-bottom: 6px;
+}
+
+.net-payable-amount {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+/* Approval Section */
+.approval-section {
+    border-top: 2px solid var(--border-color, #e2e8f0);
+    padding-top: 16px;
+    margin-top: 8px;
+}
+
+.approval-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted, #64748b);
+    letter-spacing: 0.4px;
+    margin-bottom: 12px;
+}
+
+.approval-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-approve {
+    background: linear-gradient(135deg, #059669, #10b981);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-approve:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.btn-paid {
+    background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-paid:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.btn-disabled {
+    opacity: 0.45;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
+.paid-info-section {
+    background: #f3e8ff;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-top: 10px;
+    font-size: 13px;
+    color: #6b21a8;
+    font-weight: 600;
+}
+
+/* Form panel uses flex when visible (not .hidden) */
+#ipc-form-panel:not(.hidden) {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   LAYER 3: CREATE / EDIT IPC FORM
+   ───────────────────────────────────────────────────────────── */
+
+#ipc-form-panel .form-group {
+    margin-bottom: 14px;
+}
+
+#ipc-form-panel label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-dark, #1e293b);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+#ipc-form-panel input,
+#ipc-form-panel select,
+#ipc-form-panel textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+#ipc-form-panel input:focus,
+#ipc-form-panel select:focus,
+#ipc-form-panel textarea:focus {
+    outline: none;
+    border-color: var(--primary-blue, #2563eb);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+}
+
+.form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.form-row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+}
+
+.form-calc-preview {
+    background: #f8fafc;
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-top: 4px;
+}
+
+.form-calc-preview h4 {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted, #64748b);
+    margin-bottom: 10px;
+    letter-spacing: 0.4px;
+}
+
+.calc-preview-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    font-size: 12px;
+    border-bottom: 1px dashed #e2e8f0;
+}
+
+.calc-preview-row:last-child {
+    border-bottom: none;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--primary-blue, #2563eb);
+    padding-top: 8px;
+    margin-top: 4px;
+}
+
+.calc-preview-label {
+    color: var(--text-muted, #64748b);
+}
+
+.calc-preview-value {
+    font-weight: 600;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   TOAST NOTIFICATIONS
+   ───────────────────────────────────────────────────────────── */
+
+.payment-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    z-index: 9999;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    transform: translateY(100px);
+    opacity: 0;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+    max-width: 360px;
+}
+
+.payment-toast-show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.payment-toast-success {
+    background: #dcfce7;
+    color: #15803d;
+    border-left: 4px solid #22c55e;
+}
+
+.payment-toast-info {
+    background: #dbeafe;
+    color: #1e40af;
+    border-left: 4px solid #3b82f6;
+}
+
+.payment-toast-error {
+    background: #fee2e2;
+    color: #dc2626;
+    border-left: 4px solid #ef4444;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   RESPONSIVE
+   ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 1200px) {
+    .payment-kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .payment-widgets-grid {
+        grid-template-columns: 1fr;
+    }
+    #payment-detail-workspace {
+        width: 100vw;
+        max-width: 100vw;
+    }
+}
+
+@media (max-width: 768px) {
+    .payment-kpi-grid {
+        grid-template-columns: 1fr;
+    }
+    .payment-list-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .ipc-info-grid {
+        grid-template-columns: 1fr;
+    }
+    .approval-buttons {
+        flex-direction: column;
+    }
+    .form-row-2,
+    .form-row-3 {
+        grid-template-columns: 1fr;
+    }
+}

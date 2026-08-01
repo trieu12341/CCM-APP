@@ -1,5 +1,5 @@
 import { state } from '../app.js';
-import { saveBudget, saveTender, saveContracts, saveCashflow } from '../api.js';
+import { saveBudget, saveTender, saveContracts, saveCashflow, savePayments } from '../api.js';
 
 // Centralize all localStorage keys
 export const STORAGE_KEYS = {
@@ -8,6 +8,7 @@ export const STORAGE_KEYS = {
     TENDERS: 'ccm_tenders',
     CONTRACTS: 'ccm_contracts',
     CASHFLOW: 'ccm_cashflow',
+    PAYMENTS: 'ccm_payments',
     PROJECT_ID: 'ccm_current_project_id',
 };
 
@@ -84,4 +85,23 @@ export function loadCashflowFromLS() {
         const lsData = localStorage.getItem(STORAGE_KEYS.CASHFLOW);
         return (lsData && lsData !== 'undefined' && lsData !== '[]') ? JSON.parse(lsData) : null;
     } catch (e) { console.error('Error parsing Cashflow from LS', e); return null; }
+}
+
+export function persistPayments(data) {
+    // SAFEGUARD: Do not overwrite localStorage with empty array if data exists
+    if ((!data || data.length === 0) && state.appData.Payments && state.appData.Payments.length > 0) {
+        console.warn('Blocked attempt to persist empty Payments data.');
+        return;
+    }
+    state.appData.Payments = data;
+    localStorage.setItem(STORAGE_KEYS.PAYMENTS, JSON.stringify(data));
+    savePayments(data).catch(err => console.error('Failed to sync payments to API:', err));
+    document.dispatchEvent(new Event('paymentsChanged'));
+}
+
+export function loadPaymentsFromLS() {
+    try {
+        const lsData = localStorage.getItem(STORAGE_KEYS.PAYMENTS);
+        return (lsData && lsData !== 'undefined' && lsData !== '[]') ? JSON.parse(lsData) : null;
+    } catch (e) { console.error('Error parsing Payments from LS', e); return null; }
 }

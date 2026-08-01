@@ -534,3 +534,296 @@
         </form>
     </div>
 </div>
+
+<!-- ============================================================
+     PAYMENT LAYER 2: Master IPC List
+     Opened by hiding #module-payment and showing this element.
+     ============================================================ -->
+<div id="payment-list-modal" class="hidden" style="background:var(--bg-light,#f8fafc);min-height:100vh;">
+
+    <!-- Layer 2 Header -->
+    <div class="payment-list-header">
+        <div class="payment-list-header-left">
+            <button class="btn btn-secondary" id="btn-payment-back-l1" style="display:flex;align-items:center;gap:6px;font-size:13px;">
+                <i class="fa-solid fa-arrow-left"></i> Quay lại Dashboard
+            </button>
+            <div class="payment-list-title">
+                <i class="fa-solid fa-list" style="color:var(--primary-blue);margin-right:6px;"></i>
+                Danh sách Tổng hợp Hồ sơ Thanh toán (IPC)
+            </div>
+        </div>
+        <div class="payment-list-header-right">
+            <!-- Filter Bar -->
+            <div class="payment-filter-bar">
+                <input type="text" id="ipc-search-input" placeholder="🔍 Tìm mã IPC, gói thầu, nhà thầu…">
+                <select id="ipc-contract-type-filter">
+                    <option value="All">🏷️ Tất cả loại HĐ</option>
+                    <option value="Construction">🏗️ Xây dựng</option>
+                    <option value="Consultancy">📋 Tư vấn</option>
+                </select>
+                <select id="ipc-status-filter">
+                    <option value="All">Tất cả trạng thái</option>
+                    <option value="Draft">Draft</option>
+                    <option value="Reviewing">Đang xét duyệt</option>
+                    <option value="Approved">Đã Phê duyệt</option>
+                    <option value="Paid">Đã Thanh toán</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" id="btn-new-ipc" style="display:flex;align-items:center;gap:6px;font-size:13px;white-space:nowrap;">
+                <i class="fa-solid fa-plus"></i> Tạo Hồ sơ Thanh toán Mới (IPC)
+            </button>
+        </div>
+    </div>
+
+    <!-- Layer 2 Table Body -->
+    <div class="payment-list-body">
+        <div style="overflow-x:auto;">
+            <table class="ipc-master-table">
+                <thead>
+                    <tr>
+                        <th style="width:36px;text-align:center;">#</th>
+                        <th>Mã IPC</th>
+                        <th>Gói thầu / Hợp đồng</th>
+                        <th style="text-align:center;">Đợt TT</th>
+                        <th style="text-align:center;">Ngày nộp</th>
+                        <th style="text-align:right;">Giá trị Trình</th>
+                        <th style="text-align:right;">QS Khấu trừ</th>
+                        <th style="text-align:right;">Giá trị Duyệt</th>
+                        <th style="text-align:right;">Net Thực chi</th>
+                        <th style="text-align:center;">Trạng thái</th>
+                        <th style="text-align:center;width:90px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="ipc-list-tbody">
+                    <tr>
+                        <td colspan="11" style="text-align:center;padding:32px 0;color:#94a3b8;">
+                            <i class="fa-regular fa-folder-open" style="font-size:1.5rem;display:block;margin-bottom:8px;"></i>
+                            Chưa có Hồ sơ Thanh toán nào. Hãy tạo mới!
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     PAYMENT LAYER 3: IPC Detail Workspace (slide-in panel)
+     Not a modal — slide-in from right. Scroll stays enabled.
+     ============================================================ -->
+<div id="payment-detail-workspace" class="hidden">
+
+    <!-- ── DETAIL PANEL ──────────────────────────────────── -->
+    <div id="ipc-detail-panel">
+        <!-- Header -->
+        <div class="detail-workspace-header">
+            <div class="detail-workspace-header-left">
+                <button id="btn-close-ipc-detail" class="btn btn-secondary" style="font-size:13px;padding:6px 12px;">
+                    <i class="fa-solid fa-arrow-left"></i> Quay lại Danh sách
+                </button>
+                <div>
+                    <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.4px;">Hồ sơ Thanh toán</div>
+                    <div style="font-size:15px;font-weight:700;color:var(--text-dark);" id="pay-detail-ipc-code">IPC-—</div>
+                </div>
+            </div>
+            <div class="detail-workspace-header-right">
+                <span id="pay-detail-status-badge"></span>
+                <button id="btn-delete-ipc" class="btn btn-secondary" style="font-size:12px;padding:5px 10px;color:#ef4444;border-color:#fecaca;"
+                    title="Xóa IPC này">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Body -->
+        <div class="detail-workspace-body">
+
+            <!-- IPC Info Grid -->
+            <div class="ipc-info-grid">
+                <div class="ipc-info-item" style="grid-column:span 2;">
+                    <div class="ipc-info-label">Gói thầu / Hợp đồng</div>
+                    <div class="ipc-info-value" id="pay-detail-contract-name">—</div>
+                </div>
+                <div class="ipc-info-item">
+                    <div class="ipc-info-label">Nhà thầu</div>
+                    <div class="ipc-info-value" id="pay-detail-contractor">—</div>
+                </div>
+                <div class="ipc-info-item">
+                    <div class="ipc-info-label">Đợt Thanh toán</div>
+                    <div class="ipc-info-value" id="pay-detail-payment-no">—</div>
+                </div>
+                <div class="ipc-info-item">
+                    <div class="ipc-info-label">Ngày nộp hồ sơ</div>
+                    <div class="ipc-info-value" id="pay-detail-submission-date">—</div>
+                </div>
+                <div class="ipc-info-item">
+                    <div class="ipc-info-label">Đến hạn thanh toán</div>
+                    <div class="ipc-info-value" id="pay-detail-due-date">—</div>
+                </div>
+            </div>
+
+            <!-- Net Payable Summary Card -->
+            <div class="net-payable-card">
+                <div class="net-payable-label">
+                    <i class="fa-solid fa-circle-dollar-to-slot" style="margin-right:6px;"></i>
+                    Tổng Giá trị Thực chi Đợt này (NET PAYABLE)
+                </div>
+                <div class="net-payable-amount" id="pay-net-payable-display">0 VNĐ</div>
+            </div>
+
+            <!-- Financial Breakdown Table -->
+            <div class="breakdown-section-title">
+                <i class="fa-solid fa-calculator" style="margin-right:6px;"></i>
+                Bóc tách Hồ sơ Thanh toán chuẩn QS
+            </div>
+            <table class="breakdown-table">
+                <colgroup>
+                    <col style="width:40px;">
+                    <col>
+                    <col style="width:230px;">
+                </colgroup>
+                <tbody id="pay-breakdown-table-body">
+                    <!-- Dynamically rendered by payment-layer3-ui.js -->
+                </tbody>
+            </table>
+
+            <!-- Notes -->
+            <div style="margin-bottom:16px;">
+                <div class="breakdown-section-title">Ghi chú / Notes</div>
+                <div id="pay-detail-notes" style="font-size:13px;color:#64748b;padding:8px 0;line-height:1.6;">—</div>
+            </div>
+
+            <!-- Paid Date Info (shown after marking Paid) -->
+            <div id="pay-paid-date-section" class="paid-info-section hidden">
+                <i class="fa-solid fa-circle-check" style="margin-right:6px;"></i>
+                <span id="pay-paid-date-display">Đã chuyển tiền</span>
+            </div>
+
+            <!-- Approval Section -->
+            <div class="approval-section">
+                <div class="approval-title">
+                    <i class="fa-solid fa-shield-halved" style="margin-right:6px;"></i>
+                    Cơ chế Phê duyệt (Approval Actions)
+                </div>
+                <div class="approval-buttons">
+                    <button id="btn-approve-ipc" class="btn-approve">
+                        <i class="fa-solid fa-check-double"></i>
+                        Phê duyệt IPC
+                    </button>
+                    <button id="btn-confirm-paid" class="btn-paid">
+                        <i class="fa-solid fa-money-bill-transfer"></i>
+                        Xác nhận Đã Chuyển Tiền
+                    </button>
+                </div>
+                <div style="font-size:11px;color:#94a3b8;margin-top:10px;">
+                    <i class="fa-solid fa-info-circle" style="margin-right:4px;"></i>
+                    Phê duyệt IPC → sync dữ liệu Certified sang Tab Cashflow.
+                    Xác nhận Đã Chuyển Tiền → sync dữ liệu Paid sang Tab Cashflow.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── CREATE / EDIT FORM PANEL ─────────────────────── -->
+    <div id="ipc-form-panel" class="hidden" style="flex-direction:column;height:100%;">
+        <!-- Form Header -->
+        <div class="detail-workspace-header">
+            <div class="detail-workspace-header-left">
+                <button id="btn-close-ipc-form" class="btn btn-secondary" style="font-size:13px;padding:6px 12px;">
+                    <i class="fa-solid fa-xmark"></i> Hủy
+                </button>
+                <div style="font-size:15px;font-weight:700;color:var(--text-dark);">
+                    Tạo Hồ sơ Thanh toán Mới (IPC)
+                </div>
+            </div>
+            <button id="btn-save-ipc" class="btn btn-primary" style="font-size:13px;">
+                <i class="fa-solid fa-floppy-disk"></i> Lưu IPC
+            </button>
+        </div>
+
+        <!-- Form Body -->
+        <div class="detail-workspace-body">
+            <form id="ipc-form">
+                <!-- Contract Selection -->
+                <div class="form-group">
+                    <label>Gói thầu / Hợp đồng <span style="color:#ef4444;">*</span></label>
+                    <select id="ipc-form-contract" required>
+                        <option value="">-- Chọn Gói thầu / Hợp đồng --</option>
+                    </select>
+                    <div id="ipc-form-contractor-display" style="font-size:12px;color:#64748b;margin-top:4px;"></div>
+                </div>
+
+                <!-- Payment No + Dates -->
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>Đợt Thanh toán <span style="color:#ef4444;">*</span></label>
+                        <input type="number" id="ipc-form-payment-no" min="1" value="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Ngày nộp hồ sơ</label>
+                        <input type="date" id="ipc-form-submission-date">
+                    </div>
+                    <div class="form-group">
+                        <label>Đến hạn thanh toán</label>
+                        <input type="date" id="ipc-form-due-date">
+                    </div>
+                </div>
+
+                <!-- Gross Work Done -->
+                <div class="form-group">
+                    <label>Giá trị Khối lượng Đợt này (Gross Work Done) <span style="color:#ef4444;">*</span></label>
+                    <input type="number" id="ipc-form-gross" min="0" step="1000000" placeholder="0" required>
+                </div>
+
+                <!-- Deduction Rates (AP & Retention hidden for Consultancy contracts) -->
+                <div class="form-row-3">
+                    <div class="form-group" id="ipc-form-group-ap">
+                        <label>% Thu hồi Tạm ứng (AP Recovery)</label>
+                        <input type="number" id="ipc-form-ap-recovery" min="0" max="100" step="1" value="0" placeholder="0">
+                    </div>
+                    <div class="form-group" id="ipc-form-group-retention">
+                        <label>% Giữ lại Bảo hành (Retention)</label>
+                        <input type="number" id="ipc-form-retention" min="0" max="100" step="0.5" value="5" placeholder="5">
+                    </div>
+                    <div class="form-group">
+                        <label>% Thuế GTGT (VAT)</label>
+                        <input type="number" id="ipc-form-vat" min="0" max="100" step="1" value="10" placeholder="10">
+                    </div>
+                </div>
+
+                <!-- QS Deduction (optional) -->
+                <div class="form-group">
+                    <label>Khấu trừ điều chỉnh QS (nếu có)</label>
+                    <input type="number" id="ipc-form-qs-deduction" min="0" step="1000000" placeholder="0" value="0">
+                </div>
+
+                <!-- Live Calculation Preview -->
+                <div class="form-calc-preview">
+                    <h4><i class="fa-solid fa-calculator" style="margin-right:6px;color:var(--primary-blue);"></i>Tính toán tự động (Live Preview)</h4>
+                    <div class="calc-preview-row" id="form-preview-ap-row">
+                        <span class="calc-preview-label">(-) Thu hồi Tạm ứng (AP)</span>
+                        <span class="calc-preview-value" id="form-preview-ap">0 VNĐ</span>
+                    </div>
+                    <div class="calc-preview-row" id="form-preview-retention-row">
+                        <span class="calc-preview-label">(-) Giữ lại Bảo hành</span>
+                        <span class="calc-preview-value" id="form-preview-retention">0 VNĐ</span>
+                    </div>
+                    <div class="calc-preview-row">
+                        <span class="calc-preview-label">(+) Thuế GTGT</span>
+                        <span class="calc-preview-value" id="form-preview-vat">0 VNĐ</span>
+                    </div>
+                    <div class="calc-preview-row">
+                        <span class="calc-preview-label" id="form-preview-net-label">✅ NET PAYABLE ĐỢT NÀY</span>
+                        <span class="calc-preview-value" id="form-preview-net" style="color:var(--primary-blue);font-size:14px;">0 VNĐ</span>
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <div class="form-group" style="margin-top:14px;">
+                    <label>Ghi chú / Notes</label>
+                    <textarea id="ipc-form-notes" rows="3" placeholder="Ghi chú về hồ sơ thanh toán này…"></textarea>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
