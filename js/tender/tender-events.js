@@ -80,15 +80,7 @@ export function setupTenderEvents() {
     // Close Tender Detail Modal via ✕ button
     document.getElementById('close-tender-detail-modal')?.addEventListener('click', closeTenderDetailModal);
 
-    // Close Tender Detail Modal via ESC key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            const detailModal = document.getElementById('tender-detail-modal');
-            if (detailModal && !detailModal.classList.contains('hidden')) {
-                closeTenderDetailModal();
-            }
-        }
-    });
+
 
     // Close Tender Detail Modal via clicking backdrop
     document.getElementById('tender-detail-modal')?.addEventListener('click', (e) => {

@@ -37,15 +37,7 @@ export function setupContractEvents() {
     if (closeBtn) closeBtn.addEventListener('click', closeFn);
     if (cancelBtn) cancelBtn.addEventListener('click', closeFn);
 
-    // Close Modal via ESC key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            const detailModal = document.getElementById('contract-detail-modal');
-            if (detailModal && !detailModal.classList.contains('hidden')) {
-                closeContractDetailModal();
-            }
-        }
-    });
+
 
     // Close Modal via clicking backdrop
     document.getElementById('contract-detail-modal')?.addEventListener('click', (e) => {

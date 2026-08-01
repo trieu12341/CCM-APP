@@ -145,20 +145,7 @@ export function setupPaymentEvents() {
         });
     }
 
-    // ESC key → close Layer 3 first, then Layer 2
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            const detail = document.getElementById('payment-detail-workspace');
-            if (detail && !detail.classList.contains('hidden')) {
-                closeIPCDetail();
-                return;
-            }
-            const listModal = document.getElementById('payment-list-modal');
-            if (listModal && !listModal.classList.contains('hidden')) {
-                closeLayer2();
-            }
-        }
-    });
+
 
     // ── LAYER 3 EVENTS — CREATE FORM ────────────────────────
 
@@ -238,6 +225,7 @@ export function setupPaymentEvents() {
  * Opens Layer 2 full workspace:
  * - Hides #module-payment (Layer 1) completely
  * - Shows #payment-list-modal as full-screen workspace
+ * - Collapses the sidebar to maximize space
  */
 function openLayer2() {
     // Hide Layer 1 dashboard
@@ -247,6 +235,10 @@ function openLayer2() {
     // Show Layer 2 list
     const layer2 = document.getElementById('payment-list-modal');
     if (layer2) layer2.classList.remove('hidden');
+
+    // Auto-collapse sidebar
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) sidebar.classList.add('sidebar-collapsed');
 
     // Render fresh data
     renderIPCList();
@@ -269,6 +261,10 @@ function closeLayer2() {
     // Restore Layer 1
     const layer1 = document.getElementById('module-payment');
     if (layer1) layer1.classList.remove('hidden');
+
+    // Restore sidebar
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) sidebar.classList.remove('sidebar-collapsed');
 
     // Refresh KPI dashboard
     renderPaymentDashboard();

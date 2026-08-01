@@ -21,15 +21,7 @@ export function setupProjectSummaryEvents() {
         });
     }
 
-    // Close Modal via ESC key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            if (modal && !modal.classList.contains('hidden')) {
-                modal.classList.add('hidden');
-                document.body.classList.remove('modal-open');
-            }
-        }
-    });
+
 
     // Close Modal via clicking backdrop
     if (modal) {

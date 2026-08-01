@@ -136,6 +136,43 @@ export async function initApp() {
     if (isAuthenticated) {
         await loadAppData();
     }
+
+    // ─────────────────────────────────────────────────────
+    // Global ESC Event Listener (FIFO Layer Stack)
+    // ─────────────────────────────────────────────────────
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const escapeStack = [
+                // Priority 1: Popups
+                { container: '#budgetFormModal', btn: '#close-budget-form-modal' },
+                { container: '#cashflow-import-modal', btn: '#close-cf-import-modal' },
+
+                // Priority 2: Layer 3
+                { container: '#contract-detail-modal', btn: '#close-contract-modal' },
+                { container: '#payment-detail-workspace', btn: '#btn-close-ipc-form' },
+                { container: '#payment-detail-workspace', btn: '#btn-close-ipc-detail' },
+                { container: '#tender-detail-modal', btn: '#close-tender-detail-modal' },
+                
+                // Priority 3: Layer 2
+                { container: '#payment-list-modal', btn: '#btn-payment-back-l1' },
+                { container: '#tender-list-modal', btn: '#close-tender-list-modal' },
+                { container: '#contract-list-modal', btn: '#close-contract-list-modal' },
+                { container: '#budget-list-modal', btn: '#close-budget-list-modal' },
+                { container: '#cashflow-detail-modal', btn: '#close-cashflow-modal' },
+            ];
+
+            for (const layer of escapeStack) {
+                const el = document.querySelector(layer.container);
+                if (el && !el.classList.contains('hidden') && el.style.display !== 'none') {
+                    const btn = document.querySelector(layer.btn);
+                    if (btn && btn.closest('.hidden') === null && btn.style.display !== 'none') {
+                        btn.click();
+                        return; // Stop after handling the highest priority layer
+                    }
+                }
+            }
+        }
+    });
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -291,6 +328,18 @@ function setupSidebarEvents() {
 
         menuEl.addEventListener('click', (e) => {
             e.preventDefault();
+
+            // Clean up modal state before tab switch
+            document.querySelectorAll('.modal-overlay, .inline-workspace, #payment-list-modal').forEach(el => el.classList.add('hidden'));
+            document.body.classList.remove('modal-open', 'workspace-active', 'overflow-hidden');
+            document.getElementById('sidebar')?.classList.remove('sidebar-collapsed');
+            document.body.style.overflow = '';
+            const mainContent = document.querySelector('.main-content');
+            if (mainContent) {
+                mainContent.style.overflowY = 'auto';
+                mainContent.classList.remove('overflow-hidden');
+            }
+
             // Deactivate all
             modules.forEach(x => {
                 document.getElementById(x.menu)?.classList.remove('active');
