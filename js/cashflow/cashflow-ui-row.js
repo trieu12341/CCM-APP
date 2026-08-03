@@ -1,4 +1,4 @@
-import { state } from '../app.js';
+import { state, formatCurrencyVND } from '../app.js';
 import { getLocalCashflow, saveLocalCashflow } from './cashflow-state.js';
 import { formatNumberInput, formatToMonthYear } from './cashflow-ui-utils.js';
 import { updateCashflowSubtotal, getCurrentSelectedPackageId, renderCashflowTable } from './cashflow-ui-table.js';
@@ -13,7 +13,7 @@ export function createCashflowRowNode(item, isEditMode = false) {
                 <input type="text" class="cf-input cf-code" value="${item.code || ''}" placeholder="Mã đợt (Vd: IPC-01)" style="font-weight: bold; margin-bottom: 4px; width: 100%;">
                 <input type="text" class="cf-input cf-desc" value="${item.desc || ''}" placeholder="Diễn giải công việc" style="width: 100%;">
             </td>
-            <td class="col-amount"><input type="text" class="cf-input cf-value" value="${(item.value || 0).toLocaleString('en-US')}" style="width: 100%; text-align: right;"></td>
+            <td class="col-amount"><input type="text" class="cf-input cf-value" value="${formatCurrencyVND(item.value || 0)}" style="width: 100%; text-align: right;"></td>
             <td class="col-date"><input type="date" class="cf-input cf-date" value="${item.date || ''}" style="width: 100%;"></td>
             <td class="col-date col-synced">${item.certified_date || '-'}</td>
             <td class="col-date col-synced">${item.paid_date || '-'}</td>
@@ -49,16 +49,16 @@ export function createCashflowRowNode(item, isEditMode = false) {
         if (item.is_construction) {
             valueHtml = `
                 <div style="text-align: right; line-height: 1.4;">
-                    <div style="font-size: 0.8rem; color: #64748b;" title="Gross Work Done">WD: ${(item.workdone || 0).toLocaleString('en-US')}</div>
-                    <div style="font-size: 0.8rem; color: #ef4444;" title="Retention">Ret: ${(item.retention || 0).toLocaleString('en-US')}</div>
-                    <div style="font-size: 0.8rem; color: #f97316;" title="AP Recovery">AP: ${(item.ap_recovery || 0).toLocaleString('en-US')}</div>
+                    <div style="font-size: 0.8rem; color: #64748b;" title="Gross Work Done">WD: ${formatCurrencyVND(item.workdone || 0)}</div>
+                    <div style="font-size: 0.8rem; color: #ef4444;" title="Retention">Ret: ${formatCurrencyVND(item.retention || 0)}</div>
+                    <div style="font-size: 0.8rem; color: #f97316;" title="AP Recovery">AP: ${formatCurrencyVND(item.ap_recovery || 0)}</div>
                     <div style="font-weight: 700; color: #10b981; margin-top: 4px; border-top: 1px dashed #cbd5e1; padding-top: 2px;" title="Net Certified">
-                        <span class="cf-text-value">${(item.total_cert || 0).toLocaleString('en-US')}</span>
+                        <span class="cf-text-value">${formatCurrencyVND(item.total_cert || 0)}</span>
                     </div>
                 </div>
             `;
         } else {
-            valueHtml = `<div class="cf-text-value">${(item.value || 0).toLocaleString('en-US')}</div>`;
+            valueHtml = `<div class="cf-text-value">${formatCurrencyVND(item.value || 0)}</div>`;
         }
 
         let statusClass = 'planned';

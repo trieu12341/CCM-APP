@@ -1,26 +1,55 @@
-<header class="topbar">
-    <div class="search-bar">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" placeholder="Search">
+<header class="topbar" style="display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 1.5rem; background-color: white; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 1000;">
+    <!-- LEFT: Project Selection -->
+    <div style="display: flex; align-items: center; gap: 8px;">
+        <i class="fa-solid fa-building" style="color: var(--primary-blue);"></i>
+        <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-dark);">Dự án:</span>
+        <select id="project-select" style="padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-weight: 600; font-size: 0.9rem; outline: none; cursor: pointer; min-width: 200px;">
+            <!-- JS populated -->
+        </select>
+        <button id="btn-project-info" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.85rem;" title="Thông tin dự án">
+            <i class="fa-solid fa-circle-info"></i>
+        </button>
+        <button id="btn-add-project" class="btn btn-primary" style="padding: 4px 8px; font-size: 0.85rem;" title="Thêm dự án mới">
+            <i class="fa-solid fa-plus"></i>
+        </button>
     </div>
+
+    <!-- CENTER: Inline Badges -->
+    <div style="display: flex; align-items: center; gap: 16px; font-size: 0.8rem; font-weight: 500; color: #475569; background: #f8fafc; padding: 4px 16px; border-radius: 9999px; border: 1px solid #e2e8f0;">
+        <div><i class="fa-solid fa-wallet text-slate-400"></i> Ngân sách: <span id="hero-total-budget" style="color: var(--text-dark); font-weight: 600;">-</span></div>
+        <div style="width: 4px; height: 4px; background: #cbd5e1; border-radius: 50%;"></div>
+        <div><i class="fa-solid fa-ruler-combined text-slate-400"></i> CFA: <span id="hero-cfa" style="color: var(--text-dark); font-weight: 600;">-</span></div>
+        <div style="width: 4px; height: 4px; background: #cbd5e1; border-radius: 50%;"></div>
+        <div><i class="fa-solid fa-building-user text-slate-400"></i> Quy mô: <span id="hero-scale" style="color: var(--text-dark); font-weight: 600;">-</span></div>
+        <div style="width: 4px; height: 4px; background: #cbd5e1; border-radius: 50%;"></div>
+        <div><i class="fa-solid fa-bars-progress text-slate-400"></i> Tiến độ: <span id="hero-status" style="color: var(--text-dark); font-weight: 600;">-</span></div>
+    </div>
+
+    <!-- RIGHT: Actions -->
     <div class="topbar-actions" style="display: flex; align-items: center; gap: 15px;">
-        <i class="fa-regular fa-bell"></i>
+        <div class="search-bar" style="margin: 0;">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Search" style="padding: 6px 12px 6px 32px; border-radius: 6px; font-size: 0.85rem; width: 160px;">
+        </div>
+        <i class="fa-regular fa-bell" style="cursor: pointer; font-size: 1.1rem; color: #64748b;"></i>
         <div id="user-info" style="display: flex; align-items: center; gap: 10px;">
             <div style="text-align: right;">
-                <div id="user-name" style="font-weight: 600; font-size: 0.9rem;">-</div>
-                <div id="user-role" style="font-size: 0.75rem; color: var(--text-muted); text-transform: capitalize;">-</div>
+                <div id="user-name" style="font-weight: 600; font-size: 0.85rem;">-</div>
+                <div id="user-role" style="font-size: 0.7rem; color: var(--text-muted); text-transform: capitalize;">-</div>
             </div>
-            <img src="https://i.pravatar.cc/150?img=68" alt="Profile" class="avatar-small">
-            <div class="admin-tools manager-only" style="display: none; align-items: center; gap: 8px; border-right: 1px solid #e2e8f0; padding-right: 10px; margin-right: 5px;">
-                <button id="btn-admin-restore" class="btn btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.8rem; color: #3b82f6; border-color: #bfdbfe;" title="Khôi phục dữ liệu từ file Backup JSON">
-                    <i class="fa-solid fa-download"></i> Restore Backup
+            <img src="https://i.pravatar.cc/150?img=68" alt="Profile" class="avatar-small" style="width: 32px; height: 32px;">
+            
+            <div class="admin-tools manager-only" style="display: none; align-items: center; gap: 8px; border-left: 1px solid #e2e8f0; padding-left: 10px; margin-left: 5px;">
+                <button id="btn-admin-restore" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem; color: #3b82f6; border-color: #bfdbfe;" title="Restore Backup">
+                    <i class="fa-solid fa-download"></i>
                 </button>
                 <input type="file" id="admin-restore-file" accept=".json" style="display: none;">
-                <button id="btn-admin-reset" class="btn btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.8rem; color: #ef4444; border-color: #fecaca; background: #fef2f2;" title="Reset dữ liệu test hệ thống">
-                    <i class="fa-solid fa-triangle-exclamation"></i> System Reset
+                <button id="btn-admin-reset" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem; color: #ef4444; border-color: #fecaca; background: #fef2f2;" title="System Reset">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
                 </button>
             </div>
-            <button id="btn-logout" class="btn btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button>
+            
+            <button id="btn-logout" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem; margin-left: 5px;" title="Đăng xuất"><i class="fa-solid fa-right-from-bracket"></i></button>
         </div>
     </div>
 </header>

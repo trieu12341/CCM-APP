@@ -1,7 +1,74 @@
                 <div id="module-overview" class="hidden">
-                    <div class="section-title">Overview Dashboard</div>
-                    <div class="metrics-grid">
-                        <div class="metric-card"><div class="metric-label">Overview Features</div><div class="metric-value">Coming Soon</div></div>
+                    <div class="section-title">Overview (Executive Dashboard)</div>
+                    
+                    <div class="overview-kpi-grid">
+                        <div class="kpi-card kpi-card-slate">
+                            <div class="kpi-header"><span class="kpi-title">TOTAL BUDGET</span></div>
+                            <div class="kpi-value" id="ov-kpi-budget">0 <span>VNĐ</span></div>
+                        </div>
+                        <div class="kpi-card kpi-card-blue">
+                            <div class="kpi-header"><span class="kpi-title">COMMITTED COST</span></div>
+                            <div class="kpi-value" id="ov-kpi-committed">0 <span>VNĐ</span></div>
+                        </div>
+                        <div class="kpi-card kpi-card-emerald">
+                            <div class="kpi-header"><span class="kpi-title">ACTUAL CERTIFIED</span></div>
+                            <div class="kpi-value" id="ov-kpi-certified">0 <span>VNĐ</span></div>
+                        </div>
+                        <div class="kpi-card kpi-card-orange">
+                            <div class="kpi-header"><span class="kpi-title">SAVINGS / CONTINGENCY</span></div>
+                            <div class="kpi-value" id="ov-kpi-savings">0 <span>VNĐ</span></div>
+                            <div class="overview-progress">
+                                <div class="overview-progress-bar" id="ov-kpi-savings-bar" style="width: 0%; background-color: #f97316;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="overview-charts-grid">
+                        <div class="overview-chart-card">
+                            <h3><i class="fa-solid fa-chart-bar" style="color:var(--primary-blue);"></i> Budget vs Committed vs Certified (By Package)</h3>
+                            <div id="ov-chart-packages" style="height: 300px; display: flex; align-items: center; justify-content: center;"></div>
+                        </div>
+                        <div class="overview-chart-card">
+                            <h3><i class="fa-solid fa-chart-line" style="color:var(--primary-blue);"></i> S-Curve: Planned vs Actual Cashflow</h3>
+                            <div id="ov-chart-scurve" style="height: 300px; display: flex; align-items: center; justify-content: center;"></div>
+                        </div>
+                    </div>
+
+                    <div class="overview-charts-grid" style="grid-template-columns: 1fr 1fr;">
+                        <div class="overview-risk-table">
+                            <h3 style="margin-top:0; font-size: 1rem; color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> Cảnh Báo Rủi Ro (Risk Alerts)</h3>
+                            <div class="table-responsive">
+                                <table class="table table-hover" style="width: 100%; font-size: 0.9rem;">
+                                    <thead>
+                                        <tr>
+                                            <th>Gói Thầu</th>
+                                            <th>Vấn đề</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ov-risk-table-body">
+                                        <!-- JS injected -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="overview-risk-table">
+                            <h3 style="margin-top:0; font-size: 1rem; color: #f59e0b;"><i class="fa-solid fa-clock"></i> Tác Vụ Đang Chờ (Pending Tasks)</h3>
+                            <div class="table-responsive">
+                                <table class="table table-hover" style="width: 100%; font-size: 0.9rem;">
+                                    <thead>
+                                        <tr>
+                                            <th>Loại</th>
+                                            <th>Mã / Tên</th>
+                                            <th class="text-right">Giá trị</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ov-pending-table-body">
+                                        <!-- JS injected -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

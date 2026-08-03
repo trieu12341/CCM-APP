@@ -3,6 +3,7 @@ import { saveProject, saveTender } from '../api.js';
 import { persistBudgets, persistContracts, persistTenders } from '../core/data-store.js';
 import { renderProjectTabs, renderDashboard, renderBudgetTableModal } from './budget-ui.js';
 import { renderTenders } from '../tender.js';
+import { createIPC } from '../modules/payment/payment-state.js';
 
 
 
@@ -241,14 +242,14 @@ export function setupBudgetEvents() {
             const contractId = document.getElementById('contract-select')?.value;
             const amount = parseFloat(document.getElementById('payment-amount')?.value);
             if (!amount || amount <= 0) return;
-            if (!state.appData.Payment_Claims) state.appData.Payment_Claims = [];
-            state.appData.Payment_Claims.push({
-                claim_id: 'PC' + (state.appData.Payment_Claims.length + 1).toString().padStart(3, '0'),
+            const contract = state.appData.Contracts.find(c => c.contract_id === contractId);
+            createIPC({
                 contract_id: contractId,
-                period_number: 1,
-                claimed_amount: amount,
-                advance_deduction: 0,
-                retention_amount: 0,
+                contract_name: contract ? contract.contract_name : '',
+                contractor_name: contract ? contract.vendor_name : '',
+                gross_work_done: amount,
+                certified_value: amount,
+                net_payable: amount,
                 status: 'Approved'
             });
             const contractName = state.appData.Contracts.find(c => c.contract_id === contractId)?.contract_name;

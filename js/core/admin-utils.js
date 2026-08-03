@@ -165,7 +165,6 @@ function executeReset() {
             Contracts: [],
             Cashflow: [],
             Payments: [],
-            Payment_Claims: [],
             Variations: [],
             Documents: []
         };
@@ -211,7 +210,7 @@ function handleRestore(file) {
                     await saveBudget({
                         Budgets: data['ccm_budgets'] || [],
                         Contracts: data['ccm_contracts'] || [],
-                        Payment_Claims: [],
+                        Payments: [],
                         Variations: [],
                         Documents: []
                     });

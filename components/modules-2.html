@@ -17,23 +17,23 @@
                         <div class="cashflow-kpi-sidebar" style="display: flex; flex-direction: column; gap: 12px;">
                             <div class="kpi-card kpi-card-slate">
                                 <div class="kpi-header"><span class="kpi-title">PROJECT BUDGET</span></div>
-                                <div class="kpi-value" id="cf-kpi-budget">$0</div>
+                                <div class="kpi-value" id="cf-kpi-budget">0 VNĐ</div>
                             </div>
                             <div class="kpi-card kpi-card-slate">
                                 <div class="kpi-header"><span class="kpi-title">REVISED TOTAL CONTRACT</span></div>
-                                <div class="kpi-value" id="cf-kpi-revised">$0</div>
+                                <div class="kpi-value" id="cf-kpi-revised">0 VNĐ</div>
                             </div>
                             <div class="kpi-card kpi-card-emerald">
                                 <div class="kpi-header"><span class="kpi-title">TOTAL CERTIFIED TO DATE</span></div>
-                                <div class="kpi-value" id="cf-kpi-certified">$0</div>
+                                <div class="kpi-value" id="cf-kpi-certified">0 VNĐ</div>
                             </div>
                             <div class="kpi-card kpi-card-amber">
                                 <div class="kpi-header"><span class="kpi-title">BALANCE (BUDGET - CERTIFIED)</span></div>
-                                <div class="kpi-value" id="cf-kpi-balance">$0</div>
+                                <div class="kpi-value" id="cf-kpi-balance">0 VNĐ</div>
                             </div>
                             <div class="kpi-card kpi-card-blue">
                                 <div class="kpi-header"><span class="kpi-title">TOTAL PAID AMOUNT</span></div>
-                                <div class="kpi-value" id="cf-kpi-paid">$0</div>
+                                <div class="kpi-value" id="cf-kpi-paid">0 VNĐ</div>
                             </div>
                             <div class="kpi-card kpi-card-orange">
                                 <div class="kpi-header"><span class="kpi-title">% PAID</span></div>
@@ -175,16 +175,220 @@
 
 
                 <div id="module-vo" class="hidden">
-                    <div class="section-title">Variation Order</div>
-                    <div class="metrics-grid">
-                        <div class="metric-card"><div class="metric-label">Variation Features</div><div class="metric-value">Coming Soon</div></div>
+                    <div class="payment-section-header">
+                        <div class="payment-section-title" id="vo-header-title">
+                            <i class="fa-solid fa-file-invoice-dollar" style="color:var(--primary-blue);margin-right:8px;"></i>
+                            Variation Order (VO) Dashboard
+                        </div>
+                        <button class="btn btn-primary" id="btn-show-vo-layer2" style="font-weight:600; display:flex; align-items:center; gap:0.5rem;">
+                            <i class="fa-solid fa-list-check"></i> Bảng Chi Tiết Phát Sinh VO
+                        </button>
+                    </div>
+
+                    <!-- Layer 1: VO Executive Dashboard -->
+                    <div id="vo-layer-1">
+                        <!-- KPI Grid — 3 columns for 6 cards -->
+                        <div class="payment-kpi-grid" style="grid-template-columns: repeat(3, 1fr);">
+                            <div class="kpi-card kpi-card-slate">
+                                <div class="kpi-header">
+                                    <span class="kpi-title">TOTAL VO CLAIMED</span>
+                                </div>
+                                <div class="kpi-value" id="vo-kpi-claimed">0 <span>VNĐ</span></div>
+                                <div class="kpi-sub" style="font-size:11px;opacity:0.65;margin-top:4px;">Tổng giá trị NT đệ trình</div>
+                            </div>
+                            
+                            <div class="kpi-card kpi-card-emerald">
+                                <div class="kpi-header">
+                                    <span class="kpi-title">TOTAL APPROVED VO</span>
+                                </div>
+                                <div class="kpi-value text-success" id="vo-kpi-approved">0 <span>VNĐ</span></div>
+                                <div class="kpi-sub" style="font-size:11px;opacity:0.65;margin-top:4px;">QS/CĐT đã phê duyệt</div>
+                            </div>
+                            
+                            <div class="kpi-card kpi-card-orange">
+                                <div class="kpi-header">
+                                    <span class="kpi-title">TOTAL PENDING</span>
+                                </div>
+                                <div class="kpi-value text-warning" id="vo-kpi-pending">0 <span>VNĐ</span></div>
+                                <div class="kpi-sub" style="font-size:11px;opacity:0.65;margin-top:4px;">Đang chờ xử lý / Thẩm định</div>
+                            </div>
+                            
+                            <div class="kpi-card kpi-card-red">
+                                <div class="kpi-header">
+                                    <span class="kpi-title">REJECTED</span>
+                                </div>
+                                <div class="kpi-value text-danger" id="vo-kpi-rejected">0 <span>VNĐ</span></div>
+                                <div class="kpi-sub" style="font-size:11px;opacity:0.65;margin-top:4px;">Bị từ chối</div>
+                            </div>
+                            
+                            <div class="kpi-card kpi-card-blue">
+                                <div class="kpi-header">
+                                    <span class="kpi-title">APPROVED VO COUNT</span>
+                                </div>
+                                <div class="kpi-value" id="vo-kpi-count">0 / 0</div>
+                                <div class="kpi-sub" style="font-size:11px;opacity:0.65;margin-top:4px;">Số lượng VO được duyệt</div>
+                            </div>
+                            
+                            <div class="kpi-card kpi-card-slate">
+                                <div class="kpi-header">
+                                    <span class="kpi-title">VO / CONTRACT RATIO</span>
+                                </div>
+                                <div class="kpi-value" id="vo-kpi-ratio">0%</div>
+                                <div class="kpi-sub" style="font-size:11px;opacity:0.65;margin-top:4px;">Tỷ lệ Phát sinh / Giá trị HĐ</div>
+                            </div>
+                        </div>
+
+                        <div class="payment-widgets-grid" style="grid-template-columns: 1fr 2fr;">
+                            <div class="payment-widget-card">
+                                <h3>
+                                    <i class="fa-solid fa-chart-pie" style="color:var(--primary-blue);"></i>
+                                    VO Status Breakdown
+                                </h3>
+                                <div id="vo-doughnut-chart" style="height: 300px; display: flex; align-items: center; justify-content: center;"></div>
+                            </div>
+                            <div class="payment-widget-card">
+                                <h3>
+                                    <i class="fa-solid fa-chart-bar" style="color:var(--primary-blue);"></i>
+                                    Claimed vs Approved (By Contract)
+                                </h3>
+                                <div id="vo-bar-chart" style="height: 300px; display: flex; align-items: center; justify-content: center;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Layer 2: Master VO Table -->
+                    <div id="vo-layer-2" class="hidden" style="padding: 24px;">
+                        <div style="display: flex; justify-content: flex-start; margin-bottom: 1rem;">
+                            <button class="btn btn-outline" id="btn-show-vo-layer1" style="display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fa-solid fa-arrow-left"></i> Quay lại Dashboard
+                            </button>
+                        </div>
+                        <div class="data-card">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <h3 style="font-size: 1rem; color: var(--text-dark);">Master VO List</h3>
+                                <div style="display: flex; gap: 1rem;">
+                                    <select class="form-control" id="vo-status-filter" style="width: 200px;">
+                                        <option value="all">Tất cả trạng thái</option>
+                                        <option value="Pending">Pending</option>
+                                        <option value="Approved">Approved</option>
+                                        <option value="Rejected">Rejected</option>
+                                    </select>
+                                    <button class="btn btn-primary" id="btn-create-vo">
+                                        <i class="fa-solid fa-plus"></i> Tạo Phát sinh VO Mới
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table" id="vo-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Mã VO</th>
+                                            <th>Tên Phát sinh</th>
+                                            <th>Hợp đồng / Nhà thầu</th>
+                                            <th>Ngày đệ trình</th>
+                                            <th>Ngày đánh giá</th>
+                                            <th>Giá trị Đệ trình (VNĐ)</th>
+                                            <th>Giá trị QS Duyệt (VNĐ)</th>
+                                            <th>Chênh lệch (VNĐ)</th>
+                                            <th>Trạng thái</th>
+                                            <th>Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Dynamic content -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div id="module-final" class="hidden">
-                    <div class="section-title">Final Statement</div>
-                    <div class="metrics-grid">
-                        <div class="metric-card"><div class="metric-label">Final Statement Features</div><div class="metric-value">Coming Soon</div></div>
+                    <!-- Layer 1: Finalization Executive Dashboard -->
+                    <div id="final-layer-1">
+                        <div class="final-section-header">
+                            <div class="final-section-title">
+                                <i class="fa-solid fa-file-invoice-dollar" style="margin-right: 0.5rem; color: var(--primary-blue);"></i>
+                                FINALIZATION EXECUTIVE DASHBOARD
+                            </div>
+                            <button class="btn btn-primary" id="btn-show-final-layer2" style="background-color: #ea580c; color: white; border: none;">
+                                <i class="fa-regular fa-clipboard"></i> Bảng Chi Tiết Quyết Toán Hợp Đồng
+                            </button>
+                        </div>
+
+                        <div style="padding: 1.5rem;">
+                            <div class="final-kpi-grid">
+                                <div class="kpi-card kpi-card-slate">
+                                    <div class="kpi-header"><span class="kpi-title">TOTAL FINAL APPROVED VALUE</span></div>
+                                    <div class="kpi-value" id="final-kpi-total">0 <span>VNĐ</span></div>
+                                </div>
+                                <div class="kpi-card kpi-card-emerald">
+                                    <div class="kpi-header"><span class="kpi-title">CLOSED CONTRACTS</span></div>
+                                    <div class="kpi-value" id="final-kpi-closed">0 / 0</div>
+                                </div>
+                                <div class="kpi-card kpi-card-blue">
+                                    <div class="kpi-header"><span class="kpi-title">TOTAL RETENTION HELD</span></div>
+                                    <div class="kpi-value" id="final-kpi-retention">0 <span>VNĐ</span></div>
+                                </div>
+                                <div class="kpi-card kpi-card-orange">
+                                    <div class="kpi-header"><span class="kpi-title">FINAL BALANCE TO PAY</span></div>
+                                    <div class="kpi-value" id="final-kpi-balance">0 <span>VNĐ</span></div>
+                                </div>
+                            </div>
+
+                            <div class="final-widgets-grid">
+                                <div class="final-widget-card">
+                                    <h3>
+                                        <i class="fa-solid fa-chart-pie" style="color:var(--primary-blue);"></i>
+                                        Finalization Status
+                                    </h3>
+                                    <div id="final-doughnut-chart" style="height: 300px; display: flex; align-items: center; justify-content: center;"></div>
+                                </div>
+                                <div class="final-widget-card">
+                                    <h3>
+                                        <i class="fa-solid fa-chart-bar" style="color:var(--primary-blue);"></i>
+                                        Original vs Final Value (By Contract)
+                                    </h3>
+                                    <div id="final-bar-chart" style="height: 300px; display: flex; align-items: center; justify-content: center;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Layer 2: Master Final Statement Table -->
+                    <div id="final-layer-2" class="hidden" style="padding: 24px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; align-items: center;">
+                            <button class="btn btn-outline" id="btn-show-final-layer1" style="display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fa-solid fa-arrow-left"></i> Quay lại Dashboard
+                            </button>
+                            <h2 style="font-size: 1.25rem; font-weight: 600; color: var(--text-dark); margin: 0;">Master Final Statement</h2>
+                            <button class="btn btn-primary" id="btn-new-final-statement">
+                                <i class="fa-solid fa-plus"></i> Lập Hồ Sơ Quyết Toán Mới
+                            </button>
+                        </div>
+                        
+                        <div class="card" style="margin-top: 1rem;">
+                            <div class="table-responsive">
+                                <table class="data-table" id="final-table" style="width: 100%;">
+                                    <thead>
+                                        <tr>
+                                            <th>Mã HĐ</th>
+                                            <th>Tên Hợp Đồng / Nhà Thầu</th>
+                                            <th class="text-right">Giá trị HĐ Gốc</th>
+                                            <th class="text-right">Phát sinh Approved</th>
+                                            <th class="text-right">Giá trị Quyết toán</th>
+                                            <th class="text-right">Đã Thanh Toán IPC</th>
+                                            <th class="text-right">Còn Phải Trả</th>
+                                            <th class="text-center">Trạng thái</th>
+                                            <th class="text-center">Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="final-table-body">
+                                        <!-- JS injected -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

@@ -192,7 +192,7 @@ function renderApprovalActions(ipc) {
 
 export function renderIPCForm(ipcId = null) {
     const projectId = state.currentProjectId;
-    const contracts = (state.appData.Contracts || []).filter(c => c.project_id === projectId);
+    const contracts = (state.appData.Contracts || []).filter(c => c.project_id === projectId && c.status !== 'Closed');
 
     // Populate contract dropdown — include data-contract-type for dynamic form
     const contractSel = document.getElementById('ipc-form-contract');

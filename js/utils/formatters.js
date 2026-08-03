@@ -1,9 +1,9 @@
 export const formatCurrency = (value) => {
-    return new Intl.NumberFormat('en-US').format(Math.round(value || 0)) + ' VNĐ';
+    return new Intl.NumberFormat('vi-VN').format(Math.round(value || 0)) + ' VNĐ';
 };
 
 export const formatCurrencyVND = (value) => {
-    return new Intl.NumberFormat('en-US').format(Math.round(value || 0));
+    return new Intl.NumberFormat('vi-VN').format(Math.round(value || 0));
 };
 
 export const formatCurrencyShort = (value) => {

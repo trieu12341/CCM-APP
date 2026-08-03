@@ -237,9 +237,7 @@ function openLayer2() {
     if (layer2) layer2.classList.remove('hidden');
 
     // Auto-collapse sidebar
-    const sidebar = document.getElementById('sidebar');
-    if (sidebar) sidebar.classList.add('sidebar-collapsed');
-    document.body.classList.add('sidebar-collapsed');
+    if (typeof window.collapseSidebar === 'function') window.collapseSidebar();
 
     // Render fresh data
     renderIPCList();
@@ -264,9 +262,7 @@ function closeLayer2() {
     if (layer1) layer1.classList.remove('hidden');
 
     // Restore sidebar
-    const sidebar = document.getElementById('sidebar');
-    if (sidebar) sidebar.classList.remove('sidebar-collapsed');
-    document.body.classList.remove('sidebar-collapsed');
+    if (typeof window.expandSidebar === 'function') window.expandSidebar();
 
     // Refresh KPI dashboard
     renderPaymentDashboard();

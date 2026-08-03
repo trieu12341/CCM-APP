@@ -4,37 +4,55 @@ import { renderContracts } from '../contract.js';
 import { renderCashflow } from '../cashflow.js';
 
 export function renderProjectTabs() {
-    const container = document.getElementById('project-tabs-container');
-    if (!container) return;
-    container.innerHTML = '';
+    const selectEl = document.getElementById('project-select');
+    if (!selectEl) return;
     
+    selectEl.innerHTML = '';
     state.appData.Projects.forEach(project => {
-        const btn = document.createElement('button');
-        btn.className = `project-tab ${project.project_id === state.currentProjectId ? 'active' : ''}`;
-        btn.textContent = `[${project.project_name}]`;
-        btn.onclick = () => {
-            state.currentProjectId = project.project_id;
-            localStorage.setItem('ccm_current_project_id', state.currentProjectId);
-            renderProjectTabs();
-            renderDashboard();
-            renderContracts();
-            
-            const menuCashflow = document.getElementById('menu-cashflow');
-            if (menuCashflow && menuCashflow.classList.contains('active')) {
-                renderCashflow();
-            }
-        };
-        container.appendChild(btn);
+        const option = document.createElement('option');
+        option.value = project.project_id;
+        option.textContent = project.project_name;
+        if (project.project_id === state.currentProjectId) {
+            option.selected = true;
+        }
+        selectEl.appendChild(option);
     });
 
-    const addBtn = document.createElement('button');
-    addBtn.className = 'project-tab';
-    addBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Thêm dự án';
-    addBtn.onclick = () => {
-        document.getElementById('new-project-form').reset();
-        document.getElementById('new-project-modal').classList.remove('hidden');
+    // Handle project change
+    selectEl.onchange = (e) => {
+        state.currentProjectId = e.target.value;
+        localStorage.setItem('ccm_current_project_id', state.currentProjectId);
+        
+        renderDashboard();
+        renderContracts();
+        
+        const menuCashflow = document.getElementById('menu-cashflow');
+        if (menuCashflow && menuCashflow.classList.contains('active')) {
+            renderCashflow();
+        }
+        // Also re-render Overview if active
+        const menuOverview = document.getElementById('menu-overview');
+        if (menuOverview && menuOverview.classList.contains('active')) {
+            if (window.renderOverviewDashboard) window.renderOverviewDashboard();
+        }
     };
-    container.appendChild(addBtn);
+
+    // Add project button listener
+    const addBtn = document.getElementById('btn-add-project');
+    if (addBtn) {
+        addBtn.onclick = () => {
+            document.getElementById('new-project-form').reset();
+            document.getElementById('new-project-modal').classList.remove('hidden');
+        };
+    }
+
+    // Info project button listener
+    const infoBtn = document.getElementById('btn-project-info');
+    if (infoBtn) {
+        infoBtn.onclick = () => {
+            if (window.openProjectSummary) window.openProjectSummary();
+        };
+    }
 }
 
 let chartInstances = [];
@@ -45,9 +63,13 @@ export function renderDashboard() {
     const project = state.appData.Projects.find(p => p.project_id === state.currentProjectId);
     if (!project) return;
 
-    document.getElementById('project-name').innerHTML = `${project.project_name} <i class="fa-solid fa-gear" style="color: var(--primary-blue); font-size: 1.2rem;"></i>`;
+    // Update old #project-name if still exists, otherwise skip safely
+    const projectNameEl = document.getElementById('project-name');
+    if (projectNameEl) {
+        projectNameEl.innerHTML = `${project.project_name} <i class="fa-solid fa-gear" style="color: var(--primary-blue); font-size: 1.2rem;"></i>`;
+    }
     
-    const metaElement = document.getElementById('project-meta-info') || document.querySelector('.project-meta');
+    const metaElement = document.getElementById('project-meta-info');
     if (metaElement) {
         const start = project.start_date ? new Date(project.start_date).toLocaleDateString('en-GB') : '1 January 2024';
         const end = project.end_date ? new Date(project.end_date).toLocaleDateString('en-GB') : '1 December 2024';
@@ -91,7 +113,7 @@ export function renderDashboard() {
             let contractCommitted = getDynamicContractValue(contract, state.appData);
             
             let contractExpended = 0;
-            (state.appData.Payment_Claims || []).filter(p => p.contract_id === contract.contract_id && (p.status === 'Approved' || p.status === 'Paid')).forEach(p => {
+            (state.appData.Payments || []).filter(p => p.contract_id === contract.contract_id && (p.status === 'Approved' || p.status === 'Paid')).forEach(p => {
                 contractExpended += Number(p.net_payable) || Number(p.certified_value) || 0;
             });
             
@@ -264,7 +286,7 @@ export function renderBudgetTableModal() {
             let contractCommitted = getDynamicContractValue(contract, state.appData);
             
             let contractExpended = 0;
-            (state.appData.Payment_Claims || []).filter(p => p.contract_id === contract.contract_id && (p.status === 'Approved' || p.status === 'Paid')).forEach(p => {
+            (state.appData.Payments || []).filter(p => p.contract_id === contract.contract_id && (p.status === 'Approved' || p.status === 'Paid')).forEach(p => {
                 contractExpended += Number(p.net_payable) || Number(p.certified_value) || 0;
             });
             

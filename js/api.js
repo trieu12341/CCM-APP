@@ -54,9 +54,9 @@ export async function fetchProjects() {
 }
 
 export async function fetchBudget() {
-    if (localStorage.getItem('ccm_user_reset_cleared') === 'true') return { Budgets: [], Contracts: [], Payment_Claims: [], Variations: [], Documents: [] };
+    if (localStorage.getItem('ccm_user_reset_cleared') === 'true') return { Budgets: [], Contracts: [], Variations: [], Documents: [] };
     const res = await authFetch('/api/budget');
-    return res.ok ? await res.json() : { Contracts: [], Payment_Claims: [], Variations: [], Documents: [] };
+    return res.ok ? await res.json() : { Contracts: [], Variations: [], Documents: [] };
 }
 
 export async function fetchTenders() {

@@ -3,15 +3,15 @@ import { formatCurrency, formatCurrencyVND, formatDate } from '../app.js';
 import { formatToMonthYear } from '../cashflow/cashflow-ui-utils.js';
 
 describe('Formatting Functions', () => {
-    it('formatCurrency formats to USD with $ symbol', () => {
-        expect(formatCurrency(1234567.89)).toBe('$1,234,567.89');
-        expect(formatCurrency(0)).toBe('$0');
-        expect(formatCurrency(null)).toBe('$0');
+    it('formatCurrency formats to VNĐ with symbol', () => {
+        expect(formatCurrency(1234567.89)).toBe('1.234.568 VNĐ');
+        expect(formatCurrency(0)).toBe('0 VNĐ');
+        expect(formatCurrency(null)).toBe('0 VNĐ');
     });
 
     it('formatCurrencyVND formats to VND without symbol', () => {
-        expect(formatCurrencyVND(1234567.89)).toBe('1,234,567.89');
-        expect(formatCurrencyVND(1000)).toBe('1,000');
+        expect(formatCurrencyVND(1234567.89)).toBe('1.234.568');
+        expect(formatCurrencyVND(1000)).toBe('1.000');
     });
 
     it('formatDate formats ISO string to localized date', () => {

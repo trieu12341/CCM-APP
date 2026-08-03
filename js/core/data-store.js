@@ -9,6 +9,8 @@ export const STORAGE_KEYS = {
     CONTRACTS: 'ccm_contracts',
     CASHFLOW: 'ccm_cashflow',
     PAYMENTS: 'ccm_payments',
+    VARIATIONS: 'ccm_variations',
+    FINAL: 'ccm_final',
     PROJECT_ID: 'ccm_current_project_id',
 };
 
@@ -27,7 +29,7 @@ export function persistBudgets(data) {
     saveBudget({
         Budgets: data,
         Contracts: state.appData.Contracts || [],
-        Payment_Claims: state.appData.Payment_Claims || [],
+        Payments: state.appData.Payments || [],
         Variations: state.appData.Variations || [],
         Documents: state.appData.Documents || []
     }).catch(err => console.error('Failed to sync budgets to API:', err));
@@ -109,9 +111,36 @@ export function persistPayments(data) {
     document.dispatchEvent(new Event('paymentsChanged'));
 }
 
+export function persistFinalStatements(data) {
+    clearResetFlag();
+    state.appData.Final_Statements = data;
+    localStorage.setItem(STORAGE_KEYS.FINAL, JSON.stringify(data));
+    document.dispatchEvent(new Event('finalChanged'));
+}
+
 export function loadPaymentsFromLS() {
     try {
         const lsData = localStorage.getItem(STORAGE_KEYS.PAYMENTS);
         return (lsData && lsData !== 'undefined' && lsData !== '[]') ? JSON.parse(lsData) : null;
     } catch (e) { console.error('Error parsing Payments from LS', e); return null; }
+}
+
+export function persistVariations(data) {
+    if ((!data || data.length === 0) && state.appData.Variations && state.appData.Variations.length > 0) {
+        console.warn('Blocked attempt to persist empty Variations data.');
+        return;
+    }
+    clearResetFlag();
+    state.appData.Variations = data;
+    localStorage.setItem(STORAGE_KEYS.VARIATIONS, JSON.stringify(data));
+    // Since there's no saveVariations in API yet, we just update localStorage. 
+    // It's tied to budget/contracts save later if needed.
+    document.dispatchEvent(new Event('variationsChanged'));
+}
+
+export function loadVariationsFromLS() {
+    try {
+        const lsData = localStorage.getItem(STORAGE_KEYS.VARIATIONS);
+        return (lsData && lsData !== 'undefined' && lsData !== '[]') ? JSON.parse(lsData) : null;
+    } catch (e) { console.error('Error parsing Variations from LS', e); return null; }
 }

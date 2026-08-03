@@ -7,14 +7,14 @@
    LAYER 1: EXECUTIVE DASHBOARD
    ───────────────────────────────────────────────────────────── */
 
-#module-payment .payment-section-header {
+.payment-section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
 }
 
-#module-payment .payment-section-title {
+.payment-section-title {
     font-size: 1rem;
     font-weight: 700;
     color: var(--text-dark, #1e293b);

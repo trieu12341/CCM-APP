@@ -1,12 +1,15 @@
 import { state } from '../app.js';
 import { fetchProjects, fetchBudget, fetchTenders, fetchContracts, fetchCashflow, fetchPayments, apiLogin, apiGetMe } from '../api.js';
-import { loadBudgetsFromLS, loadTendersFromLS, loadContractsFromLS, loadCashflowFromLS, loadPaymentsFromLS } from '../core/data-store.js';
+import { loadBudgetsFromLS, loadTendersFromLS, loadContractsFromLS, loadCashflowFromLS, loadPaymentsFromLS, loadVariationsFromLS } from '../core/data-store.js';
 import { setupBudgetEvents, renderProjectTabs, renderDashboard } from '../budget.js';
 import { setupTenderEvents } from '../tender.js';
 import { setupContractEvents } from '../contract.js';
 import { setupCashflowEvents, renderCashflow } from '../cashflow.js';
 import { setupProjectSummaryEvents } from '../project.js';
 import { setupPaymentEvents, renderPaymentDashboard } from '../payment.js';
+import { setupVOEvents, renderVODashboard } from '../vo.js';
+import { setupFinalEvents, renderFinalDashboard } from '../final.js';
+import { initializeOverviewModule, renderOverviewDashboard } from '../overview.js';
 import { initAdminUtils } from './admin-utils.js';
 
 // ─────────────────────────────────────────────────────────────
@@ -155,6 +158,9 @@ export async function initApp() {
                 { container: '#payment-detail-workspace', btn: '#btn-close-ipc-form' },
                 { container: '#payment-detail-workspace', btn: '#btn-close-ipc-detail' },
                 { container: '#tender-detail-modal', btn: '#close-tender-detail-modal' },
+                { container: '#voModal', btn: '#closeVoModalBtn' },
+                { container: '#vo-form-workspace', btn: '#btn-cancel-vo' },
+                { container: '#final-breakdown-workspace', btn: '#btn-close-final-breakdown' },
                 
                 // Priority 3: Layer 2
                 { container: '#payment-list-modal', btn: '#btn-payment-back-l1' },
@@ -162,6 +168,8 @@ export async function initApp() {
                 { container: '#contract-list-modal', btn: '#close-contract-list-modal' },
                 { container: '#budget-list-modal', btn: '#close-budget-list-modal' },
                 { container: '#cashflow-detail-modal', btn: '#close-cashflow-modal' },
+                { container: '#vo-layer-2', btn: '#btn-show-vo-layer1' },
+                { container: '#final-layer-2', btn: '#btn-show-final-layer1' },
             ];
 
             for (const layer of escapeStack) {
@@ -203,6 +211,10 @@ async function loadAppData() {
         try { const lsCon = localStorage.getItem('ccm_contracts'); if (lsCon) fetchedContracts = JSON.parse(lsCon); } catch(e){}
         try { const lsCash = localStorage.getItem('ccm_cashflow'); if (lsCash) fetchedCashflow = JSON.parse(lsCash); } catch(e){}
         try { const lsPay = localStorage.getItem('ccm_payments'); if (lsPay) fetchedPayments = JSON.parse(lsPay); } catch(e){}
+        let fetchedVariations = [];
+        try { const lsVo = localStorage.getItem('ccm_variations'); if (lsVo) fetchedVariations = JSON.parse(lsVo); } catch(e){}
+        let fetchedFinal = [];
+        try { const lsFinal = localStorage.getItem('ccm_final'); if (lsFinal) fetchedFinal = JSON.parse(lsFinal); } catch(e){}
 
         state.appData = {
             Projects: Array.isArray(fetchedProjects) ? fetchedProjects : [],
@@ -211,8 +223,8 @@ async function loadAppData() {
             Contracts: Array.isArray(fetchedContracts) ? fetchedContracts : [],
             Cashflow: Array.isArray(fetchedCashflow) ? fetchedCashflow : [],
             Payments: Array.isArray(fetchedPayments) ? fetchedPayments : [],
-            Payment_Claims: [],
-            Variations: [],
+            Variations: Array.isArray(fetchedVariations) && fetchedVariations.length > 0 ? fetchedVariations : [],
+            Final_Statements: Array.isArray(fetchedFinal) ? fetchedFinal : [],
             Documents: []
         };
 
@@ -234,6 +246,9 @@ async function loadAppData() {
             { name: 'Cashflow',        fn: setupCashflowEvents },
             { name: 'ProjectSummary',  fn: setupProjectSummaryEvents },
             { name: 'Payment',         fn: setupPaymentEvents },
+            { name: 'VO',              fn: setupVOEvents },
+            { name: 'Final',           fn: setupFinalEvents },
+            { name: 'Overview',        fn: initializeOverviewModule },
             { name: 'AdminUtils',      fn: initAdminUtils },
         ];
 
@@ -284,6 +299,18 @@ function setupSidebarEvents() {
             document.querySelectorAll('.modal-overlay, .inline-workspace, #payment-list-modal').forEach(el => el.classList.add('hidden'));
             document.body.classList.remove('modal-open', 'workspace-active', 'overflow-hidden');
             document.getElementById('sidebar')?.classList.remove('sidebar-collapsed');
+            document.getElementById('project-tabs-container')?.classList.remove('hidden');
+            
+            // Reset VO module to Layer 1
+            document.getElementById('vo-layer-1')?.classList.remove('hidden');
+            document.getElementById('vo-layer-2')?.classList.add('hidden');
+            document.getElementById('btn-show-vo-layer2')?.classList.remove('hidden');
+            
+            // Reset Final module to Layer 1
+            document.getElementById('final-layer-1')?.classList.remove('hidden');
+            document.getElementById('final-layer-2')?.classList.add('hidden');
+            document.getElementById('btn-show-final-layer2')?.classList.remove('hidden');
+            
             document.body.style.overflow = '';
             const mainContent = document.querySelector('.main-content');
             if (mainContent) {
@@ -319,6 +346,11 @@ function setupSidebarEvents() {
                 // Payment dashboard re-render on tab switch
                 if (m.mod === 'module-payment') {
                     setTimeout(() => { try { renderPaymentDashboard(); } catch(e) { console.error(e); } }, 50);
+                }
+
+                // VO dashboard re-render on tab switch
+                if (m.mod === 'module-vo') {
+                    setTimeout(() => { try { renderVODashboard(); } catch(e) { console.error(e); } }, 50);
                 }
             }
         });

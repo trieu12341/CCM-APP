@@ -5,7 +5,7 @@ export function setupProjectSummaryEvents() {
     const closeBtn = document.getElementById('closeProjectModalBtn');
     // Use Event Delegation for dynamically rendered project title/info icon
     document.addEventListener('click', (e) => {
-        const projectTitleBtn = e.target.closest('#project-name, .fa-circle-info, .fa-gear');
+        const projectTitleBtn = e.target.closest('#project-name, #btn-project-info, .fa-circle-info, .fa-gear');
         if (projectTitleBtn) {
             e.preventDefault();
             openSummaryModal();

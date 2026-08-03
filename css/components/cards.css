@@ -189,6 +189,10 @@
 .kpi-card-orange .kpi-count { color: #ea580c; }
 .kpi-card-orange .kpi-value { color: #ea580c; }
 
+.kpi-card-red { border-top: 3px solid #ef4444; }
+.kpi-card-red .kpi-count { color: #dc2626; }
+.kpi-card-red .kpi-value { color: #dc2626; }
+
 /* Keep for Cashflow Sidebar Compatibility */
 .cf-kpi-box {
     background: #ffffff;

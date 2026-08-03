@@ -22,6 +22,19 @@
       "end_date": "2026-08-08",
       "total_budget": 20000000,
       "contingency_budget": 1000000
+    },
+    {
+      "project_id": "P001",
+      "project_name": "Project A",
+      "location": "Ho Chi Minh City",
+      "start_date": "2025-11-11",
+      "end_date": "2027-11-11",
+      "cfa": 50000,
+      "scale": "15 levels",
+      "status": "Đang thực hiện",
+      "image_url": "",
+      "total_budget": 0,
+      "contingency_budget": 0
     }
   ]
 }

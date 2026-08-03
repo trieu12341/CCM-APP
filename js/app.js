@@ -9,7 +9,6 @@ export const state = {
         Contracts: [],
         Cashflow: [],
         Payments: [],
-        Payment_Claims: [],
         Variations: [],
         Documents: [],
         Tenders: []
@@ -30,13 +29,18 @@ export function getContractBudgetValue(contract, appData) {
 
 export function getDynamicContractValue(contract, appData) {
     if (!contract) return 0;
-    // Excluded Variations (VO) per user request. Focus on original_value.
-    const originalValue = Number(contract.original_value);
-    if (!isNaN(originalValue) && originalValue !== 0) {
-        return originalValue;
+    
+    // Original contract value
+    const originalValue = Number(contract.original_value) || Number(contract.total_value) || Number(contract.contract_value) || 0;
+    
+    // Add approved variations (SSOT logic for VO Layer)
+    let approvedVOValue = 0;
+    if (appData && appData.Variations) {
+        const approvedVOs = appData.Variations.filter(vo => vo.contract_id === contract.contract_id && vo.status === 'Approved');
+        approvedVOValue = approvedVOs.reduce((sum, vo) => sum + (Number(vo.approved_amount) || Number(vo.vo_amount) || 0), 0);
     }
-    // Fallback for old data where total_value is directly stored
-    return Number(contract.total_value) || Number(contract.contract_value) || 0;
+    
+    return originalValue + approvedVOValue;
 }
 
 document.addEventListener('componentsLoaded', initApp);
