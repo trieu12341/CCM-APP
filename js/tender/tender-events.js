@@ -8,7 +8,7 @@ import { getLocalContracts, saveLocalContracts } from '../contract/contract-stat
 import { openContractModal, renderContractTableModal } from '../contract/contract-ui.js';
 import { generateCashflowForContract } from '../cashflow/cashflow-calc.js';
 import { createDraftContractFromTender } from '../contract/contract-actions.js';
-import { persistBudgets } from '../core/data-store.js';
+import { persistBudgets, persistTenders } from '../core/data-store.js';
 
 function addRound() {
     const tender = state.appData.Tenders.find(t => t.tender_id === tenderState.currentTenderDetailId);
@@ -42,6 +42,7 @@ async function saveTenderDetail() {
     try {
         const success = await updateTender(tender);
         if (success) {
+            persistTenders(state.appData.Tenders);
             alert('Đã lưu cập nhật gói thầu thành công!');
             renderTenders();
         } else {
@@ -92,6 +93,14 @@ export function setupTenderEvents() {
 
     const btnInitCBA = document.getElementById('btn-init-cba');
     if (btnInitCBA) btnInitCBA.addEventListener('click', initCBA);
+
+    const btnAddBidderEmpty = document.getElementById('btn-add-bidder-empty');
+    if (btnAddBidderEmpty) {
+        btnAddBidderEmpty.addEventListener('click', () => {
+            initCBA();
+            window.addBidder();
+        });
+    }
 
     const btnAddBidder = document.getElementById('btn-add-bidder');
     if (btnAddBidder) btnAddBidder.addEventListener('click', window.addBidder);
@@ -144,6 +153,7 @@ export function setupTenderEvents() {
             try {
                 const success = await updateTender(tender);
                 if (success) {
+                    persistTenders(state.appData.Tenders);
                     document.getElementById('detail-tender-status').textContent = tender.status;
                     document.getElementById('detail-tender-winner').textContent = tender.winner;
                     document.getElementById('detail-tender-final-price').textContent = formatCurrency(tender.final_price);
@@ -272,6 +282,7 @@ export function setupTenderEvents() {
             const success = await saveTender(newTender);
             if (success) {
                 state.appData.Tenders.push(newTender);
+                persistTenders(state.appData.Tenders);
                 renderTenders();
                 newTenderModal.classList.add('hidden');
             } else {

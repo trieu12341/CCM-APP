@@ -177,7 +177,8 @@
     padding-left: 0.5rem;
 }
 
-body.is-manager #sidebar .manager-only {
+body.is-manager #sidebar .manager-only,
+body.is-admin #sidebar .manager-only {
     display: flex !important;
 }
 

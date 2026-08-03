@@ -70,8 +70,10 @@ export async function initApp() {
                 if (roleEl) roleEl.textContent = state.user.role || 'Quantity Surveyor';
 
                 // Role-based CSS
-                const isAdmin = ['manager', 'admin'].includes(state.user.role);
-                document.body.classList.toggle('is-manager', isAdmin);
+                const isAdmin = state.user.role === 'admin';
+                const isManager = state.user.role === 'manager';
+                document.body.classList.toggle('is-admin', isAdmin);
+                document.body.classList.toggle('is-manager', isManager);
                 showApp(); // Reveal main app only here
                 return true;
             } else {

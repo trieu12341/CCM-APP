@@ -1,6 +1,6 @@
 import { state, mockActivities } from '../app.js';
 import { saveProject, saveTender } from '../api.js';
-import { persistBudgets, persistContracts } from '../core/data-store.js';
+import { persistBudgets, persistContracts, persistTenders } from '../core/data-store.js';
 import { renderProjectTabs, renderDashboard, renderBudgetTableModal } from './budget-ui.js';
 import { renderTenders } from '../tender.js';
 
@@ -33,6 +33,7 @@ export function setupBudgetEvents() {
             const success = await saveTender(newTender);
             if (success) {
                 state.appData.Tenders.push(newTender);
+                persistTenders(state.appData.Tenders);
                 alert(`Đã tạo hồ sơ Đấu thầu cho gói: ${newTender.tender_name}`);
                 renderBudgetTableModal();
                 if (typeof renderTenders === 'function') renderTenders();
