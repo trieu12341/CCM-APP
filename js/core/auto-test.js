@@ -107,6 +107,9 @@ export async function runAutoTestWorkflow() {
     
     const chkExport = document.getElementById('chk-auto-export');
     const isAutoExportEnabled = chkExport ? chkExport.checked : true;
+    
+    const chkPreserve = document.getElementById('chk-preserve-data');
+    const isPreserveDataEnabled = chkPreserve ? chkPreserve.checked : false;
 
     const term = document.getElementById('testing-terminal');
     if (term) term.innerHTML = ''; // Clear terminal
@@ -123,14 +126,30 @@ export async function runAutoTestWorkflow() {
     try {
     // --- CƠ CHẾ INJECT & SYNC DATA STATE ---
     try {
-        terminalLog('Chuẩn bị Môi trường Kiểm thử (Injecting Data State)...', 'info');
+        terminalLog('Chuẩn bị Môi trường Kiểm thử (Fetching Mock Data)...', 'info');
         clearResetFlag();
         
-        state.appData.Budgets = [];
-        state.appData.Tenders = [];
-        state.appData.Contracts = [];
-        state.appData.Cashflow = [];
-        state.appData.Payments = [];
+        const fetchJson = async (url) => {
+            try {
+                const r = await fetch(url);
+                return r.ok ? await r.json() : null;
+            } catch (e) { return null; }
+        };
+
+        const [projData, budgetData, tenderData, contractData, cashflowData, paymentData] = await Promise.all([
+            fetchJson('data/projects.json'),
+            fetchJson('data/budget.json'),
+            fetchJson('data/tenders.json'),
+            fetchJson('data/contracts.json'),
+            fetchJson('data/cashflow.json'),
+            fetchJson('data/payments.json')
+        ]);
+        
+        state.appData.Budgets = budgetData?.Budgets || [];
+        state.appData.Tenders = tenderData?.Tenders || [];
+        state.appData.Contracts = contractData?.Contracts || budgetData?.Contracts || [];
+        state.appData.Cashflow = cashflowData?.Cashflow || [];
+        state.appData.Payments = paymentData?.Payment_Claims || budgetData?.Payment_Claims || [];
         
         persistBudgets(state.appData.Budgets);
         persistTenders(state.appData.Tenders);
@@ -138,25 +157,23 @@ export async function runAutoTestWorkflow() {
         persistCashflow(state.appData.Cashflow);
         persistPayments(state.appData.Payments);
         
-        localStorage.setItem('ccm_projects', JSON.stringify([]));
+        localStorage.setItem('ccm_projects', JSON.stringify(projData?.Projects || []));
 
         window.dispatchEvent(new CustomEvent('appDataChanged'));
-        terminalLog('Môi trường Kiểm thử đã sẵn sàng.', 'success');
+        terminalLog('Đã nạp dữ liệu thực tế từ thư mục data/.', 'success');
     } catch (e) {
-        terminalLog(`Lỗi khởi tạo môi trường: ${e.message}`, 'error');
+        terminalLog(`Lỗi tải dữ liệu mẫu: ${e.message}`, 'error');
     }
 
-    // TEST CASE 1: VERIFY CLEAN RESET
-    terminalLog('\n--- TEST CASE 1: VERIFY CLEAN RESET ---', 'warn');
+    // TEST CASE 1: VERIFY DATA LOAD
+    terminalLog('\n--- TEST CASE 1: VERIFY DATA LOAD ---', 'warn');
     try {
         await delay(stepDelay);
-        const isClean = state.appData.Budgets.length === 0 && 
-                        state.appData.Tenders.length === 0 && 
-                        state.appData.Contracts.length === 0;
+        const hasData = state.appData.Budgets.length > 0 || state.appData.Tenders.length > 0;
                         
-        if (!isClean) throw new Error("Mảng dữ liệu vẫn còn phần tử sau khi reset");
+        if (!hasData) throw new Error("Dữ liệu nạp từ JSON đang rỗng (không có Budgets/Tenders)");
         
-        terminalLog('✅ TC1 Passed: Dữ liệu đã được dọn dẹp sạch sẽ 100%.', 'success');
+        terminalLog('✅ TC1 Passed: Dữ liệu mẫu (Mock Data) đã được nạp thành công.', 'success');
         passed++;
     } catch (error) {
         terminalLog(`❌ TC1 Failed: ${error.message}`, 'error');
@@ -164,9 +181,9 @@ export async function runAutoTestWorkflow() {
         await delay(3000);
         failed++;
         errorLogs.push({
-            testCaseId: 'TC1', module: 'System', step: 'Kiểm tra reset dữ liệu',
-            expected: 'Các mảng dữ liệu (Budgets, Tenders, Contracts) phải rỗng',
-            actual: 'Dữ liệu vẫn còn tồn tại',
+            testCaseId: 'TC1', module: 'System', step: 'Kiểm tra nạp dữ liệu Mock',
+            expected: 'Các mảng dữ liệu mẫu phải có phần tử',
+            actual: 'Dữ liệu vẫn trống',
             errorMessage: error.message, stackTrace: error.stack
         });
     }
@@ -175,15 +192,6 @@ export async function runAutoTestWorkflow() {
     // TEST CASE 2: WORKFLOW LINKAGE (BUDGET -> TENDER)
     terminalLog('\n--- TEST CASE 2: WORKFLOW LINKAGE (BUDGET -> TENDER) ---', 'warn');
     try {
-        const testBudget = [{
-            budget_id: 'b-test-autotest',
-            package_name: 'Auto Test Package',
-            total_budget: 1000000,
-            status: 'Approved'
-        }];
-        persistBudgets(testBudget);
-        window.dispatchEvent(new CustomEvent('appDataChanged'));
-        terminalLog('Đã bơm (inject) 1 Budget mẫu.', 'info');
         await delay(stepDelay);
         
         const budgetMenu = document.getElementById('menu-budget');
@@ -198,7 +206,7 @@ export async function runAutoTestWorkflow() {
             await interactWithHighlight(tenderMenu, () => tenderMenu.click(), stepDelay);
         }
         
-        terminalLog('✅ TC2 Passed: Liên kết dữ liệu Budget sang Tender hoạt động bình thường.', 'success');
+        terminalLog('✅ TC2 Passed: Liên kết dữ liệu Budget sang Tender hoạt động bình thường với Data thực.', 'success');
         passed++;
     } catch (error) {
         terminalLog(`❌ TC2 Failed: ${error.message}`, 'error');
@@ -206,8 +214,8 @@ export async function runAutoTestWorkflow() {
         await delay(3000);
         failed++;
         errorLogs.push({
-            testCaseId: 'TC2', module: 'Budget/Tender', step: 'Tạo Budget và chuyển qua tab Tender',
-            expected: 'Hệ thống chuyển tab mượt mà và load dữ liệu liên kết',
+            testCaseId: 'TC2', module: 'Budget/Tender', step: 'Chuyển tab Budget và Tender',
+            expected: 'Hệ thống chuyển tab mượt mà và load dữ liệu thực',
             actual: 'Có lỗi xảy ra khi click menu hoặc render component',
             errorMessage: error.message, stackTrace: error.stack
         });
@@ -323,41 +331,58 @@ export async function runAutoTestWorkflow() {
         }
     }
     } finally {
-        terminalLog('\n[TEARDOWN] Đang dọn dẹp dữ liệu kiểm thử...', 'warn');
-        // 1. Xóa toàn bộ dữ liệu giả lập trong RAM
-        state.appData.Budgets = [];
-        state.appData.Tenders = [];
-        state.appData.Contracts = [];
-        state.appData.Cashflow = [];
-        state.appData.Payments = [];
-        
-        // 2. Kích hoạt cơ chế reset sạch LocalStorage
-        clearResetFlag();
-        persistBudgets([]);
-        persistTenders([]);
-        persistContracts([]);
-        persistCashflow([]);
-        persistPayments([]);
-        localStorage.setItem('ccm_projects', JSON.stringify([]));
-        
-        // 3. Dispatch Event cập nhật dữ liệu toàn hệ thống
-        window.dispatchEvent(new CustomEvent('appDataChanged'));
-        
-        // Dọn dẹp UI
-        document.querySelectorAll('.modal-overlay, .inline-workspace, #payment-list-modal').forEach(el => el.classList.add('hidden'));
-        document.body.classList.remove('modal-open', 'workspace-active', 'overflow-hidden');
-        document.getElementById('sidebar')?.classList.remove('sidebar-collapsed');
-        document.body.style.overflow = '';
-        const mainContent = document.querySelector('.main-content');
-        if (mainContent) {
-            mainContent.style.overflowY = 'auto';
-            mainContent.classList.remove('overflow-hidden');
+        if (isPreserveDataEnabled) {
+            terminalLog('\n[TEARDOWN] Bỏ qua dọn dẹp dữ liệu (Preserve Data Mode)...', 'warn');
+            
+            // Dọn dẹp UI
+            document.querySelectorAll('.modal-overlay, .inline-workspace, #payment-list-modal').forEach(el => el.classList.add('hidden'));
+            document.body.classList.remove('modal-open', 'workspace-active', 'overflow-hidden');
+            document.getElementById('sidebar')?.classList.remove('sidebar-collapsed');
+            document.body.style.overflow = '';
+            const mainContent = document.querySelector('.main-content');
+            if (mainContent) {
+                mainContent.style.overflowY = 'auto';
+                mainContent.classList.remove('overflow-hidden');
+            }
+            
+            terminalLog('✅ [TEARDOWN] Đã hoàn tất, giữ nguyên dữ liệu trên UI.', 'success');
+        } else {
+            terminalLog('\n[TEARDOWN] Đang dọn dẹp dữ liệu kiểm thử...', 'warn');
+            // 1. Xóa toàn bộ dữ liệu giả lập trong RAM
+            state.appData.Budgets = [];
+            state.appData.Tenders = [];
+            state.appData.Contracts = [];
+            state.appData.Cashflow = [];
+            state.appData.Payments = [];
+            
+            // 2. Kích hoạt cơ chế reset sạch LocalStorage
+            clearResetFlag();
+            persistBudgets([]);
+            persistTenders([]);
+            persistContracts([]);
+            persistCashflow([]);
+            persistPayments([]);
+            localStorage.setItem('ccm_projects', JSON.stringify([]));
+            
+            // 3. Dispatch Event cập nhật dữ liệu toàn hệ thống
+            window.dispatchEvent(new CustomEvent('appDataChanged'));
+            
+            // Dọn dẹp UI
+            document.querySelectorAll('.modal-overlay, .inline-workspace, #payment-list-modal').forEach(el => el.classList.add('hidden'));
+            document.body.classList.remove('modal-open', 'workspace-active', 'overflow-hidden');
+            document.getElementById('sidebar')?.classList.remove('sidebar-collapsed');
+            document.body.style.overflow = '';
+            const mainContent = document.querySelector('.main-content');
+            if (mainContent) {
+                mainContent.style.overflowY = 'auto';
+                mainContent.classList.remove('overflow-hidden');
+            }
+            
+            // 4. Đưa màn hình điều khiển quay trở lại Tab 8
+            const testingMenu = document.getElementById('menu-testing');
+            if (testingMenu) testingMenu.click();
+            
+            terminalLog('✅ [TEARDOWN] Đã dọn dẹp dữ liệu và khôi phục Clean State.', 'success');
         }
-        
-        // 4. Đưa màn hình điều khiển quay trở lại Tab 8
-        const testingMenu = document.getElementById('menu-testing');
-        if (testingMenu) testingMenu.click();
-        
-        terminalLog('✅ [TEARDOWN] Đã dọn dẹp dữ liệu và khôi phục Clean State.', 'success');
     }
 }
