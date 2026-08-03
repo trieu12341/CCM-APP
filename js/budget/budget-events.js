@@ -310,10 +310,25 @@ export function setupBudgetEvents() {
             const location   = document.getElementById('proj-location')?.value;
             const start      = document.getElementById('proj-start')?.value;
             const end        = document.getElementById('proj-end')?.value;
-            const budget      = parseFloat(document.getElementById('proj-budget')?.value);
-            const contingency = parseFloat(document.getElementById('proj-contingency')?.value);
+            const cfa        = document.getElementById('proj-cfa')?.value;
+            const scale      = document.getElementById('proj-scale')?.value;
+            const status     = document.getElementById('proj-status')?.value;
+            const image      = document.getElementById('proj-image')?.value;
+
             const newId = 'P' + (state.appData.Projects.length + 1).toString().padStart(3, '0');
-            const newProject = { project_id: newId, project_name: name, location, start_date: start, end_date: end, total_budget: budget, contingency_budget: contingency };
+            const newProject = { 
+                project_id: newId, 
+                project_name: name, 
+                location: location, 
+                start_date: start, 
+                end_date: end, 
+                cfa: cfa ? Number(cfa) : 0,
+                scale: scale,
+                status: status,
+                image_url: image,
+                total_budget: 0, 
+                contingency_budget: 0 
+            };
             const success = await saveProject(newProject);
             if (success) {
                 state.appData.Projects.push(newProject);

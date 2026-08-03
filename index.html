@@ -57,7 +57,7 @@
                 <div id="project-header-container"></div>
                 <div id="modules-1-container"></div>
                 <div id="modules-2-container"></div>
-                <div id="testing-view-container"></div>
+
                 <div id="modals-1-container"></div>
                 <div id="modals-2-container"></div>
             </div>
@@ -65,7 +65,7 @@
     </div>
 
     <script type="module" src="js/app.js"></script>
-    <script type="module" src="js/core/auto-test.js"></script>
+
     <script type="module">
         import { loadComponent } from './js/utils/html-loader.js';
 
@@ -77,8 +77,7 @@
                 loadComponent('modules-1-container', 'components/modules-1.html'),
                 loadComponent('modules-2-container', 'components/modules-2.html'),
                 loadComponent('modals-1-container', 'components/modals-1.html'),
-                loadComponent('modals-2-container', 'components/modals-2.html'),
-                loadComponent('testing-view-container', 'components/testing-view.html')
+                loadComponent('modals-2-container', 'components/modals-2.html')
             ]);
             document.dispatchEvent(new Event('componentsLoaded'));
         }

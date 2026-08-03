@@ -356,8 +356,7 @@ function setupSidebarEvents() {
         { menu: 'menu-cashflow',  mod: 'cashflow-view' },
         { menu: 'menu-payment',   mod: 'module-payment' },
         { menu: 'menu-vo',        mod: 'module-vo' },
-        { menu: 'menu-final',     mod: 'module-final' },
-        { menu: 'menu-testing',   mod: 'testing-view-container' }
+        { menu: 'menu-final',     mod: 'module-final' }
     ];
 
     modules.forEach(m => {

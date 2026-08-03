@@ -50,21 +50,25 @@
 
     <!-- New Project Modal -->
     <div id="new-project-modal" class="modal-overlay hidden">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 600px;">
             <div class="modal-header">
                 <h2>Thêm dự án mới</h2>
                 <button id="close-project-modal" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <form id="new-project-form">
-                <div class="form-group">
+                <div class="form-group" style="margin-bottom: 1rem;">
                     <label for="proj-name">Tên dự án</label>
                     <input type="text" id="proj-name" required>
                 </div>
-                <div class="form-group">
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label for="proj-scale">Quy mô dự án</label>
+                    <input type="text" id="proj-scale" placeholder="VD: 15 tầng gồm 11 tầng căn hộ, 1 tầng tiện ích" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 1rem;">
                     <label for="proj-location">Địa điểm</label>
                     <input type="text" id="proj-location" required>
                 </div>
-                <div style="display: flex; gap: 1rem;">
+                <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
                     <div class="form-group" style="flex: 1;">
                         <label for="proj-start">Ngày bắt đầu</label>
                         <input type="date" id="proj-start" required>
@@ -74,13 +78,23 @@
                         <input type="date" id="proj-end" required>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="proj-budget">Tổng dự toán ($)</label>
-                    <input type="number" id="proj-budget" required>
+                <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="proj-cfa">Diện tích CFA (m²)</label>
+                        <input type="number" id="proj-cfa" placeholder="VD: 50000" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="proj-status">Tiến độ dự án</label>
+                        <select id="proj-status" required>
+                            <option value="Đang chuẩn bị">Đang chuẩn bị</option>
+                            <option value="Đang thực hiện" selected>Đang thực hiện</option>
+                            <option value="Đã hoàn thành">Đã hoàn thành</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="proj-contingency">Dự phòng phí ($)</label>
-                    <input type="number" id="proj-contingency" required>
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label for="proj-image">Hình ảnh dự án (URL)</label>
+                    <input type="url" id="proj-image" placeholder="https://example.com/image.jpg">
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" id="cancel-project-modal">Hủy</button>
