@@ -1,4 +1,5 @@
 import { saveProject, saveTender, saveBudget, saveContracts, saveCashflow, savePayments } from '../api.js';
+import { state } from '../app.js';
 
 // admin-utils.js
 // Utility module for Admin functions: Data Reset and Auto-Backup
@@ -133,6 +134,9 @@ function executeReset() {
         try {
             if (scopeFull) {
                 SYSTEM_KEYS.forEach(key => localStorage.removeItem(key));
+                // Set flag to prevent mock data seeding
+                localStorage.setItem('ccm_user_reset_cleared', 'true');
+                
                 await saveProject([]);
                 await saveBudget({ Budgets: [], Contracts: [], Payment_Claims: [], Variations: [], Documents: [] });
                 await saveTender([]);
@@ -158,6 +162,19 @@ function executeReset() {
         } catch (err) {
             console.error("Failed to clear API data", err);
         }
+
+        // Clear RAM state
+        state.appData = {
+            Projects: [],
+            Budgets: [],
+            Tenders: [],
+            Contracts: [],
+            Cashflow: [],
+            Payments: [],
+            Payment_Claims: [],
+            Variations: [],
+            Documents: []
+        };
 
         // Add a visual toast/alert before reload
         alert('Đã dọn dẹp dữ liệu theo yêu cầu! Hệ thống sẽ tự động khởi động lại (Reload).');

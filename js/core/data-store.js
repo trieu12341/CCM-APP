@@ -16,7 +16,12 @@ export const STORAGE_KEYS = {
 // PERSIST TO LOCAL STORAGE & API
 // ==========================================
 
+export function clearResetFlag() {
+    localStorage.removeItem('ccm_user_reset_cleared');
+}
+
 export function persistBudgets(data) {
+    clearResetFlag();
     state.appData.Budgets = data;
     localStorage.setItem(STORAGE_KEYS.BUDGETS, JSON.stringify(data));
     saveBudget({
@@ -30,12 +35,14 @@ export function persistBudgets(data) {
 }
 
 export function persistTenders(data) {
+    clearResetFlag();
     state.appData.Tenders = data;
     localStorage.setItem(STORAGE_KEYS.TENDERS, JSON.stringify(data));
     document.dispatchEvent(new Event('tendersChanged'));
 }
 
 export function persistContracts(data) {
+    clearResetFlag();
     state.appData.Contracts = data;
     localStorage.setItem(STORAGE_KEYS.CONTRACTS, JSON.stringify(data));
     saveContracts(data).catch(err => console.error('Failed to sync contracts to API:', err));
@@ -49,6 +56,7 @@ export function persistCashflow(data) {
         return;
     }
 
+    clearResetFlag();
     state.appData.Cashflow = data;
     localStorage.setItem(STORAGE_KEYS.CASHFLOW, JSON.stringify(data));
     saveCashflow(data).catch(err => console.error('Failed to sync cashflow to API:', err));
@@ -93,6 +101,8 @@ export function persistPayments(data) {
         console.warn('Blocked attempt to persist empty Payments data.');
         return;
     }
+    
+    clearResetFlag();
     state.appData.Payments = data;
     localStorage.setItem(STORAGE_KEYS.PAYMENTS, JSON.stringify(data));
     savePayments(data).catch(err => console.error('Failed to sync payments to API:', err));

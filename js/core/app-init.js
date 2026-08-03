@@ -181,6 +181,41 @@ export async function initApp() {
 // ─────────────────────────────────────────────────────────────
 async function loadAppData() {
     try {
+        const isCleared = localStorage.getItem('ccm_user_reset_cleared') === 'true';
+
+        if (isCleared) {
+            console.warn('✅ System was hard reset. Bypassing all mock data and fetching.');
+            state.appData = {
+                Projects: [],
+                Budgets: [],
+                Tenders: [],
+                Contracts: [],
+                Cashflow: [],
+                Payments: [],
+                Payment_Claims: [],
+                Variations: [],
+                Documents: []
+            };
+            
+            // Wire events and render empty state
+            const setupSteps = [
+                { name: 'Sidebar',         fn: setupSidebarEvents },
+                { name: 'Budget',          fn: setupBudgetEvents },
+                { name: 'Tender',          fn: setupTenderEvents },
+                { name: 'Contract',        fn: setupContractEvents },
+                { name: 'Cashflow',        fn: setupCashflowEvents },
+                { name: 'ProjectSummary',  fn: setupProjectSummaryEvents },
+                { name: 'Payment',         fn: setupPaymentEvents },
+                { name: 'AdminUtils',      fn: initAdminUtils },
+            ];
+            for (const step of setupSteps) {
+                try { step.fn(); } catch (err) { console.error(`setup${step.name}Events failed:`, err); }
+            }
+            try { renderProjectTabs(); } catch (e) {}
+            try { renderDashboard();   } catch (e) {}
+            return;
+        }
+
         const [projectsData, budgetData, tendersData, contractsData, cashflowData, paymentsData] = await Promise.all([
             fetchProjects(),
             fetchBudget(),
