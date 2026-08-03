@@ -7,6 +7,7 @@ import { setupContractEvents } from '../contract.js';
 import { setupCashflowEvents, renderCashflow } from '../cashflow.js';
 import { setupProjectSummaryEvents } from '../project.js';
 import { setupPaymentEvents, renderPaymentDashboard } from '../payment.js';
+import { initAdminUtils } from './admin-utils.js';
 
 // ─────────────────────────────────────────────────────────────
 // MAIN ENTRY POINT — called after all HTML components are loaded
@@ -284,6 +285,7 @@ async function loadAppData() {
             { name: 'Cashflow',        fn: setupCashflowEvents },
             { name: 'ProjectSummary',  fn: setupProjectSummaryEvents },
             { name: 'Payment',         fn: setupPaymentEvents },
+            { name: 'AdminUtils',      fn: initAdminUtils },
         ];
 
         for (const step of setupSteps) {

@@ -55,3 +55,6 @@
     width: 100%;
 }
 
+body.is-manager .manager-only {
+    display: inline-flex !important;
+}
