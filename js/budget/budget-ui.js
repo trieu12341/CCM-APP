@@ -1,4 +1,4 @@
-import { state, formatCurrency, formatCurrencyVND, formatDate, mockActivities } from '../app.js';
+import { state, formatCurrency, formatCurrencyVND, formatDate, mockActivities, getDynamicContractValue } from '../app.js';
 import { renderTenders } from '../tender.js';
 import { renderContracts } from '../contract.js';
 import { renderCashflow } from '../cashflow.js';
@@ -88,13 +88,11 @@ export function renderDashboard() {
         
         const linkedContracts = (state.appData.Contracts || []).filter(c => c.budget_id === budget.id);
         linkedContracts.forEach(contract => {
-            let contractCommitted = Number(contract.total_value || contract.original_value || 0);
-            const variations = (state.appData.Variations || []).filter(v => v.contract_id === contract.contract_id && v.status === 'Approved');
-            variations.forEach(v => contractCommitted += Number(v.vo_amount || 0));
+            let contractCommitted = getDynamicContractValue(contract, state.appData);
             
             let contractExpended = 0;
-            (state.appData.Payment_Claims || []).filter(p => p.contract_id === contract.contract_id && p.status === 'Approved').forEach(p => {
-                contractExpended += Number(p.claimed_amount || 0);
+            (state.appData.Payment_Claims || []).filter(p => p.contract_id === contract.contract_id && (p.status === 'Approved' || p.status === 'Paid')).forEach(p => {
+                contractExpended += Number(p.net_payable) || Number(p.certified_value) || 0;
             });
             
             committed += contractCommitted;
@@ -263,13 +261,11 @@ export function renderBudgetTableModal() {
         
         const linkedContracts = (state.appData.Contracts || []).filter(c => c.budget_id === budget.id);
         linkedContracts.forEach(contract => {
-            let contractCommitted = Number(contract.total_value || contract.original_value || 0);
-            const variations = (state.appData.Variations || []).filter(v => v.contract_id === contract.contract_id && v.status === 'Approved');
-            variations.forEach(v => contractCommitted += Number(v.vo_amount || 0));
+            let contractCommitted = getDynamicContractValue(contract, state.appData);
             
             let contractExpended = 0;
-            (state.appData.Payment_Claims || []).filter(p => p.contract_id === contract.contract_id && p.status === 'Approved').forEach(p => {
-                contractExpended += Number(p.claimed_amount || 0);
+            (state.appData.Payment_Claims || []).filter(p => p.contract_id === contract.contract_id && (p.status === 'Approved' || p.status === 'Paid')).forEach(p => {
+                contractExpended += Number(p.net_payable) || Number(p.certified_value) || 0;
             });
             
             committed += contractCommitted;

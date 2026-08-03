@@ -1,4 +1,4 @@
-import { state, formatCurrency, formatCurrencyVND } from '../app.js';
+import { state, formatCurrency, formatCurrencyVND, getContractBudgetValue, getDynamicContractValue } from '../app.js';
 import { getLocalCashflow } from './cashflow-state.js';
 import { calculateForecastEngine, calculatePackageTotalPlanned } from './cashflow-calc.js';
 
@@ -15,8 +15,8 @@ export function renderCashflow() {
     let budget = 0;
     let revised = 0;
     contracts.filter(c => c.project_id === state.currentProjectId).forEach(c => {
-        budget += (Number(c.budget_value) || 0);
-        revised += (Number(c.total_value) || 0);
+        budget += getContractBudgetValue(c, state.appData);
+        revised += getDynamicContractValue(c, state.appData);
     });
 
     let cashflows = getLocalCashflow();

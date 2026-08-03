@@ -1,4 +1,4 @@
-import { state, formatCurrency, formatCurrencyVND } from '../app.js';
+import { state, formatCurrency, formatCurrencyVND, getContractBudgetValue, getDynamicContractValue } from '../app.js';
 import { getLocalContracts } from './contract-state.js';
 
 export function toggleDynamicFields(type) {
@@ -41,8 +41,8 @@ export function renderContracts() {
         let constructionCommitted = 0;
 
         contracts.forEach(c => {
-            const budget = Number(c.budget_value) || 0;
-            const committed = Number(c.total_value) || 0;
+            const budget = getContractBudgetValue(c, state.appData);
+            const committed = getDynamicContractValue(c, state.appData);
             
             totalBudget += budget;
             totalCommitted += committed;
@@ -192,9 +192,9 @@ export function renderContractTableModal() {
         }
 
         const typeStr = contract.type === 'Consultancy' ? 'Tư vấn' : 'Thi công';
-        const budget = Number(contract.budget_value) || 0;
-        const total = Number(contract.total_value) || 0;
-        const savings = budget - total;
+        const budget = getContractBudgetValue(contract, state.appData);
+        const contractVal = getDynamicContractValue(contract, state.appData);
+        const savings = budget - contractVal;
 
         let savingsHtml = formatCurrency(Math.abs(savings));
         if (savings < 0) {
@@ -212,7 +212,7 @@ export function renderContractTableModal() {
             <td>${contract.package_name || '-'}</td>
             <td>${contract.contractor || '-'}</td>
             <td style="font-weight: 600;">${formatCurrency(budget)}</td>
-            <td style="font-weight: 600;">${formatCurrency(total)}</td>
+            <td style="font-weight: 600;">${formatCurrency(contractVal)}</td>
             <td style="font-weight: 600;">${savingsHtml}</td>
             <td class="${statusClass}"><i class="fa-solid fa-circle" style="font-size: 0.5rem; margin-right: 4px;"></i>${statusText}</td>
             <td style="text-align: center;"><input type="checkbox" class="contract-cb" data-id="${contract.contract_id}"></td>
@@ -286,8 +286,8 @@ export function openContractModal(contract = null) {
         }
         
         document.getElementById('contract-status-input').value = contract.status || 'Active';
-        document.getElementById('contract-budget-input').value = contract.budget_value || '';
-        document.getElementById('contract-value-input').value = contract.total_value || '';
+        document.getElementById('contract-budget-input').value = getContractBudgetValue(contract, state.appData) || '';
+        document.getElementById('contract-value-input').value = getDynamicContractValue(contract, state.appData) || '';
         document.getElementById('contract-attachment-input').value = contract.attachment_url || '';
         
         document.getElementById('contract-adv-percent-input').value = contract.advance_payment_percent || '';

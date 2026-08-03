@@ -29,8 +29,7 @@ export function saveContract() {
         contractor: document.getElementById('contract-contractor-input').value.trim(),
         contract_date: document.getElementById('contract-date-input').value,
         status: document.getElementById('contract-status-input').value,
-        budget_value: parseFloat(document.getElementById('contract-budget-input').value) || 0,
-        total_value: parseFloat(document.getElementById('contract-value-input').value) || 0,
+        original_value: parseFloat(document.getElementById('contract-value-input').value) || 0,
         attachment_url: document.getElementById('contract-attachment-input').value.trim(),
         
         advance_payment_percent: parseFloat(document.getElementById('contract-adv-percent-input').value) || 0,
@@ -87,8 +86,7 @@ export function createDraftContractFromTender(tender) {
         contractor:     tender.winner || '',
         contract_date:  new Date().toISOString().split('T')[0],
         status:         'Draft',
-        budget_value:   Number(tender.budgetAmount || tender.estimatedValue || tender.approved_budget || 0),
-        total_value:    Number(tender.final_price || 0),
+        original_value: Number(tender.final_price || 0),
         scope_of_work:  '',
         attachment_url: ''
     };
@@ -173,8 +171,7 @@ export function handleContractExcelImport(e) {
                 type: typeStr,
                 package_name: pkgName.toString().trim(),
                 contractor: contractor ? contractor.toString().trim() : '',
-                budget_value: budgetValue,
-                total_value: value,
+                original_value: value,
                 status: status ? status.toString().trim() : 'Active'
             });
         }

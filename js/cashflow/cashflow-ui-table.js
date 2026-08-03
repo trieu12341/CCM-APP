@@ -1,4 +1,4 @@
-import { state, formatCurrencyDetailed, formatCurrency, formatCurrencyVND } from '../app.js';
+import { state, formatCurrencyDetailed, formatCurrency, formatCurrencyVND, getContractBudgetValue, getDynamicContractValue } from '../app.js';
 import { getLocalCashflow } from './cashflow-state.js';
 import { calculateForecastEngine, syncCashflowWithPayment, calculatePackageTotalPlanned } from './cashflow-calc.js';
 import { createCashflowRowNode } from './cashflow-ui-row.js';
@@ -92,7 +92,7 @@ function renderPackageList(contracts, cashflows) {
             if (cf.status === 'Paid') totalPaid += val;
         });
 
-        const contractValue = parseFloat(c.total_value) || parseFloat(c.budget_value) || 0;
+        const contractValue = getDynamicContractValue(c, state.appData);
         const progressPct = contractValue > 0 ? Math.min(100, (totalPaid / contractValue) * 100) : 0;
 
         const cid = getContractId(c);
@@ -137,7 +137,7 @@ function renderRightPane(contractId, contracts, allCashflows) {
         calculateForecastEngine(contractCashflows, contract);
     }
 
-    const contractValue = parseFloat(contract.total_value) || parseFloat(contract.budget_value) || 0;
+    const contractValue = getDynamicContractValue(contract, state.appData);
     
     let totalPlan = calculatePackageTotalPlanned(contractCashflows);
     let totalCert = 0, totalPaid = 0;

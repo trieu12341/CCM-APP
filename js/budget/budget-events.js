@@ -283,8 +283,6 @@ export function setupBudgetEvents() {
                 contract_name: categoryName,
                 contractor: 'TBD',
                 vendor_name: 'TBD',
-                budget_value: amount,
-                total_value: amount,
                 original_value: amount,
                 advance_rate: 0,
                 retention_rate: 0
