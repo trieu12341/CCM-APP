@@ -1,3 +1,5 @@
+import { saveProject, saveTender, saveBudget, saveContracts, saveCashflow, savePayments } from '../api.js';
+
 // admin-utils.js
 // Utility module for Admin functions: Data Reset and Auto-Backup
 
@@ -127,20 +129,34 @@ function executeReset() {
     handleAutoBackup();
 
     // 2. Wait slightly to ensure download triggers, then delete and reload
-    setTimeout(() => {
-        if (scopeFull) {
-            SYSTEM_KEYS.forEach(key => localStorage.removeItem(key));
-        } else {
-            if (scopePayments) {
-                localStorage.removeItem('ccm_payments');
+    setTimeout(async () => {
+        try {
+            if (scopeFull) {
+                SYSTEM_KEYS.forEach(key => localStorage.removeItem(key));
+                await saveProject([]);
+                await saveBudget({ Budgets: [], Contracts: [], Payment_Claims: [], Variations: [], Documents: [] });
+                await saveTender([]);
+                await saveContracts([]);
+                await saveCashflow([]);
+                await savePayments([]);
+            } else {
+                if (scopePayments) {
+                    localStorage.removeItem('ccm_payments');
+                    await savePayments([]);
+                }
+                if (scopeCashflow) {
+                    localStorage.removeItem('ccm_cashflow');
+                    await saveCashflow([]);
+                }
+                if (scopeContracts) {
+                    localStorage.removeItem('ccm_contracts');
+                    localStorage.removeItem('ccm_tenders');
+                    await saveContracts([]);
+                    await saveTender([]);
+                }
             }
-            if (scopeCashflow) {
-                localStorage.removeItem('ccm_cashflow');
-            }
-            if (scopeContracts) {
-                localStorage.removeItem('ccm_contracts');
-                localStorage.removeItem('ccm_tenders');
-            }
+        } catch (err) {
+            console.error("Failed to clear API data", err);
         }
 
         // Add a visual toast/alert before reload
@@ -151,7 +167,7 @@ function executeReset() {
 
 function handleRestore(file) {
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
         try {
             const data = JSON.parse(e.target.result);
             if (typeof data !== 'object' || data === null) {
@@ -164,6 +180,32 @@ function handleRestore(file) {
                     const value = typeof data[key] === 'object' ? JSON.stringify(data[key]) : data[key];
                     localStorage.setItem(key, value);
                     restoredCount++;
+                    
+                    // Sync restored data back to the server via API
+                    try {
+                        if (key === 'ccm_projects') await saveProject(data[key] || []);
+                        if (key === 'ccm_tenders') await saveTender(data[key] || []);
+                        if (key === 'ccm_contracts') await saveContracts(data[key] || []);
+                        if (key === 'ccm_cashflow') await saveCashflow(data[key] || []);
+                        if (key === 'ccm_payments') await savePayments(data[key] || []);
+                    } catch (err) {
+                        console.error('Failed to restore API data for', key, err);
+                    }
+                }
+            }
+
+            // Sync Budget manually if it exists to match the API structure
+            if (data.hasOwnProperty('ccm_budgets')) {
+                try {
+                    await saveBudget({
+                        Budgets: data['ccm_budgets'] || [],
+                        Contracts: data['ccm_contracts'] || [],
+                        Payment_Claims: [],
+                        Variations: [],
+                        Documents: []
+                    });
+                } catch (err) {
+                    console.error('Failed to restore Budget API data', err);
                 }
             }
             
