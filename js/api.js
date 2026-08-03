@@ -48,31 +48,37 @@ export async function apiGetMe() {
 }
 
 export async function fetchProjects() {
+    if (localStorage.getItem('ccm_user_reset_cleared') === 'true') return { Projects: [] };
     const res = await authFetch('/api/projects');
     return res.ok ? await res.json() : { Projects: [] };
 }
 
 export async function fetchBudget() {
+    if (localStorage.getItem('ccm_user_reset_cleared') === 'true') return { Budgets: [], Contracts: [], Payment_Claims: [], Variations: [], Documents: [] };
     const res = await authFetch('/api/budget');
     return res.ok ? await res.json() : { Contracts: [], Payment_Claims: [], Variations: [], Documents: [] };
 }
 
 export async function fetchTenders() {
+    if (localStorage.getItem('ccm_user_reset_cleared') === 'true') return { Tenders: [] };
     const res = await authFetch('/api/tenders');
     return res.ok ? await res.json() : { Tenders: [] };
 }
 
 export async function fetchContracts() {
+    if (localStorage.getItem('ccm_user_reset_cleared') === 'true') return [];
     const res = await authFetch('/api/contracts');
     return res.ok ? await res.json() : [];
 }
 
 export async function fetchCashflow() {
+    if (localStorage.getItem('ccm_user_reset_cleared') === 'true') return [];
     const res = await authFetch('/api/cashflow');
     return res.ok ? await res.json() : [];
 }
 
 export async function fetchPayments() {
+    if (localStorage.getItem('ccm_user_reset_cleared') === 'true') return [];
     const res = await authFetch('/api/payments');
     return res.ok ? await res.json() : [];
 }
