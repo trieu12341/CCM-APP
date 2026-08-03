@@ -330,21 +330,23 @@ export function setupBudgetEvents() {
                 contingency_budget: 0 
             };
             const success = await saveProject(newProject);
-            if (success) {
-                state.appData.Projects.push(newProject);
-                state.currentProjectId = newId;
-                
-                localStorage.setItem('ccm_projects', JSON.stringify(state.appData.Projects));
-                localStorage.setItem('ccm_current_project_id', newId);
-                
-                window.dispatchEvent(new CustomEvent('appDataChanged'));
+            
+            // Luôn lưu vào LocalStorage và state (hỗ trợ chế độ offline)
+            state.appData.Projects.push(newProject);
+            state.currentProjectId = newId;
+            
+            localStorage.setItem('ccm_projects', JSON.stringify(state.appData.Projects));
+            localStorage.setItem('ccm_current_project_id', newId);
+            
+            window.dispatchEvent(new CustomEvent('appDataChanged'));
 
-                if (typeof renderProjectTabs === 'function') renderProjectTabs();
-                renderDashboard();
-                renderBudgetTableModal();
-                newProjectModal.classList.add('hidden');
-            } else {
-                console.error('Lỗi khi thêm dự án');
+            if (typeof renderProjectTabs === 'function') renderProjectTabs();
+            renderDashboard();
+            renderBudgetTableModal();
+            newProjectModal.classList.add('hidden');
+            
+            if (!success) {
+                console.warn('Không thể lưu lên server, đã lưu offline vào LocalStorage');
             }
         });
     }
