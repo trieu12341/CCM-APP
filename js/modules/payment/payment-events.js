@@ -239,6 +239,7 @@ function openLayer2() {
     // Auto-collapse sidebar
     const sidebar = document.getElementById('sidebar');
     if (sidebar) sidebar.classList.add('sidebar-collapsed');
+    document.body.classList.add('sidebar-collapsed');
 
     // Render fresh data
     renderIPCList();
@@ -265,6 +266,7 @@ function closeLayer2() {
     // Restore sidebar
     const sidebar = document.getElementById('sidebar');
     if (sidebar) sidebar.classList.remove('sidebar-collapsed');
+    document.body.classList.remove('sidebar-collapsed');
 
     // Refresh KPI dashboard
     renderPaymentDashboard();

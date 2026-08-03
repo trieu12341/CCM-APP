@@ -106,6 +106,7 @@ export async function runAutoTestWorkflow() {
     const total = 4;
     const errorLogs = [];
 
+    try {
     // --- CƠ CHẾ INJECT & SYNC DATA STATE ---
     try {
         terminalLog('Chuẩn bị Môi trường Kiểm thử (Injecting Data State)...', 'info');
@@ -282,22 +283,6 @@ export async function runAutoTestWorkflow() {
         });
     }
 
-    // CƠ CHẾ DỌN DẸP
-    terminalLog('\nHoàn tất Workflow. Đang đưa UI về trạng thái ổn định (Reset)...', 'info');
-    document.querySelectorAll('.modal-overlay, .inline-workspace, #payment-list-modal').forEach(el => el.classList.add('hidden'));
-    document.body.classList.remove('modal-open', 'workspace-active', 'overflow-hidden');
-    document.getElementById('sidebar')?.classList.remove('sidebar-collapsed');
-    document.body.style.overflow = '';
-    const mainContent = document.querySelector('.main-content');
-    if (mainContent) {
-        mainContent.style.overflowY = 'auto';
-        mainContent.classList.remove('overflow-hidden');
-    }
-    
-    // Switch back to testing tab just in case
-    const testingMenu = document.getElementById('menu-testing');
-    if (testingMenu) testingMenu.click();
-
     // KẾT QUẢ BÁO CÁO
     const endTime = performance.now();
     updateKPI(total, passed, failed, endTime - startTime);
@@ -310,7 +295,6 @@ export async function runAutoTestWorkflow() {
         const btnExport = document.getElementById('btn-export-log');
         if (btnExport) {
             btnExport.style.display = 'inline-block';
-            // Lần nào gán lại cũng clear old event listener bằng cách replace node hoặc cẩn thận, nhưng đây ta gán đè onclick
             btnExport.onclick = () => exportErrorLogTxt(errorLogs);
         }
         
@@ -318,5 +302,43 @@ export async function runAutoTestWorkflow() {
             terminalLog('Đang tự động xuất file log .txt...', 'info');
             exportErrorLogTxt(errorLogs);
         }
+    }
+    } finally {
+        terminalLog('\n[TEARDOWN] Đang dọn dẹp dữ liệu kiểm thử...', 'warn');
+        // 1. Xóa toàn bộ dữ liệu giả lập trong RAM
+        state.appData.Budgets = [];
+        state.appData.Tenders = [];
+        state.appData.Contracts = [];
+        state.appData.Cashflow = [];
+        state.appData.Payments = [];
+        
+        // 2. Kích hoạt cơ chế reset sạch LocalStorage
+        clearResetFlag();
+        persistBudgets([]);
+        persistTenders([]);
+        persistContracts([]);
+        persistCashflow([]);
+        persistPayments([]);
+        localStorage.setItem('ccm_projects', JSON.stringify([]));
+        
+        // 3. Dispatch Event cập nhật dữ liệu toàn hệ thống
+        window.dispatchEvent(new CustomEvent('appDataChanged'));
+        
+        // Dọn dẹp UI
+        document.querySelectorAll('.modal-overlay, .inline-workspace, #payment-list-modal').forEach(el => el.classList.add('hidden'));
+        document.body.classList.remove('modal-open', 'workspace-active', 'overflow-hidden');
+        document.getElementById('sidebar')?.classList.remove('sidebar-collapsed');
+        document.body.style.overflow = '';
+        const mainContent = document.querySelector('.main-content');
+        if (mainContent) {
+            mainContent.style.overflowY = 'auto';
+            mainContent.classList.remove('overflow-hidden');
+        }
+        
+        // 4. Đưa màn hình điều khiển quay trở lại Tab 8
+        const testingMenu = document.getElementById('menu-testing');
+        if (testingMenu) testingMenu.click();
+        
+        terminalLog('✅ [TEARDOWN] Đã dọn dẹp dữ liệu và khôi phục Clean State.', 'success');
     }
 }
