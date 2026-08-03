@@ -12,8 +12,12 @@
             </button>
             <div style="display: flex; gap: 15px;">
                 <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-                    <input type="checkbox" id="chk-visual-delay" checked>
-                    Chạy hiệu ứng trực quan (Delay 600ms)
+                    <span style="font-weight: 500;">Tốc độ kiểm thử:</span>
+                    <select id="sel-test-speed" class="input-field" style="width: auto; padding: 4px 8px; border-radius: 4px; border: 1px solid #cbd5e1;">
+                        <option value="1500">Chậm - Demo quan sát (1500ms)</option>
+                        <option value="800" selected>Vừa - Chuẩn UI Test (800ms)</option>
+                        <option value="200">Siêu tốc - Quick Check (200ms)</option>
+                    </select>
                 </label>
                 <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
                     <input type="checkbox" id="chk-auto-export" checked>

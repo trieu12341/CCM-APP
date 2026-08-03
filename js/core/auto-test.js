@@ -8,9 +8,23 @@ import {
     persistPayments 
 } from './data-store.js';
 
-let isVisualDelayEnabled = true;
+const delay = ms => new Promise(r => setTimeout(r, ms));
 
-const delay = ms => new Promise(r => setTimeout(r, isVisualDelayEnabled ? ms : 0));
+async function interactWithHighlight(element, actionCallback, delayMs) {
+    if (!element) return;
+    const oldOutline = element.style.outline;
+    const oldOutlineOffset = element.style.outlineOffset;
+    
+    element.style.outline = '3px solid #ff0055';
+    element.style.outlineOffset = '2px';
+    
+    if (actionCallback) actionCallback();
+    
+    await delay(delayMs);
+    
+    element.style.outline = oldOutline;
+    element.style.outlineOffset = oldOutlineOffset;
+}
 
 function terminalLog(msg, type = 'info') {
     const term = document.getElementById('testing-terminal');
@@ -88,8 +102,8 @@ document.addEventListener('componentsLoaded', () => {
 });
 
 export async function runAutoTestWorkflow() {
-    const chkVisual = document.getElementById('chk-visual-delay');
-    isVisualDelayEnabled = chkVisual ? chkVisual.checked : true;
+    const speedSelect = document.getElementById('sel-test-speed');
+    const stepDelay = speedSelect ? parseInt(speedSelect.value, 10) : 800;
     
     const chkExport = document.getElementById('chk-auto-export');
     const isAutoExportEnabled = chkExport ? chkExport.checked : true;
@@ -135,7 +149,7 @@ export async function runAutoTestWorkflow() {
     // TEST CASE 1: VERIFY CLEAN RESET
     terminalLog('\n--- TEST CASE 1: VERIFY CLEAN RESET ---', 'warn');
     try {
-        await delay(600);
+        await delay(stepDelay);
         const isClean = state.appData.Budgets.length === 0 && 
                         state.appData.Tenders.length === 0 && 
                         state.appData.Contracts.length === 0;
@@ -146,6 +160,8 @@ export async function runAutoTestWorkflow() {
         passed++;
     } catch (error) {
         terminalLog(`❌ TC1 Failed: ${error.message}`, 'error');
+        terminalLog(`⏳ Tạm dừng 3000ms tại màn hình lỗi để quan sát...`, 'error');
+        await delay(3000);
         failed++;
         errorLogs.push({
             testCaseId: 'TC1', module: 'System', step: 'Kiểm tra reset dữ liệu',
@@ -168,26 +184,26 @@ export async function runAutoTestWorkflow() {
         persistBudgets(testBudget);
         window.dispatchEvent(new CustomEvent('appDataChanged'));
         terminalLog('Đã bơm (inject) 1 Budget mẫu.', 'info');
-        await delay(600);
+        await delay(stepDelay);
         
         const budgetMenu = document.getElementById('menu-budget');
         if (budgetMenu) {
             terminalLog('Chuyển qua Tab Budget...', 'info');
-            budgetMenu.click();
+            await interactWithHighlight(budgetMenu, () => budgetMenu.click(), stepDelay);
         }
-        await delay(600);
         
         const tenderMenu = document.getElementById('menu-tender');
         if (tenderMenu) {
             terminalLog('Chuyển qua Tab Tender...', 'info');
-            tenderMenu.click();
+            await interactWithHighlight(tenderMenu, () => tenderMenu.click(), stepDelay);
         }
-        await delay(600);
         
         terminalLog('✅ TC2 Passed: Liên kết dữ liệu Budget sang Tender hoạt động bình thường.', 'success');
         passed++;
     } catch (error) {
         terminalLog(`❌ TC2 Failed: ${error.message}`, 'error');
+        terminalLog(`⏳ Tạm dừng 3000ms tại màn hình lỗi để quan sát...`, 'error');
+        await delay(3000);
         failed++;
         errorLogs.push({
             testCaseId: 'TC2', module: 'Budget/Tender', step: 'Tạo Budget và chuyển qua tab Tender',
@@ -204,16 +220,14 @@ export async function runAutoTestWorkflow() {
         const paymentMenu = document.getElementById('menu-payment');
         if (paymentMenu) {
             terminalLog('Mở Tab Payment...', 'info');
-            paymentMenu.click();
+            await interactWithHighlight(paymentMenu, () => paymentMenu.click(), stepDelay);
         }
-        await delay(600);
         
         const openWorkspaceBtn = document.getElementById('btn-new-payment') || document.getElementById('btn-open-ipc-workspace');
         if (openWorkspaceBtn) {
             terminalLog('Mở Workspace Payment IPC Mới...', 'info');
-            openWorkspaceBtn.click();
+            await interactWithHighlight(openWorkspaceBtn, () => openWorkspaceBtn.click(), stepDelay);
         }
-        await delay(600);
         
         const isSidebarCollapsed = document.body.classList.contains('sidebar-collapsed') || document.getElementById('sidebar')?.classList.contains('sidebar-collapsed');
         if (!isSidebarCollapsed) {
@@ -224,10 +238,11 @@ export async function runAutoTestWorkflow() {
         const typeSelect = document.getElementById('ipc-type');
         if (typeSelect) {
             terminalLog('Đang chuyển loại Hợp đồng sang: Consultancy...', 'info');
-            typeSelect.value = 'Consultancy';
-            typeSelect.dispatchEvent(new Event('change'));
+            await interactWithHighlight(typeSelect, () => {
+                typeSelect.value = 'Consultancy';
+                typeSelect.dispatchEvent(new Event('change'));
+            }, stepDelay);
         }
-        await delay(600);
         
         const apContainer = document.getElementById('ipc-ap-container');
         const retContainer = document.getElementById('ipc-retention-container');
@@ -244,6 +259,8 @@ export async function runAutoTestWorkflow() {
         passed++;
     } catch (error) {
         terminalLog(`❌ TC3 Failed: ${error.message}`, 'error');
+        terminalLog(`⏳ Tạm dừng 3000ms tại màn hình lỗi để quan sát...`, 'error');
+        await delay(3000);
         failed++;
         errorLogs.push({
             testCaseId: 'TC3', module: 'Payment', step: 'Mở Form IPC và chọn gói thầu Consultancy',
@@ -259,11 +276,11 @@ export async function runAutoTestWorkflow() {
     try {
         terminalLog('Giả lập phím ESC lần 1...', 'info');
         document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
-        await delay(600);
+        await delay(stepDelay);
         
         terminalLog('Giả lập phím ESC lần 2 (Đóng Layer 2/3)...', 'info');
         document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
-        await delay(600);
+        await delay(stepDelay);
         
         const modalOpen = document.body.classList.contains('modal-open');
         if (modalOpen) {
@@ -274,6 +291,8 @@ export async function runAutoTestWorkflow() {
         passed++;
     } catch (error) {
         terminalLog(`❌ TC4 Failed: ${error.message}`, 'error');
+        terminalLog(`⏳ Tạm dừng 3000ms tại màn hình lỗi để quan sát...`, 'error');
+        await delay(3000);
         failed++;
         errorLogs.push({
             testCaseId: 'TC4', module: 'Core UI', step: 'Nhấn phím ESC để đóng Modal/Layer',
