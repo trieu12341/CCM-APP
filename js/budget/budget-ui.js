@@ -129,10 +129,18 @@ export function renderDashboard() {
     if (contingencyBudget === 0) {
         contingencyBudget = project.contingency_budget || 0;
     }
+
+    // Yêu cầu: Phân bổ Ngân sách thi công/tư vấn (Soft/Hard Cost) bằng Tổng ngân sách trừ Dự phòng 
+    // nếu mảng Budgets chưa có dữ liệu chi tiết
+    if (consultancyBudget === 0 && constructionBudget === 0 && (project.total_budget || 0) > 0) {
+        constructionBudget = (project.total_budget || 0) - contingencyBudget;
+        if (constructionBudget < 0) constructionBudget = 0; // Tránh số âm nếu nhập sai
+    }
+
     const contingencyRemaining = contingencyBudget - contingencyExpended; 
     
     const totalBudget = consultancyBudget + constructionBudget + contingencyBudget;
-    const totalBudgetFallback = totalBudget > 0 ? totalBudget : (project.total_budget || 0) + contingencyBudget;
+    const totalBudgetFallback = totalBudget > 0 ? totalBudget : (project.total_budget || 0);
 
     document.getElementById('metric-total-budget').innerHTML = `${formatCurrencyVND(totalBudgetFallback)} <span>VNĐ</span>`;
     
