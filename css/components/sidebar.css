@@ -177,4 +177,8 @@
     padding-left: 0.5rem;
 }
 
+body.is-manager #sidebar .manager-only {
+    display: flex !important;
+}
+
 /* Main Content */
