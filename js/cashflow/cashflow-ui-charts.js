@@ -13,9 +13,14 @@ export function renderCashflow() {
     let contracts = state.appData.Contracts || [];
     
     let budget = 0;
+    if (state.appData.Budgets) {
+        state.appData.Budgets.filter(b => b.project_id === state.currentProjectId).forEach(b => {
+            budget += Number(b.budgeted) || 0;
+        });
+    }
+
     let revised = 0;
     contracts.filter(c => c.project_id === state.currentProjectId).forEach(c => {
-        budget += getContractBudgetValue(c, state.appData);
         revised += getDynamicContractValue(c, state.appData);
     });
 

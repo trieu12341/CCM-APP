@@ -365,7 +365,10 @@
             <i class="fa-solid fa-file-invoice-dollar" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
             <h3 style="margin-bottom: 0.5rem;">Chưa có dữ liệu Bảng So Sánh Giá</h3>
             <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Khởi tạo bảng CBA để bắt đầu phân tích giá thầu.</p>
-            <button class="btn btn-primary manager-hide" id="btn-init-cba" style="margin: 0 auto;">+ Khởi tạo Bảng So Sánh Giá (CBA)</button>
+            <div style="display: flex; gap: 1rem; justify-content: center;" class="manager-hide">
+                <button class="btn btn-primary" id="btn-init-cba" style="margin: 0;">+ Khởi tạo Bảng CBA</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('excel-upload-input').click()" style="margin: 0; color: #10b981; border-color: #10b981;"><i class="fa-solid fa-file-excel"></i> Import CBA từ Excel</button>
+            </div>
         </div>
 
         <!-- CBA Table View -->

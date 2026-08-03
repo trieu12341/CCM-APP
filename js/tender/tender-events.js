@@ -8,6 +8,7 @@ import { getLocalContracts, saveLocalContracts } from '../contract/contract-stat
 import { openContractModal, renderContractTableModal } from '../contract/contract-ui.js';
 import { generateCashflowForContract } from '../cashflow/cashflow-calc.js';
 import { createDraftContractFromTender } from '../contract/contract-actions.js';
+import { persistBudgets } from '../core/data-store.js';
 
 function addRound() {
     const tender = state.appData.Tenders.find(t => t.tender_id === tenderState.currentTenderDetailId);
@@ -174,13 +175,7 @@ export function setupTenderEvents() {
                         if (budgetIdx !== -1) {
                             state.appData.Budgets[budgetIdx].cached_committed = Number(tender.final_price || 0);
                             // Persist vào server để survive reload
-                            saveBudget({
-                                Budgets:        state.appData.Budgets,
-                                Contracts:      state.appData.Contracts,
-                                Payment_Claims: state.appData.Payment_Claims,
-                                Variations:     state.appData.Variations,
-                                Documents:      state.appData.Documents
-                            }).catch(err => console.error('[award] saveBudget failed:', err));
+                            persistBudgets(state.appData.Budgets);
                         }
                     }
 

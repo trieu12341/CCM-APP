@@ -187,91 +187,32 @@ async function loadAppData() {
             console.warn('✅ System was hard reset. Will bypass default mock data.');
         }
 
-        const [projectsData, budgetData, tendersData, contractsData, cashflowData, paymentsData] = await Promise.all([
-            fetchProjects(),
-            fetchBudget(),
-            fetchTenders(),
-            fetchContracts(),
-            fetchCashflow(),
-            fetchPayments()
-        ]);
-
         // ── 1. Hydrate state ──────────────────────────────
-        let fetchedProjects = projectsData.Projects || [];
-        if (fetchedProjects.length === 0) {
-            try {
-                const lsProj = localStorage.getItem('ccm_projects');
-                if (lsProj) fetchedProjects = JSON.parse(lsProj);
-            } catch (e) {}
-        }
-        if (fetchedProjects.length === 0 && !isCleared) {
-            fetchedProjects = [{
-                project_id: 'proj-1',
-                project_name: 'Dự án Demo',
-                start_date: '2024-01-01',
-                end_date: '2025-12-01',
-                location: 'Hà Nội, Việt Nam',
-                total_budget: 0,
-                contingency_budget: 0
-            }];
-            localStorage.setItem('ccm_projects', JSON.stringify(fetchedProjects));
-        }
+        let fetchedProjects = [];
+        let fetchedBudgets = [];
+        let fetchedTenders = [];
+        let fetchedContracts = [];
+        let fetchedCashflow = [];
+        let fetchedPayments = [];
 
-        state.appData.Projects       = fetchedProjects;
-        
-        // Contracts fallback
-        let fetchedContracts = (Array.isArray(contractsData) && contractsData.length > 0) ? contractsData : (budgetData.Contracts || []);
-        if (fetchedContracts.length === 0) {
-            const lsContracts = loadContractsFromLS();
-            if (lsContracts) fetchedContracts = lsContracts;
-        }
-        state.appData.Contracts = fetchedContracts;
-        
-        // ── CASHFLOW RECOVERY LOGIC (STRICT) ──────────────
-        let fetchedCashflow = Array.isArray(cashflowData) && cashflowData.length > 0 ? cashflowData : [];
-        const localData = localStorage.getItem('ccm_cashflow');
-        if (localData && localData !== '[]' && localData !== 'undefined') {
-            try {
-                // ALWAYS PRIORITIZE LOCALSTORAGE FOR CASHFLOW TO PREVENT DATA LOSS
-                fetchedCashflow = JSON.parse(localData);
-                console.log('✅ Khôi phục thành công dữ liệu Cashflow từ LocalStorage');
-            } catch(e) { console.error('Lỗi khi khôi phục Cashflow:', e); }
-        }
-        state.appData.Cashflow = fetchedCashflow;
+        try { const lsProj = localStorage.getItem('ccm_projects'); if (lsProj) fetchedProjects = JSON.parse(lsProj); } catch(e){}
+        try { const lsBud = localStorage.getItem('ccm_budgets'); if (lsBud) fetchedBudgets = JSON.parse(lsBud); } catch(e){}
+        try { const lsTen = localStorage.getItem('ccm_tenders'); if (lsTen) fetchedTenders = JSON.parse(lsTen); } catch(e){}
+        try { const lsCon = localStorage.getItem('ccm_contracts'); if (lsCon) fetchedContracts = JSON.parse(lsCon); } catch(e){}
+        try { const lsCash = localStorage.getItem('ccm_cashflow'); if (lsCash) fetchedCashflow = JSON.parse(lsCash); } catch(e){}
+        try { const lsPay = localStorage.getItem('ccm_payments'); if (lsPay) fetchedPayments = JSON.parse(lsPay); } catch(e){}
 
-        state.appData.Payments = Array.isArray(paymentsData) ? paymentsData : [];
-
-        // PAYMENTS RECOVERY LOGIC — prioritize localStorage
-        const localPayments = localStorage.getItem('ccm_payments');
-        if (localPayments && localPayments !== '[]' && localPayments !== 'undefined') {
-            try {
-                const parsed = JSON.parse(localPayments);
-                if (Array.isArray(parsed) && parsed.length > 0) {
-                    state.appData.Payments = parsed;
-                    console.log(`✅ Khôi phục ${parsed.length} IPC từ LocalStorage (ccm_payments)`);
-                }
-            } catch (e) { console.error('Lỗi khi khôi phục Payments:', e); }
-        }
-        
-        // Load Budgets with fallback to localStorage
-        let fetchedBudgets = budgetData.Budgets || [];
-        if (fetchedBudgets.length === 0) {
-            const lsBudgets = loadBudgetsFromLS();
-            if (lsBudgets) fetchedBudgets = lsBudgets;
-        }
-        state.appData.Budgets = fetchedBudgets;
-
-        state.appData.Payment_Claims = budgetData.Payment_Claims  || [];
-        state.appData.Variations     = budgetData.Variations      || [];
-        state.appData.Documents      = budgetData.Documents       || [];
-        
-        // Tenders fallback
-        let fetchedTenders = tendersData.Tenders || [];
-        if (fetchedTenders.length === 0) {
-            const lsTenders = loadTendersFromLS();
-            if (lsTenders) fetchedTenders = lsTenders;
-        }
-        state.appData.Tenders = fetchedTenders;
+        state.appData = {
+            Projects: Array.isArray(fetchedProjects) ? fetchedProjects : [],
+            Budgets: Array.isArray(fetchedBudgets) ? fetchedBudgets : [],
+            Tenders: Array.isArray(fetchedTenders) ? fetchedTenders : [],
+            Contracts: Array.isArray(fetchedContracts) ? fetchedContracts : [],
+            Cashflow: Array.isArray(fetchedCashflow) ? fetchedCashflow : [],
+            Payments: Array.isArray(fetchedPayments) ? fetchedPayments : [],
+            Payment_Claims: [],
+            Variations: [],
+            Documents: []
+        };
 
         const savedActiveId = localStorage.getItem('ccm_current_project_id');
         if (savedActiveId && state.appData.Projects.some(p => p.project_id === savedActiveId)) {

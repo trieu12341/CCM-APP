@@ -133,16 +133,10 @@ function executeReset() {
     setTimeout(async () => {
         try {
             if (scopeFull) {
-                SYSTEM_KEYS.forEach(key => localStorage.removeItem(key));
+                localStorage.clear();
+                sessionStorage.clear();
                 // Set flag to prevent mock data seeding
                 localStorage.setItem('ccm_user_reset_cleared', 'true');
-                
-                await saveProject([]);
-                await saveBudget({ Budgets: [], Contracts: [], Payment_Claims: [], Variations: [], Documents: [] });
-                await saveTender([]);
-                await saveContracts([]);
-                await saveCashflow([]);
-                await savePayments([]);
             } else {
                 if (scopePayments) {
                     localStorage.removeItem('ccm_payments');

@@ -94,5 +94,9 @@ export function setupContractEvents() {
         });
     }
 
+    window.addEventListener('appDataChanged', () => {
+        renderContracts();
+    });
+
     renderContracts();
 }

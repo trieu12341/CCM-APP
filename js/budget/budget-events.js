@@ -1,6 +1,6 @@
 import { state, mockActivities } from '../app.js';
-import { saveProject, saveBudget, saveTender } from '../api.js';
-import { persistBudgets } from '../core/data-store.js';
+import { saveProject, saveTender } from '../api.js';
+import { persistBudgets, persistContracts } from '../core/data-store.js';
 import { renderProjectTabs, renderDashboard, renderBudgetTableModal } from './budget-ui.js';
 import { renderTenders } from '../tender.js';
 
@@ -252,7 +252,8 @@ export function setupBudgetEvents() {
             });
             const contractName = state.appData.Contracts.find(c => c.contract_id === contractId)?.contract_name;
             mockActivities.unshift({ text: `Payment Claim Approved: ${amount.toLocaleString()} VNĐ for ${contractName}`, date: new Date().toISOString() });
-            await saveBudget({ Budgets: state.appData.Budgets, Contracts: state.appData.Contracts, Payment_Claims: state.appData.Payment_Claims, Variations: state.appData.Variations, Documents: state.appData.Documents });
+            persistBudgets(state.appData.Budgets);
+            persistContracts(state.appData.Contracts);
             renderDashboard();
             renderBudgetTableModal();
             paymentModal.classList.add('hidden');
@@ -290,7 +291,8 @@ export function setupBudgetEvents() {
             if (!state.appData.Contracts) state.appData.Contracts = [];
             state.appData.Contracts.push(newContract);
             mockActivities.unshift({ text: `New Contract Entry added: ${categoryName}`, date: new Date().toISOString() });
-            await saveBudget({ Budgets: state.appData.Budgets, Contracts: state.appData.Contracts, Payment_Claims: state.appData.Payment_Claims, Variations: state.appData.Variations, Documents: state.appData.Documents });
+            persistBudgets(state.appData.Budgets);
+            persistContracts(state.appData.Contracts);
             renderDashboard();
             renderBudgetTableModal();
             newEntryModal.classList.add('hidden');

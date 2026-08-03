@@ -40,18 +40,27 @@ export function renderContracts() {
         let constructionBudget = 0;
         let constructionCommitted = 0;
 
+        if (state.appData.Budgets) {
+            const projectBudgets = state.appData.Budgets.filter(b => b.project_id === projectId);
+            projectBudgets.forEach(b => {
+                const bVal = Number(b.budgeted) || 0;
+                totalBudget += bVal;
+                if (b.category === 'Consultancy') {
+                    consultancyBudget += bVal;
+                } else if (b.category === 'Construction') {
+                    constructionBudget += bVal;
+                }
+            });
+        }
+
         contracts.forEach(c => {
-            const budget = getContractBudgetValue(c, state.appData);
             const committed = getDynamicContractValue(c, state.appData);
             
-            totalBudget += budget;
             totalCommitted += committed;
             
             if (c.type === 'Consultancy') {
-                consultancyBudget += budget;
                 consultancyCommitted += committed;
             } else {
-                constructionBudget += budget;
                 constructionCommitted += committed;
             }
         });

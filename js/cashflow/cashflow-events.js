@@ -177,4 +177,9 @@ export function setupCashflowEvents() {
             tableViewContainer.style.display = 'none';
         });
     }
+
+    window.addEventListener('appDataChanged', () => {
+        renderCashflow();
+        renderCashflowTable();
+    });
 }
