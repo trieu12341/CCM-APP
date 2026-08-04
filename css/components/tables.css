@@ -103,3 +103,22 @@
     color: var(--text-muted);
 }
 
+/* Zebra Striping for Budget Table */
+.zebra-odd {
+    background-color: #ffffff; /* bg-white */
+}
+
+.zebra-even {
+    background-color: #fff7ed; /* orange-50 equivalent */
+}
+
+#budget-tracker-table tbody tr.zebra-odd:hover,
+#budget-tracker-table tbody tr.zebra-even:hover {
+    background-color: #ffedd5; /* orange-100 highlight */
+}
+
+/* Numeric alignment and tabular-nums */
+.numeric-cell {
+    text-align: right !important;
+    font-variant-numeric: tabular-nums;
+}

@@ -65,6 +65,7 @@ export function setupBudgetEvents() {
         document.getElementById('budget-id').value = `BG-${(currentCount + 1).toString().padStart(2, '0')}`;
         
         document.getElementById('budget-category').value = 'Consultancy';
+        document.getElementById('budget-budgetCode').value = '';
         document.getElementById('budget-packageName').value = '';
         document.getElementById('budget-budgeted').value = '';
         document.getElementById('budget-notes').value = '';
@@ -82,6 +83,7 @@ export function setupBudgetEvents() {
     bindEvent('budgetForm', 'submit', async (e) => {
         e.preventDefault();
         const id = document.getElementById('budget-id').value;
+        const budgetCode = document.getElementById('budget-budgetCode').value;
         const category = document.getElementById('budget-category').value;
         const packageName = document.getElementById('budget-packageName').value;
         const budgeted = parseCurrencyInput(document.getElementById('budget-budgeted').value);
@@ -96,7 +98,7 @@ export function setupBudgetEvents() {
 
         if (index !== -1) {
             // Edit existing
-            state.appData.Budgets[index] = { ...state.appData.Budgets[index], category, packageName, budgeted, notes };
+            state.appData.Budgets[index] = { ...state.appData.Budgets[index], budgetCode, category, packageName, budgeted, notes };
             mockActivities.unshift({ text: `Đã cập nhật ngân sách: ${packageName}`, date: new Date().toISOString() });
         } else {
             // Create new
@@ -104,6 +106,7 @@ export function setupBudgetEvents() {
             const newItem = {
                 id: newId,
                 project_id: state.currentProjectId,
+                budgetCode,
                 category,
                 packageName,
                 budgeted,
@@ -133,6 +136,7 @@ export function setupBudgetEvents() {
                 if (budgetItem) {
                     document.getElementById('budgetFormTitle').textContent = 'Sửa Hạng Mục Ngân Sách';
                     document.getElementById('budget-id').value = budgetItem.id;
+                    document.getElementById('budget-budgetCode').value = budgetItem.budgetCode || '';
                     document.getElementById('budget-category').value = budgetItem.category || 'Consultancy';
                     document.getElementById('budget-packageName').value = budgetItem.packageName || '';
                     document.getElementById('budget-budgeted').value = (budgetItem.budgeted || 0).toLocaleString('en-US');
@@ -175,24 +179,26 @@ export function setupBudgetEvents() {
                 
                 let addedCount = 0;
                 
-                // Giả định form chuẩn: Category | Package Name | Budgeted
+                // Giả định form chuẩn: Budget Code | Category | Package Name | Budgeted
                 // Nếu header ở dòng 0, loop từ dòng 1
                 for (let i = 1; i < rows.length; i++) {
                     const row = rows[i];
-                    if (!row || row.length < 2) continue;
+                    if (!row || row.length < 3) continue;
                     
-                    const catRaw = (row[0] || '').toString().toLowerCase();
+                    const budgetCode = (row[0] || '').toString().trim();
+                    const catRaw = (row[1] || '').toString().toLowerCase();
                     let category = 'Construction';
                     if (catRaw.includes('tư vấn') || catRaw.includes('soft')) category = 'Consultancy';
                     else if (catRaw.includes('dự phòng') || catRaw.includes('contingency')) category = 'Contingency';
                     
-                    const packageName = row[1] || 'Unknown';
-                    if (row.length >= 3) {
-                        const budgeted = parseCurrencyInput(row[2]);
+                    const packageName = row[2] || 'Unknown';
+                    if (row.length >= 4) {
+                        const budgeted = parseCurrencyInput(row[3]);
                         if (budgeted > 0) {
                             const newId = 'B' + Date.now() + Math.floor(Math.random()*1000);
                             state.appData.Budgets.push({
                                 id: newId,
+                                budgetCode,
                                 project_id: state.currentProjectId,
                                 category,
                                 packageName,

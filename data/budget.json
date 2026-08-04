@@ -1,15 +1,275 @@
 {
   "Budgets": [
     {
-      "id": "B001-1785776868781",
+      "id": "B1785858680206484",
+      "budgetCode": "104-04",
       "project_id": "P001",
       "category": "Consultancy",
-      "packageName": "Phan Tho",
-      "budgeted": 500,
+      "packageName": "Concept Architect - DB",
+      "budgeted": 1550000000,
+      "notes": "",
+      "cached_committed": 1550000000
+    },
+    {
+      "id": "B1785858680206713",
+      "budgetCode": "104-26",
+      "project_id": "P001",
+      "category": "Consultancy",
+      "packageName": "Concept Architect - AI",
+      "budgeted": 437500000,
+      "notes": "",
+      "cached_committed": 437500000
+    },
+    {
+      "id": "B178585868020666",
+      "budgetCode": "104-04",
+      "project_id": "P001",
+      "category": "Consultancy",
+      "packageName": "Local Architect",
+      "budgeted": 3874000000,
+      "notes": ""
+    },
+    {
+      "id": "B1785858680206824",
+      "budgetCode": "104-28",
+      "project_id": "P001",
+      "category": "Consultancy",
+      "packageName": "Landscape",
+      "budgeted": 540000000,
+      "notes": ""
+    },
+    {
+      "id": "B1785858680206541",
+      "budgetCode": "104-30",
+      "project_id": "P001",
+      "category": "Consultancy",
+      "packageName": "ID",
+      "budgeted": 5200000000,
+      "notes": ""
+    },
+    {
+      "id": "B1785858680206947",
+      "budgetCode": "104-27",
+      "project_id": "P001",
+      "category": "Consultancy",
+      "packageName": "Facade Lighting",
+      "budgeted": 326880000,
+      "notes": ""
+    },
+    {
+      "id": "B1785858680206922",
+      "budgetCode": "104-32",
+      "project_id": "P001",
+      "category": "Consultancy",
+      "packageName": "Local MEP",
+      "budgeted": 3027300000,
+      "notes": ""
+    },
+    {
+      "id": "B1785858680206540",
+      "budgetCode": "104-09",
+      "project_id": "P001",
+      "category": "Consultancy",
+      "packageName": "C&S",
+      "budgeted": 800000000,
+      "notes": ""
+    },
+    {
+      "id": "B1785858680206532",
+      "budgetCode": "107-06",
+      "project_id": "P001",
+      "category": "Consultancy",
+      "packageName": "Traffic connection",
+      "budgeted": 185185185.18518516,
+      "notes": ""
+    },
+    {
+      "id": "B1785858680206548",
+      "budgetCode": "107-07",
+      "project_id": "P001",
+      "category": "Consultancy",
+      "packageName": "EIA",
+      "budgeted": 250000000,
+      "notes": ""
+    },
+    {
+      "id": "B178585868020696",
+      "budgetCode": "104-15",
+      "project_id": "P001",
+      "category": "Consultancy",
+      "packageName": "Thẩm tra",
+      "budgeted": 180000000,
+      "notes": ""
+    },
+    {
+      "id": "B1785858680206192",
+      "budgetCode": "104-16",
+      "project_id": "P001",
+      "category": "Consultancy",
+      "packageName": "Thẩm định",
+      "budgeted": 70000000,
+      "notes": ""
+    },
+    {
+      "id": "B1785858680206292",
+      "budgetCode": "104-12",
+      "project_id": "P001",
+      "category": "Consultancy",
+      "packageName": "QS",
+      "budgeted": 1400000000,
+      "notes": ""
+    },
+    {
+      "id": "B1785858680206330",
+      "budgetCode": "206",
+      "project_id": "P001",
+      "category": "Consultancy",
+      "packageName": "CAR Insurances",
+      "budgeted": 311849999.9999999,
+      "notes": ""
+    },
+    {
+      "id": "B1785858680206490",
+      "budgetCode": "107-05",
+      "project_id": "P001",
+      "category": "Consultancy",
+      "packageName": "Power / water agreement",
+      "budgeted": 50000000,
+      "notes": ""
+    },
+    {
+      "id": "B178585868020646",
+      "budgetCode": "102-16",
+      "project_id": "P001",
+      "category": "Consultancy",
+      "packageName": "Dilapidation survey",
+      "budgeted": 300000000,
+      "notes": ""
+    },
+    {
+      "id": "B1785858680206511",
+      "budgetCode": "104-08",
+      "project_id": "P001",
+      "category": "Consultancy",
+      "packageName": "Signage Consultant",
+      "budgeted": 100000000,
+      "notes": ""
+    },
+    {
+      "id": "B1785858680206848",
+      "budgetCode": "105-08",
+      "project_id": "P001",
+      "category": "Consultancy",
+      "packageName": "Construction Management",
+      "budgeted": 5000000000,
+      "notes": ""
+    },
+    {
+      "id": "B1785858680206594",
+      "budgetCode": "102-07",
+      "project_id": "P001",
+      "category": "Construction",
+      "packageName": "scale model",
+      "budgeted": 320400000,
+      "notes": ""
+    },
+    {
+      "id": "B1785858680206813",
+      "budgetCode": "102-14",
+      "project_id": "P001",
+      "category": "Construction",
+      "packageName": "Bomb survey",
+      "budgeted": 60000000,
+      "notes": ""
+    },
+    {
+      "id": "B1785858680206672",
+      "budgetCode": "104-02",
+      "project_id": "P001",
+      "category": "Construction",
+      "packageName": "Soil Investigation",
+      "budgeted": 203130000,
+      "notes": ""
+    },
+    {
+      "id": "B1785858680206759",
+      "budgetCode": "104-02",
+      "project_id": "P001",
+      "category": "Construction",
+      "packageName": "Topographic Survey",
+      "budgeted": 138888888.88888887,
+      "notes": ""
+    },
+    {
+      "id": "B1785858680206242",
+      "budgetCode": "102-02",
+      "project_id": "P001",
+      "category": "Construction",
+      "packageName": "Test Piles & Fence, Gate",
+      "budgeted": 1500000000,
+      "notes": ""
+    },
+    {
+      "id": "B1785858680206206",
+      "budgetCode": "102-02",
+      "project_id": "P001",
+      "category": "Construction",
+      "packageName": "Main Works",
+      "budgeted": 87624174976.3318,
+      "notes": ""
+    },
+    {
+      "id": "B1785858680206622",
+      "budgetCode": "102-03",
+      "project_id": "P001",
+      "category": "Construction",
+      "packageName": "MEP Works",
+      "budgeted": 55424050218.04675,
+      "notes": ""
+    },
+    {
+      "id": "B1785858680206869",
+      "budgetCode": "102-04",
+      "project_id": "P001",
+      "category": "Construction",
+      "packageName": "Finishing",
+      "budgeted": 61159148755.9616,
       "notes": ""
     }
   ],
-  "Contracts": [],
+  "Contracts": [
+    {
+      "contract_id": "c-1785862051703",
+      "from_tender_id": "T001",
+      "budget_id": "B1785858680206484",
+      "project_id": "P001",
+      "contract_code": "CTR-T001",
+      "type": "Consultancy",
+      "package_name": "Concept Architect - DB",
+      "contractor": "Công ty TNHH DB",
+      "contract_date": "2026-08-04",
+      "status": "Draft",
+      "original_value": 1550000000,
+      "scope_of_work": "",
+      "attachment_url": ""
+    },
+    {
+      "contract_id": "c-1785862089626",
+      "from_tender_id": "T002",
+      "budget_id": "B1785858680206713",
+      "project_id": "P001",
+      "contract_code": "CTR-T002",
+      "type": "Consultancy",
+      "package_name": "Concept Architect - AI",
+      "contractor": "Công ty AI Planet",
+      "contract_date": "2026-08-04",
+      "status": "Active",
+      "original_value": 3870000000,
+      "scope_of_work": "",
+      "attachment_url": "",
+      "total_value": 437500000
+    }
+  ],
   "Payments": [],
   "Variations": [],
   "Documents": []

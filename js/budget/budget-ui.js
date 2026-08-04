@@ -279,7 +279,7 @@ export function renderBudgetTableModal() {
 
     const projectBudgets = (state.appData.Budgets || []).filter(b => b.project_id === state.currentProjectId);
 
-    const createRow = (budget) => {
+    const createRow = (budget, index = 0) => {
         const budgeted = Number(budget.budgeted) || 0;
         let committed = 0;
         let expended = 0;
@@ -306,27 +306,32 @@ export function renderBudgetTableModal() {
 
         const varianceVal = budgeted - committed - expended;
         const progress = committed > 0 ? (expended / committed) * 100 : 0;
+        const isTenderCreated = (state.appData.Tenders || []).some(t => t.budget_id === budget.id) || 
+                                (budget.tender_status && budget.tender_status !== 'Draft') || 
+                                !!budget.tender_id;
+
+        const btnCreateHtml = isTenderCreated 
+            ? `<button class="w-8 h-8 rounded-md flex items-center justify-center text-slate-300 cursor-not-allowed" disabled title="Đã tạo gói thầu"><i class="fa-solid fa-plus"></i></button>`
+            : `<button class="btn-create-tender w-8 h-8 rounded-md flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors" data-id="${budget.id}" title="Tạo gói thầu từ mục này"><i class="fa-solid fa-plus"></i></button>`;
+
         const actionHtml = `
-            <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
-                <button class="btn-create-tender bg-amber-700 hover:bg-amber-800 text-white px-2 py-1 rounded" data-id="${budget.id}" style="font-size: 0.85rem; border: none; cursor: pointer;">Tạo Thầu</button>
-                <button class="btn-edit-budget text-gray-500 hover:text-blue-600" data-id="${budget.id}" style="background: none; border: none; cursor: pointer; padding: 4px;" title="Sửa"><i class="fa-solid fa-pen"></i></button>
-                <button class="btn-delete-budget text-gray-500 hover:text-red-600" data-id="${budget.id}" style="background: none; border: none; cursor: pointer; padding: 4px;" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+            <div style="display: flex; gap: 4px; justify-content: flex-end; align-items: center;">
+                ${btnCreateHtml}
+                <button class="btn-edit-budget w-8 h-8 rounded-md flex items-center justify-center text-slate-500 hover:text-blue-600 hover:bg-slate-100 transition-colors" data-id="${budget.id}" title="Chỉnh sửa"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn-delete-budget w-8 h-8 rounded-md flex items-center justify-center text-slate-500 hover:text-red-600 hover:bg-slate-100 transition-colors" data-id="${budget.id}" title="Xóa"><i class="fa-solid fa-trash"></i></button>
             </div>
         `;
 
         const tr = document.createElement('tr');
+        tr.classList.add(index % 2 === 0 ? 'zebra-odd' : 'zebra-even');
         tr.innerHTML = `
+            <td>${budget.budgetCode || ''}</td>
             <td>${budget.packageName || 'Unnamed Package'}</td>
-            <td>${formatCurrency(budgeted)}</td>
-            <td>${formatCurrency(committed)}</td>
-            <td>${formatCurrency(expended)}</td>
-            <td class="${varianceVal < 0 ? 'text-red' : 'text-blue'}">${varianceVal < 0 ? '-' : ''}${formatCurrency(Math.abs(varianceVal))}</td>
-            <td>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: ${progress}%"></div>
-                </div>
-            </td>
-            <td style="text-align: center;">${actionHtml}</td>
+            <td class="numeric-cell">${formatCurrency(budgeted)}</td>
+            <td class="numeric-cell">${formatCurrency(committed)}</td>
+            <td class="numeric-cell">${formatCurrency(expended)}</td>
+            <td class="numeric-cell ${varianceVal < 0 ? 'text-red' : 'text-blue'}">${varianceVal < 0 ? '-' : ''}${formatCurrency(Math.abs(varianceVal))}</td>
+            <td style="text-align: right; padding-right: 0.5rem;">${actionHtml}</td>
         `;
 
         const btnCreateTender = tr.querySelector('.btn-create-tender');
@@ -357,8 +362,8 @@ export function renderBudgetTableModal() {
         const headerTR = document.createElement('tr');
         headerTR.innerHTML = `<td colspan="7" style="background-color: #f1f5f9; font-weight: bold; padding: 0.75rem;">I. Tư vấn (Soft Cost)</td>`;
         tbodyConsultancy.appendChild(headerTR);
-        consultancies.forEach(b => {
-            const rowData = createRow(b);
+        consultancies.forEach((b, idx) => {
+            const rowData = createRow(b, idx);
             tbodyConsultancy.appendChild(rowData.element);
             totalBudgeted += rowData.budgeted;
             totalCommitted += rowData.committed;
@@ -370,8 +375,8 @@ export function renderBudgetTableModal() {
         const headerTR = document.createElement('tr');
         headerTR.innerHTML = `<td colspan="7" style="background-color: #f1f5f9; font-weight: bold; padding: 0.75rem;">II. Xây dựng / M&E (Hard Cost)</td>`;
         tbodyConstruction.appendChild(headerTR);
-        constructions.forEach(b => {
-            const rowData = createRow(b);
+        constructions.forEach((b, idx) => {
+            const rowData = createRow(b, idx);
             tbodyConstruction.appendChild(rowData.element);
             totalBudgeted += rowData.budgeted;
             totalCommitted += rowData.committed;
@@ -383,8 +388,8 @@ export function renderBudgetTableModal() {
         const contHeaderTR = document.createElement('tr');
         contHeaderTR.innerHTML = `<td colspan="7" style="background-color: #f1f5f9; font-weight: bold; padding: 0.75rem;">III. Dự phòng (Contingency)</td>`;
         tbodyContingency.appendChild(contHeaderTR);
-        contingencies.forEach(b => {
-            const rowData = createRow(b);
+        contingencies.forEach((b, idx) => {
+            const rowData = createRow(b, idx);
             tbodyContingency.appendChild(rowData.element);
             totalBudgeted += rowData.budgeted;
             totalCommitted += rowData.committed;
@@ -400,20 +405,17 @@ export function renderBudgetTableModal() {
         tbodyContingency.appendChild(contHeaderTR);
 
         const contTR = document.createElement('tr');
+        contTR.classList.add('zebra-odd');
         contTR.innerHTML = `
+            <td></td>
             <td>Dự phòng (Contingency)</td>
-            <td>${formatCurrency(contingencyBudget)}</td>
-            <td>${formatCurrency(0)}</td>
-            <td>${formatCurrency(0)}</td>
-            <td class="text-blue">${formatCurrency(contingencyBudget)}</td>
-            <td>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 0%"></div>
-                </div>
-            </td>
-            <td style="text-align: center;">
-                <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
-                    <button class="btn-create-tender bg-amber-700 hover:bg-amber-800 text-white px-2 py-1 rounded" style="font-size: 0.85rem; border: none; cursor: pointer;">Tạo Thầu</button>
+            <td class="numeric-cell">${formatCurrency(contingencyBudget)}</td>
+            <td class="numeric-cell">${formatCurrency(0)}</td>
+            <td class="numeric-cell">${formatCurrency(0)}</td>
+            <td class="numeric-cell text-blue">${formatCurrency(contingencyBudget)}</td>
+            <td style="text-align: right; padding-right: 0.5rem;">
+                <div style="display: flex; gap: 4px; justify-content: flex-end; align-items: center;">
+                    <button class="btn-create-tender w-8 h-8 rounded-md flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors" title="Tạo gói thầu từ mục này"><i class="fa-solid fa-plus"></i></button>
                 </div>
             </td>
         `;
@@ -424,12 +426,11 @@ export function renderBudgetTableModal() {
     const totalVariance = totalBudgeted - totalCommitted - totalExpended;
     tfootTotal.innerHTML = `
         <tr style="background: #e2e8f0; font-weight: bold;">
-            <td style="text-align: right; padding-right: 1rem;">TỔNG CỘNG</td>
-            <td>${formatCurrency(totalBudgeted)}</td>
-            <td>${formatCurrency(totalCommitted)}</td>
-            <td>${formatCurrency(totalExpended)}</td>
-            <td class="${totalVariance < 0 ? 'text-red' : 'text-blue'}">${totalVariance < 0 ? '-' : ''}${formatCurrency(Math.abs(totalVariance))}</td>
-            <td></td>
+            <td colspan="2" style="text-align: right; padding-right: 1rem;">TỔNG CỘNG</td>
+            <td class="numeric-cell">${formatCurrency(totalBudgeted)}</td>
+            <td class="numeric-cell">${formatCurrency(totalCommitted)}</td>
+            <td class="numeric-cell">${formatCurrency(totalExpended)}</td>
+            <td class="numeric-cell ${totalVariance < 0 ? 'text-red' : 'text-blue'}">${totalVariance < 0 ? '-' : ''}${formatCurrency(Math.abs(totalVariance))}</td>
             <td></td>
         </tr>
     `;
