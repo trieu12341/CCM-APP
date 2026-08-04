@@ -160,11 +160,13 @@ export function renderFinalBreakdown(contractId) {
     if (finalAcc.contract.status === 'Closed') {
         submitBtn.disabled = true;
         submitBtn.innerHTML = `<i class="fa-solid fa-check"></i> ĐÃ QUYẾT TOÁN`;
+        submitBtn.className = 'btn text-white font-bold py-3 px-6 rounded-xl shadow-lg';
         submitBtn.style.backgroundColor = '#10b981'; // Success green
     } else {
         submitBtn.disabled = false;
         submitBtn.innerHTML = `<i class="fa-solid fa-lock"></i> CHỐT QUYẾT TOÁN & ĐÓNG HỢP ĐỒNG`;
-        submitBtn.style.backgroundColor = 'var(--danger-color)';
+        submitBtn.className = 'btn bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg';
+        submitBtn.style.backgroundColor = '';
     }
 }
 

@@ -1,5 +1,6 @@
 import { state, formatCurrencyVND } from '../app.js';
 import { getLocalCashflow, saveLocalCashflow } from './cashflow-state.js';
+import { parseCurrencyInput } from '../utils/formatters.js';
 import { formatNumberInput, formatToMonthYear } from './cashflow-ui-utils.js';
 import { updateCashflowSubtotal, getCurrentSelectedPackageId, renderCashflowTable } from './cashflow-ui-table.js';
 
@@ -109,7 +110,7 @@ export function saveRowData(tr, existingId) {
 
     const contractId = getCurrentSelectedPackageId();
     const allContracts = state.appData.Contracts || [];
-    const contract = allContracts.find(c => c.id === contractId);
+    const contract = allContracts.find(c => c.contract_id === contractId || c.id === contractId);
     const pkgName = contract ? contract.package_name : '';
 
     const newItem = {
@@ -120,7 +121,7 @@ export function saveRowData(tr, existingId) {
         code: tr.querySelector('.cf-code').value.trim(),
         desc: tr.querySelector('.cf-desc').value.trim(),
         date: tr.querySelector('.cf-date').value,
-        value: parseFloat(tr.querySelector('.cf-value').value.replace(/,/g, '')) || 0,
+        value: parseCurrencyInput(tr.querySelector('.cf-value').value),
         certified_date: '', 
         paid_date: '',
         status: tr.querySelector('.cf-status').value

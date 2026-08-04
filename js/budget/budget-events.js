@@ -4,6 +4,7 @@ import { persistBudgets, persistContracts, persistTenders } from '../core/data-s
 import { renderProjectTabs, renderDashboard, renderBudgetTableModal } from './budget-ui.js';
 import { renderTenders } from '../tender.js';
 import { createIPC } from '../modules/payment/payment-state.js';
+import { parseCurrencyInput } from '../utils/formatters.js';
 
 
 
@@ -59,7 +60,10 @@ export function setupBudgetEvents() {
     // --- Budget CRUD Logic ---
     bindEvent('btnAddNewBudget', 'click', () => {
         document.getElementById('budgetFormTitle').textContent = 'Thêm Hạng Mục Ngân Sách';
-        document.getElementById('budget-id').value = '';
+        
+        const currentCount = state.appData.Budgets ? state.appData.Budgets.length : 0;
+        document.getElementById('budget-id').value = `BG-${(currentCount + 1).toString().padStart(2, '0')}`;
+        
         document.getElementById('budget-category').value = 'Consultancy';
         document.getElementById('budget-packageName').value = '';
         document.getElementById('budget-budgeted').value = '';
@@ -80,22 +84,23 @@ export function setupBudgetEvents() {
         const id = document.getElementById('budget-id').value;
         const category = document.getElementById('budget-category').value;
         const packageName = document.getElementById('budget-packageName').value;
-        const budgetedStr = document.getElementById('budget-budgeted').value.replace(/,/g, '');
-        const budgeted = parseFloat(budgetedStr) || 0;
+        const budgeted = parseCurrencyInput(document.getElementById('budget-budgeted').value);
         const notes = document.getElementById('budget-notes').value;
 
         if (!state.appData.Budgets) state.appData.Budgets = [];
 
+        let index = -1;
         if (id) {
+            index = state.appData.Budgets.findIndex(b => b.id === id);
+        }
+
+        if (index !== -1) {
             // Edit existing
-            const index = state.appData.Budgets.findIndex(b => b.id === id);
-            if (index !== -1) {
-                state.appData.Budgets[index] = { ...state.appData.Budgets[index], category, packageName, budgeted, notes };
-                mockActivities.unshift({ text: `Đã cập nhật ngân sách: ${packageName}`, date: new Date().toISOString() });
-            }
+            state.appData.Budgets[index] = { ...state.appData.Budgets[index], category, packageName, budgeted, notes };
+            mockActivities.unshift({ text: `Đã cập nhật ngân sách: ${packageName}`, date: new Date().toISOString() });
         } else {
             // Create new
-            const newId = 'B' + (state.appData.Budgets.length + 1).toString().padStart(3, '0') + '-' + Date.now();
+            const newId = id || 'BG-' + (state.appData.Budgets.length + 1).toString().padStart(2, '0');
             const newItem = {
                 id: newId,
                 project_id: state.currentProjectId,
@@ -182,19 +187,20 @@ export function setupBudgetEvents() {
                     else if (catRaw.includes('dự phòng') || catRaw.includes('contingency')) category = 'Contingency';
                     
                     const packageName = row[1] || 'Unknown';
-                    const budgeted = parseFloat(row[2]) || 0;
-                    
-                    if (packageName.trim() !== '') {
-                        const newId = 'B' + Date.now() + Math.floor(Math.random()*1000);
-                        state.appData.Budgets.push({
-                            id: newId,
-                            project_id: state.currentProjectId,
-                            category,
-                            packageName,
-                            budgeted,
-                            notes: ''
-                        });
-                        addedCount++;
+                    if (row.length >= 3) {
+                        const budgeted = parseCurrencyInput(row[2]);
+                        if (budgeted > 0) {
+                            const newId = 'B' + Date.now() + Math.floor(Math.random()*1000);
+                            state.appData.Budgets.push({
+                                id: newId,
+                                project_id: state.currentProjectId,
+                                category,
+                                packageName,
+                                budgeted,
+                                notes: ''
+                            });
+                            addedCount++;
+                        }
                     }
                 }
 
@@ -240,7 +246,7 @@ export function setupBudgetEvents() {
         bindEvent('payment-form', 'submit', async (e) => {
             e.preventDefault();
             const contractId = document.getElementById('contract-select')?.value;
-            const amount = parseFloat(document.getElementById('payment-amount')?.value);
+            const amount = parseCurrencyInput(document.getElementById('payment-amount')?.value);
             if (!amount || amount <= 0) return;
             const contract = state.appData.Contracts.find(c => c.contract_id === contractId);
             createIPC({
@@ -277,7 +283,7 @@ export function setupBudgetEvents() {
         bindEvent('new-entry-form', 'submit', async (e) => {
             e.preventDefault();
             const categoryName = document.getElementById('entry-category')?.value;
-            const amount = parseFloat(document.getElementById('entry-amount')?.value);
+            const amount = parseCurrencyInput(document.getElementById('entry-amount')?.value);
             if (!categoryName || !amount || amount <= 0) return;
             const newContract = {
                 contract_id: 'C' + (state.appData.Contracts.length + 1).toString().padStart(3, '0'),

@@ -1,6 +1,8 @@
 import { state, formatCurrencyDetailed, formatCurrency, formatCurrencyVND, getContractBudgetValue, getDynamicContractValue } from '../app.js';
 import { getLocalCashflow } from './cashflow-state.js';
 import { calculateForecastEngine, syncCashflowWithPayment, calculatePackageTotalPlanned } from './cashflow-calc.js';
+import { renderCashflowChart } from './cashflow-ui-chart.js';
+import { parseCurrencyInput } from '../utils/formatters.js';
 import { createCashflowRowNode } from './cashflow-ui-row.js';
 
 let currentSelectedPackageId = null;
@@ -18,13 +20,13 @@ export function updateCashflowSubtotal() {
         // During edit, the input value is Gross Work Done, which shouldn't be added to Net Payable.
         const textEl = tr.querySelector('.cf-text-value');
         if (textEl) {
-            const val = parseFloat(textEl.textContent.replace(/,/g, ''));
+            const val = parseCurrencyInput(textEl.textContent);
             if (!isNaN(val)) total += val;
         } else {
             // For non-construction or missing text elements, fallback to input if it's not construction
             const valInput = tr.querySelector('.cf-value');
             if (valInput && !tr.querySelector('.col-amount').innerHTML.includes('WD:')) {
-                const val = parseFloat(valInput.value.replace(/,/g, ''));
+                const val = parseCurrencyInput(valInput.value);
                 if (!isNaN(val)) total += val;
             }
         }

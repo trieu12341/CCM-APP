@@ -27,8 +27,16 @@ export const formatDate = (dateString) => {
     return isNaN(dateObj) ? dateString : dateObj.toLocaleDateString('vi-VN');
 };
 
-export const parseBudget = (val) => {
-    if (!val) return 0;
-    if (typeof val === 'number') return val;
-    return Number(String(val).replace(/,/g, '')) || 0;
+export const parseCurrencyInput = (value) => {
+    if (!value) return 0;
+    if (typeof value === 'number') return value;
+    // Remove all non-numeric characters except for dots and commas
+    // For Vietnam currency, 4.000.000.000 uses dots. We can just strip all non-digit characters.
+    // If we expect decimal values like 4.5, then it's different. But VN currency rarely uses decimals.
+    // However, to be safe: strip all non-digits.
+    const str = String(value).replace(/\D/g, '');
+    return parseFloat(str) || 0;
 };
+
+// Keep parseBudget for backwards compatibility if needed elsewhere
+export const parseBudget = parseCurrencyInput;

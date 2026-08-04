@@ -8,27 +8,11 @@ export function setupFinalEvents() {
     // NAVIGATION: Layer 1 <-> Layer 2
     // ----------------------------------------------------------------------
     const btnShowL2 = document.getElementById('btn-show-final-layer2');
-    const btnShowL1 = document.getElementById('btn-show-final-layer1');
-    const l1 = document.getElementById('final-layer-1');
-    const l2 = document.getElementById('final-layer-2');
-
+    
     if (btnShowL2) {
         btnShowL2.addEventListener('click', () => {
-            if (l1) l1.classList.add('hidden');
-            if (l2) l2.classList.remove('hidden');
-            if (typeof window.collapseSidebar === 'function') window.collapseSidebar();
-
-            renderFinalTable();
-        });
-    }
-
-    if (btnShowL1) {
-        btnShowL1.addEventListener('click', () => {
-            if (l1) l1.classList.remove('hidden');
-            if (l2) l2.classList.add('hidden');
-            if (typeof window.expandSidebar === 'function') window.expandSidebar();
-
-            renderFinalDashboard();
+            const btnNewFinal = document.getElementById('btn-new-final-statement');
+            if (btnNewFinal) btnNewFinal.click();
         });
     }
 
@@ -140,23 +124,19 @@ export function setupFinalEvents() {
 
             // Add delta to Contingency
             if (delta !== 0) {
-                const project = state.appData.Projects.find(p => p.project_id === state.currentProjectId);
-                const contingencyBudget = state.appData.Budgets.find(b => b.project_id === state.currentProjectId && b.category === 'Contingency');
+                let contingencyBudget = state.appData.Budgets.find(b => b.id === 'BG-CONT' && b.project_id === state.currentProjectId);
                 if (contingencyBudget) {
                     contingencyBudget.budgeted = (contingencyBudget.budgeted || 0) + delta;
-                } else if (project) {
-                    project.contingency_budget = (project.contingency_budget || 0) + delta;
-                    // Persist project implicitly handled if we call persistProjects? We don't have persistProjects yet.
-                    // Actually, if we just let it be, it's state manipulation. Let's just create a Contingency budget item if none exists.
+                    contingencyBudget.notes = (contingencyBudget.notes || '') + `\n+ Quyết toán ${contract.contract_id}: ${formatCurrencyVND(delta)}`;
+                } else {
                     state.appData.Budgets.push({
-                        id: 'B' + Date.now(),
+                        id: 'BG-CONT',
                         project_id: state.currentProjectId,
                         category: 'Contingency',
-                        packageName: 'Dự phòng phát sinh từ Quyết toán',
-                        budgeted: (project.contingency_budget || 0) + delta,
-                        notes: `Savings from closing ${contract.contract_id}`
+                        packageName: 'Dự phòng chung & Quyết toán',
+                        budgeted: delta,
+                        notes: `+ Quyết toán ${contract.contract_id}: ${formatCurrencyVND(delta)}`
                     });
-                    project.contingency_budget = 0; // Migrate it to Budgets
                 }
             }
 
@@ -169,7 +149,6 @@ export function setupFinalEvents() {
             alert('Đã chốt quyết toán hợp đồng thành công! Dữ liệu đã được khóa.');
             workspace.classList.add('hidden');
             renderFinalDashboard();
-            renderFinalTable();
         });
     }
 }

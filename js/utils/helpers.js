@@ -31,6 +31,9 @@ window.openInlineWorkspace = function(workspaceId) {
     if (header) header.classList.add('hidden');
     if (tabs) tabs.classList.add('hidden');
     
+    const m2 = document.getElementById('modules-2-container');
+    if (m2) m2.classList.add('hidden');
+    
     // 2. Hide all other Layer 2/3
     document.querySelectorAll('.modal-overlay.layer-2, .modal-overlay.layer-3').forEach(el => {
         el.classList.add('hidden');
@@ -63,6 +66,9 @@ window.closeInlineWorkspace = function() {
     if (m1) m1.classList.remove('hidden');
     if (header) header.classList.remove('hidden');
     if (tabs) tabs.classList.remove('hidden');
+    
+    const m2 = document.getElementById('modules-2-container');
+    if (m2) m2.classList.remove('hidden');
     
     // 3. Expand Sidebar
     window.expandSidebar();

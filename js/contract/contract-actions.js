@@ -1,7 +1,8 @@
 import { state } from '../app.js';
 import { getLocalContracts, saveLocalContracts } from './contract-state.js';
-import { renderContracts, closeContractDetailModal } from './contract-ui.js';
+import { renderContracts, closeContractDetailModal, renderContractTableModal } from './contract-ui.js';
 import { generateCashflowForContract } from '../cashflow/cashflow-calc.js';
+import { parseCurrencyInput } from '../utils/formatters.js';
 
 export function saveContract() {
     const projectId = state.currentProjectId;
@@ -24,12 +25,12 @@ export function saveContract() {
         contract_id: contractId,
         project_id: projectId,
         contract_code: document.getElementById('contract-code-input').value.trim(),
-        type: document.getElementById('contract-type-select').value,
+        type: document.getElementById('contract-type-select').value || 'Construction',
         package_name: document.getElementById('contract-name-input').value.trim(),
         contractor: document.getElementById('contract-contractor-input').value.trim(),
         contract_date: document.getElementById('contract-date-input').value,
         status: document.getElementById('contract-status-input').value,
-        original_value: parseFloat(document.getElementById('contract-value-input').value) || 0,
+        original_value: parseCurrencyInput(document.getElementById('contract-value-input').value) || 0,
         attachment_url: document.getElementById('contract-attachment-input').value.trim(),
         
         advance_payment_percent: parseFloat(document.getElementById('contract-adv-percent-input').value) || 0,
@@ -48,8 +49,9 @@ export function saveContract() {
     
     saveLocalContracts(allContracts);
     generateCashflowForContract(updatedContract);
-
+    
     closeContractDetailModal();
+    renderContractTableModal();
     renderContracts();
 }
 

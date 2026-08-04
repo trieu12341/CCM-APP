@@ -45,7 +45,7 @@ export function filterVOs() {
 export function createVO(voData) {
     const newVO = {
         ...voData,
-        vo_id: 'VO-' + Date.now(), // Generate unique ID
+        vo_id: 'VO-' + (state.appData.Variations ? state.appData.Variations.length + 1 : 1).toString().padStart(2, '0'),
     };
     if (!state.appData.Variations) state.appData.Variations = [];
     state.appData.Variations.push(newVO);

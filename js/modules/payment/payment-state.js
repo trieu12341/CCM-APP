@@ -46,7 +46,7 @@ export function createIPC(ipcData) {
     const now = new Date().toISOString().split('T')[0];
 
     const newIPC = {
-        ipc_id: `ipc-${Date.now()}`,
+        ipc_id: `IPC-${(payments.length + 1).toString().padStart(2, '0')}`,
         project_id: state.currentProjectId || '',
         contract_id: '',
         contract_name: '',

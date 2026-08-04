@@ -733,16 +733,10 @@
         <!-- Form Header -->
         <div class="detail-workspace-header">
             <div class="detail-workspace-header-left">
-                <button id="btn-close-ipc-form" class="btn btn-secondary" style="font-size:13px;padding:6px 12px;">
-                    <i class="fa-solid fa-xmark"></i> Hủy
-                </button>
                 <div style="font-size:15px;font-weight:700;color:var(--text-dark);">
                     Tạo Hồ sơ Thanh toán Mới (IPC)
                 </div>
             </div>
-            <button id="btn-save-ipc" class="btn btn-primary" style="font-size:13px;">
-                <i class="fa-solid fa-floppy-disk"></i> Lưu IPC
-            </button>
         </div>
 
         <!-- Form Body -->
@@ -828,6 +822,16 @@
                     <textarea id="ipc-form-notes" rows="3" placeholder="Ghi chú về hồ sơ thanh toán này…"></textarea>
                 </div>
             </form>
+        </div>
+
+        <!-- Sticky Footer -->
+        <div class="detail-workspace-footer" style="padding: 1rem 1.5rem; border-top: 1px solid var(--border-color); background: white; display: flex; justify-content: flex-end; gap: 1rem; position: sticky; bottom: 0;">
+            <button type="button" id="btn-close-ipc-form" class="btn btn-secondary">
+                <i class="fa-solid fa-xmark"></i> Hủy
+            </button>
+            <button type="button" id="btn-save-ipc" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk"></i> Lưu IPC
+            </button>
         </div>
     </div>
 </div>

@@ -298,18 +298,21 @@ function setupSidebarEvents() {
             // Clean up modal state before tab switch
             document.querySelectorAll('.modal-overlay, .inline-workspace, #payment-list-modal').forEach(el => el.classList.add('hidden'));
             document.body.classList.remove('modal-open', 'workspace-active', 'overflow-hidden');
-            document.getElementById('sidebar')?.classList.remove('sidebar-collapsed');
-            document.getElementById('project-tabs-container')?.classList.remove('hidden');
+            
+            // Return to Dashboard Layer 1 via helpers.js
+            if (typeof window.closeInlineWorkspace === 'function') {
+                window.closeInlineWorkspace();
+            } else {
+                document.getElementById('sidebar')?.classList.remove('sidebar-collapsed');
+                document.getElementById('project-tabs-container')?.classList.remove('hidden');
+            }
             
             // Reset VO module to Layer 1
             document.getElementById('vo-layer-1')?.classList.remove('hidden');
             document.getElementById('vo-layer-2')?.classList.add('hidden');
             document.getElementById('btn-show-vo-layer2')?.classList.remove('hidden');
             
-            // Reset Final module to Layer 1
-            document.getElementById('final-layer-1')?.classList.remove('hidden');
-            document.getElementById('final-layer-2')?.classList.add('hidden');
-            document.getElementById('btn-show-final-layer2')?.classList.remove('hidden');
+            // Final module doesn't have layer 2 anymore, it uses inline-workspace
             
             document.body.style.overflow = '';
             const mainContent = document.querySelector('.main-content');

@@ -1,4 +1,4 @@
-﻿import { state, formatCurrencyVND } from '../app.js';
+import { state, formatCurrencyVND } from '../app.js';
 import { tenderState } from './tender-state.js';
 
 export function recalculateCBA() {
@@ -55,5 +55,5 @@ export function recalculateCBA() {
 export function parseFormattedNumber(val) {
     if (!val) return 0;
     if (typeof val === 'number') return val;
-    return parseFloat(val.toString().replace(/,/g, '')) || 0;
+    return parseFloat(val.toString().replace(/\D/g, '')) || 0;
 }

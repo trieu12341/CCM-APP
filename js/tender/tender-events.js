@@ -4,6 +4,7 @@ import { tenderState } from './tender-state.js';
 import { renderTenders, initCBA, renderTenderRoundTabs, renderCBATable, renderTenderTableModal, closeTenderDetailModal } from './tender-ui.js';
 import { parseFormattedNumber } from './tender-calc.js';
 import { handleExcelUpload } from './tender-excel.js';
+import { parseCurrencyInput } from '../utils/formatters.js';
 import { getLocalContracts, saveLocalContracts } from '../contract/contract-state.js';
 import { openContractModal, renderContractTableModal } from '../contract/contract-ui.js';
 import { generateCashflowForContract } from '../cashflow/cashflow-calc.js';
@@ -265,7 +266,7 @@ export function setupTenderEvents() {
             
             const code = document.getElementById('tender-code').value;
             const name = document.getElementById('tender-name').value;
-            const budget = parseFloat(document.getElementById('tender-budget').value);
+            const budget = parseCurrencyInput(document.getElementById('tender-budget').value);
             const status = document.getElementById('tender-status').value;
             const deadline = document.getElementById('tender-deadline').value;
             

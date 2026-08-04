@@ -311,8 +311,11 @@
                                 <i class="fa-solid fa-file-invoice-dollar" style="margin-right: 0.5rem; color: var(--primary-blue);"></i>
                                 FINALIZATION EXECUTIVE DASHBOARD
                             </div>
+                            <button class="btn btn-primary" id="btn-new-final-statement" style="background-color: var(--primary-blue); color: white; border: none; margin-right: 0.5rem;">
+                                <i class="fa-solid fa-plus"></i> Lập Hồ Sơ Quyết Toán Mới
+                            </button>
                             <button class="btn btn-primary" id="btn-show-final-layer2" style="background-color: #ea580c; color: white; border: none;">
-                                <i class="fa-regular fa-clipboard"></i> Bảng Chi Tiết Quyết Toán Hợp Đồng
+                                <i class="fa-regular fa-clipboard"></i> DS Bảng Quyết Toán Hợp Đồng
                             </button>
                         </div>
 
@@ -351,42 +354,6 @@
                                     </h3>
                                     <div id="final-bar-chart" style="height: 300px; display: flex; align-items: center; justify-content: center;"></div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Layer 2: Master Final Statement Table -->
-                    <div id="final-layer-2" class="hidden" style="padding: 24px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; align-items: center;">
-                            <button class="btn btn-outline" id="btn-show-final-layer1" style="display: flex; align-items: center; gap: 0.5rem;">
-                                <i class="fa-solid fa-arrow-left"></i> Quay lại Dashboard
-                            </button>
-                            <h2 style="font-size: 1.25rem; font-weight: 600; color: var(--text-dark); margin: 0;">Master Final Statement</h2>
-                            <button class="btn btn-primary" id="btn-new-final-statement">
-                                <i class="fa-solid fa-plus"></i> Lập Hồ Sơ Quyết Toán Mới
-                            </button>
-                        </div>
-                        
-                        <div class="card" style="margin-top: 1rem;">
-                            <div class="table-responsive">
-                                <table class="data-table" id="final-table" style="width: 100%;">
-                                    <thead>
-                                        <tr>
-                                            <th>Mã HĐ</th>
-                                            <th>Tên Hợp Đồng / Nhà Thầu</th>
-                                            <th class="text-right">Giá trị HĐ Gốc</th>
-                                            <th class="text-right">Phát sinh Approved</th>
-                                            <th class="text-right">Giá trị Quyết toán</th>
-                                            <th class="text-right">Đã Thanh Toán IPC</th>
-                                            <th class="text-right">Còn Phải Trả</th>
-                                            <th class="text-center">Trạng thái</th>
-                                            <th class="text-center">Hành động</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="final-table-body">
-                                        <!-- JS injected -->
-                                    </tbody>
-                                </table>
                             </div>
                         </div>
                     </div>
