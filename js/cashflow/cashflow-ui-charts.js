@@ -1,6 +1,7 @@
 import { state, formatCurrency, formatCurrencyVND, getContractBudgetValue, getDynamicContractValue } from '../app.js';
 import { getLocalCashflow } from './cashflow-state.js';
 import { calculateForecastEngine, calculatePackageTotalPlanned } from './cashflow-calc.js';
+import { parseCurrencyInput } from '../utils/formatters.js';
 
 let chartInstances = [];
 
@@ -39,17 +40,26 @@ export function renderCashflow() {
     let totalCertified = 0;
     let totalPaid = 0;
     
+    // Single Source of Truth for Payments
+    if (state.appData.Payments) {
+        state.appData.Payments.filter(p => p.project_id === state.currentProjectId).forEach(p => {
+            const st = (p.status || '').toLowerCase();
+            const val = parseCurrencyInput(p.certified_amount || p.net_payable || p.certified_value);
+            const paidVal = parseCurrencyInput(p.paid_amount || p.net_payable);
+
+            if (st === 'approved' || st === 'đã duyệt' || st === 'paid' || st === 'đã thanh toán') {
+                totalCertified += val;
+            }
+            if (st === 'paid' || st === 'đã thanh toán') {
+                totalPaid += paidVal;
+            }
+        });
+    }
+
     let monthlyData = {}; 
 
     cashflows.filter(c => c.project_id === state.currentProjectId).forEach(c => {
         const val = c.is_construction ? (Number(c.netPayable) || Number(c.total_cert) || 0) : (Number(c.value) || 0);
-        
-        if (c.status === 'Certified' || c.status === 'Paid') {
-            totalCertified += val;
-        }
-        if (c.status === 'Paid') {
-            totalPaid += val;
-        }
         
         if (c.date) {
             const parts = c.date.split('-');
