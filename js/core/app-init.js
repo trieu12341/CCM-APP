@@ -355,6 +355,11 @@ function setupSidebarEvents() {
                 if (m.mod === 'module-vo') {
                     setTimeout(() => { try { renderVODashboard(); } catch(e) { console.error(e); } }, 50);
                 }
+
+                // Final dashboard re-render on tab switch
+                if (m.mod === 'module-final') {
+                    setTimeout(() => { try { renderFinalDashboard(); } catch(e) { console.error(e); } }, 50);
+                }
             }
         });
     });
