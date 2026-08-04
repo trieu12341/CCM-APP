@@ -46,7 +46,8 @@ export function renderTenders() {
                 evaluatingVal += budget;
             } else if (status === 'awarded') {
                 awardedCount++;
-                awardedVal += budget;
+                const actualAwarded = parseBudget(t.awarded_amount || t.final_price || t.awardedAmount || 0);
+                awardedVal += (actualAwarded > 0) ? actualAwarded : budget;
             } else {
                 notOpenedVal += budget;
             }
