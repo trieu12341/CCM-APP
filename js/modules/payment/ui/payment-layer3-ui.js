@@ -400,6 +400,7 @@ export function readIPCFormData() {
         ap_deduction:          apDed,
         retention_deduction:   retDed,
         vat_amount:            vatAmt,
+        sub_total:             breakdown ? breakdown.subTotal : (netPayable - vatAmt),
         net_payable:           netPayable,
         qs_deduction:          qsDed,
         certified_value:       netPayable,

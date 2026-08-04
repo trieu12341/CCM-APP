@@ -1,4 +1,5 @@
 import { state, formatCurrencyVND } from '../../app.js';
+import { parseCurrencyInput } from '../../utils/formatters.js';
 
 export function calculateOverviewMetrics() {
     const projectId = state.currentProjectId;
@@ -31,7 +32,11 @@ export function calculateOverviewMetrics() {
 
     // Actual Certified
     const projectPayments = (state.appData.Payments || []).filter(p => p.project_id === projectId && (p.status === 'Approved' || p.status === 'Paid'));
-    const totalCertified = projectPayments.reduce((sum, p) => sum + (Number(p.certified_amount) || Number(p.net_payable) || 0), 0);
+    const totalCertified = projectPayments.reduce((sum, p) => {
+        const gross = parseCurrencyInput(p.certified_amount || p.net_payable);
+        const vat = parseCurrencyInput(p.vat_amount);
+        return sum + (p.sub_total !== undefined ? parseCurrencyInput(p.sub_total) : (gross - vat));
+    }, 0);
 
     // Savings / Contingency
     const savings = totalBudget - totalCommitted;
@@ -60,7 +65,11 @@ export function getProjectPackagesData() {
         const voAmount = isClosed ? 0 : contractVOs.reduce((sum, vo) => sum + (Number(vo.approved_amount) || Number(vo.claimed_amount) || 0), 0);
         
         const contractPayments = payments.filter(p => p.contract_id === c.contract_id);
-        const certified = contractPayments.reduce((sum, p) => sum + (Number(p.certified_amount) || Number(p.net_payable) || 0), 0);
+        const certified = contractPayments.reduce((sum, p) => {
+            const gross = parseCurrencyInput(p.certified_amount || p.net_payable);
+            const vat = parseCurrencyInput(p.vat_amount);
+            return sum + (p.sub_total !== undefined ? parseCurrencyInput(p.sub_total) : (gross - vat));
+        }, 0);
 
         return {
             name: c.package_name || c.contract_name || 'N/A',
@@ -114,10 +123,12 @@ export function getRiskAndPendingTasks() {
 
     const allPayments = (state.appData.Payments || []).filter(p => p.project_id === projectId && (p.status === 'Draft' || p.status === 'Reviewing'));
     allPayments.forEach(p => {
+        const gross = parseCurrencyInput(p.net_payable);
+        const vat = parseCurrencyInput(p.vat_amount);
         pendingTasks.push({
             type: 'Thanh toán (IPC)',
             name: `IPC-${p.payment_no} (${p.contract_id})`,
-            value: Number(p.net_payable) || 0
+            value: p.sub_total !== undefined ? parseCurrencyInput(p.sub_total) : (gross - vat)
         });
     });
 

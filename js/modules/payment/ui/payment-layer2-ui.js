@@ -64,8 +64,10 @@ export function renderIPCList(filterState = { search: '', status: 'All', contrac
         const ipcCode = p.ipc_id.replace('ipc-', 'IPC-');
         const gross    = Number(p.gross_work_done) || 0;
         const qsDed    = Number(p.qs_deduction) || 0;
-        const certified = Number(p.certified_value) || Number(p.net_payable) || 0;
-        const netPay   = Number(p.net_payable) || 0;
+        const certifiedGross = Number(p.certified_value) || Number(p.net_payable) || 0;
+        const vat = Number(p.vat_amount) || 0;
+        const certified = p.sub_total !== undefined ? Number(p.sub_total) : (certifiedGross - vat);
+        const netPay   = certified;
         const ctType   = p.contract_type || 'Construction';
         const ctBadge  = ctType === 'Consultancy'
             ? `<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:#fef3c7;color:#d97706;font-weight:700;">Tư vấn</span>`

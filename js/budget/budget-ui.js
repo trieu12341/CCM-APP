@@ -2,6 +2,7 @@ import { state, formatCurrency, formatCurrencyVND, formatDate, mockActivities, g
 import { renderTenders } from '../tender.js';
 import { renderContracts } from '../contract.js';
 import { renderCashflow } from '../cashflow.js';
+import { parseCurrencyInput } from '../utils/formatters.js';
 
 export function renderProjectTabs() {
     const selectEl = document.getElementById('project-select');
@@ -114,7 +115,9 @@ export function renderDashboard() {
             
             let contractExpended = 0;
             (state.appData.Payments || []).filter(p => p.contract_id === contract.contract_id && (p.status === 'Approved' || p.status === 'Paid')).forEach(p => {
-                contractExpended += Number(p.net_payable) || Number(p.certified_value) || 0;
+                const gross = parseCurrencyInput(p.certified_amount || p.net_payable || p.certified_value);
+                const vat = parseCurrencyInput(p.vat_amount);
+                contractExpended += p.sub_total !== undefined ? parseCurrencyInput(p.sub_total) : (gross - vat);
             });
             
             committed += contractCommitted;
@@ -287,7 +290,9 @@ export function renderBudgetTableModal() {
             
             let contractExpended = 0;
             (state.appData.Payments || []).filter(p => p.contract_id === contract.contract_id && (p.status === 'Approved' || p.status === 'Paid')).forEach(p => {
-                contractExpended += Number(p.net_payable) || Number(p.certified_value) || 0;
+                const gross = parseCurrencyInput(p.certified_amount || p.net_payable || p.certified_value);
+                const vat = parseCurrencyInput(p.vat_amount);
+                contractExpended += p.sub_total !== undefined ? parseCurrencyInput(p.sub_total) : (gross - vat);
             });
             
             committed += contractCommitted;

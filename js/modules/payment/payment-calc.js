@@ -74,7 +74,12 @@ export function calcPaymentKPIs(payments = [], contracts = []) {
             const st = (p.status || '').toLowerCase();
             return st === 'approved' || st === 'đã duyệt' || st === 'paid' || st === 'đã thanh toán';
         })
-        .reduce((sum, p) => sum + parseCurrencyInput(p.net_payable || p.certified_amount || p.certified_value), 0);
+        .reduce((sum, p) => {
+            const gross = parseCurrencyInput(p.net_payable || p.certified_amount || p.certified_value);
+            const vat = parseCurrencyInput(p.vat_amount);
+            const net = p.sub_total !== undefined ? parseCurrencyInput(p.sub_total) : (gross - vat);
+            return sum + net;
+        }, 0);
 
     // Card 4: Total Paid = sum of paid_amount for Paid IPCs
     const totalPaid = payments
@@ -82,7 +87,12 @@ export function calcPaymentKPIs(payments = [], contracts = []) {
             const st = (p.status || '').toLowerCase();
             return st === 'paid' || st === 'đã thanh toán';
         })
-        .reduce((sum, p) => sum + parseCurrencyInput(p.paid_amount || p.net_payable), 0);
+        .reduce((sum, p) => {
+            const gross = parseCurrencyInput(p.paid_amount || p.net_payable);
+            const vat = parseCurrencyInput(p.vat_amount);
+            const net = gross - vat;
+            return sum + net;
+        }, 0);
 
     return {
         totalActiveContracts,
@@ -116,12 +126,18 @@ export function calcPaymentTrend(payments = []) {
         if (!monthMap[key]) {
             monthMap[key] = { submitted: 0, certified: 0, paid: 0 };
         }
-        monthMap[key].submitted += Number(p.gross_work_done) || 0;
+        monthMap[key].submitted += parseCurrencyInput(p.gross_work_done || p.submitted_amount);
         if (p.status === 'Approved' || p.status === 'Paid') {
-            monthMap[key].certified += Number(p.net_payable) || Number(p.certified_value) || 0;
+            const gross = parseCurrencyInput(p.net_payable || p.certified_value);
+            const vat = parseCurrencyInput(p.vat_amount);
+            const net = p.sub_total !== undefined ? parseCurrencyInput(p.sub_total) : (gross - vat);
+            monthMap[key].certified += net;
         }
         if (p.status === 'Paid') {
-            monthMap[key].paid += Number(p.paid_amount) || Number(p.net_payable) || 0;
+            const gross = parseCurrencyInput(p.paid_amount || p.net_payable);
+            const vat = parseCurrencyInput(p.vat_amount);
+            const net = gross - vat;
+            monthMap[key].paid += net;
         }
     });
 

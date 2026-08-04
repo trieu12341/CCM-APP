@@ -1,4 +1,5 @@
 import { state } from '../../app.js';
+import { parseCurrencyInput } from '../../utils/formatters.js';
 
 /**
  * Lấy danh sách hợp đồng cho một dự án cụ thể.
@@ -39,7 +40,11 @@ export function calculateFinalAccount(contractId) {
         const contractPayments = state.appData.Payments.filter(p => p.contract_id === contractId);
         // D: Chỉ cộng các IPC đã duyệt/thanh toán (Approved/Paid)
         const certifiedPayments = contractPayments.filter(p => p.status === 'Approved' || p.status === 'Paid');
-        d = certifiedPayments.reduce((sum, p) => sum + (parseFloat(p.certified_amount) || 0), 0);
+        d = certifiedPayments.reduce((sum, p) => {
+            const gross = parseCurrencyInput(p.certified_amount || p.net_payable);
+            const vat = parseCurrencyInput(p.vat_amount);
+            return sum + (p.sub_total !== undefined ? parseCurrencyInput(p.sub_total) : (gross - vat));
+        }, 0);
         
         // E: Tổng thu hồi tạm ứng từ các kỳ
         totalAdvanceRecovery = certifiedPayments.reduce((sum, p) => sum + (parseFloat(p.advance_recovery_amount) || 0), 0);

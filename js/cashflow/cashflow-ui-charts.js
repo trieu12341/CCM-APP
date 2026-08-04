@@ -44,8 +44,12 @@ export function renderCashflow() {
     if (state.appData.Payments) {
         state.appData.Payments.filter(p => p.project_id === state.currentProjectId).forEach(p => {
             const st = (p.status || '').toLowerCase();
-            const val = parseCurrencyInput(p.certified_amount || p.net_payable || p.certified_value);
-            const paidVal = parseCurrencyInput(p.paid_amount || p.net_payable);
+            const gross = parseCurrencyInput(p.certified_amount || p.net_payable || p.certified_value);
+            const vat = parseCurrencyInput(p.vat_amount);
+            const val = p.sub_total !== undefined ? parseCurrencyInput(p.sub_total) : (gross - vat);
+            
+            const paidGross = parseCurrencyInput(p.paid_amount || p.net_payable);
+            const paidVal = paidGross - vat;
 
             if (st === 'approved' || st === 'đã duyệt' || st === 'paid' || st === 'đã thanh toán') {
                 totalCertified += val;
