@@ -1,7 +1,7 @@
 import { state, formatCurrencyDetailed, formatCurrency, formatCurrencyVND, getContractBudgetValue, getDynamicContractValue } from '../app.js';
 import { getLocalCashflow } from './cashflow-state.js';
 import { calculateForecastEngine, syncCashflowWithPayment, calculatePackageTotalPlanned } from './cashflow-calc.js';
-import { renderCashflowChart } from './cashflow-ui-chart.js';
+import { renderCashflowChart } from './cashflow-ui-charts.js';
 import { parseCurrencyInput } from '../utils/formatters.js';
 import { createCashflowRowNode } from './cashflow-ui-row.js';
 
