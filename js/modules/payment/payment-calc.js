@@ -3,6 +3,7 @@
  * Pure calculation functions — no side effects, no DOM access.
  * All QS financial computations for IPC breakdown.
  */
+import { parseCurrencyInput } from '../../utils/formatters.js';
 
 // ─────────────────────────────────────────────────────────────
 // IPC FINANCIAL BREAKDOWN (5-line QS Standard)
@@ -57,28 +58,37 @@ export function calcNetPayable({ grossWorkDone = 0, apRecoveryPct = 0, retention
 export function calcPaymentKPIs(payments = [], contracts = []) {
     // Card 1: Sum of all Active contract values
     const totalActiveContracts = contracts
-        .filter(c => c.status !== 'Terminated' && c.status !== 'Closed')
-        .reduce((sum, c) => sum + (Number(c.total_value) || Number(c.contract_value) || 0), 0);
+        .filter(c => {
+            const st = (c.status || '').toLowerCase();
+            return st === 'active' || st === 'đang thực hiện';
+        })
+        .reduce((sum, c) => sum + parseCurrencyInput(c.current_value || c.original_value || c.contract_value || c.total_value), 0);
 
     // Card 2: Total Submitted = sum of gross_work_done across all IPCs
     const totalSubmitted = payments
-        .reduce((sum, p) => sum + (Number(p.gross_work_done) || 0), 0);
+        .reduce((sum, p) => sum + parseCurrencyInput(p.submitted_amount || p.gross_work_done), 0);
 
     // Card 3: Total Approved/Certified = sum of certified_value for Approved + Paid IPCs
     const totalApproved = payments
-        .filter(p => p.status === 'Approved' || p.status === 'Paid')
-        .reduce((sum, p) => sum + (Number(p.net_payable) || Number(p.certified_value) || 0), 0);
+        .filter(p => {
+            const st = (p.status || '').toLowerCase();
+            return st === 'approved' || st === 'đã duyệt' || st === 'paid' || st === 'đã thanh toán';
+        })
+        .reduce((sum, p) => sum + parseCurrencyInput(p.net_payable || p.certified_amount || p.certified_value), 0);
 
     // Card 4: Total Paid = sum of paid_amount for Paid IPCs
     const totalPaid = payments
-        .filter(p => p.status === 'Paid')
-        .reduce((sum, p) => sum + (Number(p.paid_amount) || Number(p.net_payable) || 0), 0);
+        .filter(p => {
+            const st = (p.status || '').toLowerCase();
+            return st === 'paid' || st === 'đã thanh toán';
+        })
+        .reduce((sum, p) => sum + parseCurrencyInput(p.paid_amount || p.net_payable), 0);
 
     return {
-        totalActiveContracts: Math.round(totalActiveContracts),
-        totalSubmitted: Math.round(totalSubmitted),
-        totalApproved: Math.round(totalApproved),
-        totalPaid: Math.round(totalPaid),
+        totalActiveContracts,
+        totalSubmitted,
+        totalApproved,
+        totalPaid,
     };
 }
 
