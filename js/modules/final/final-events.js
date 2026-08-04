@@ -1,4 +1,4 @@
-import { state } from '../../app.js';
+import { state, formatCurrencyVND } from '../../app.js';
 import { getContractsForProject, calculateFinalAccount } from './final-state.js';
 import { renderFinalDashboard, renderFinalTable, renderFinalBreakdown, recalculateFinalRetentionAndBalance } from './final-ui.js';
 import { persistFinalStatements, persistContracts, persistBudgets } from '../../core/data-store.js';
