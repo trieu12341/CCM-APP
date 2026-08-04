@@ -22,16 +22,26 @@ export function renderFinalDashboard() {
     let originalValues = [];
     let finalValues = [];
 
+    const finalStatements = state.appData.Final_Statements || [];
+
     contracts.forEach(contract => {
         const finalAcc = calculateFinalAccount(contract.contract_id);
         if (!finalAcc) return;
 
+        const fs = finalStatements.find(f => f.contract_id === contract.contract_id);
+
         // KPI
         if (contract.status === 'Closed') {
             closedCount++;
-            totalApprovedFinal += finalAcc.c;
-            totalRetention += finalAcc.fDefault; 
-            finalBalance += finalAcc.gDefault;
+            if (fs) {
+                totalApprovedFinal += Number(fs.final_value || fs.value_c) || 0;
+                totalRetention += Number(fs.retention_held || fs.value_f) || 0;
+                finalBalance += Number(fs.value_g) || 0;
+            } else {
+                totalApprovedFinal += finalAcc.c;
+                totalRetention += finalAcc.fDefault; 
+                finalBalance += finalAcc.gDefault;
+            }
         }
 
         // Doughnut Chart Data (Mapping from simple status)
@@ -40,9 +50,11 @@ export function renderFinalDashboard() {
         else if (st === 'Active') chartData.reviewing++; // Assume active means in progress/reviewing
 
         // Bar Chart Data
+        const finalValue = (contract.status === 'Closed' && fs) ? (Number(fs.final_value || fs.value_c) || 0) : finalAcc.c;
+        
         barCategories.push(contract.package_name || contract.contract_id);
         originalValues.push(finalAcc.a / 1e9); // Convert to billions
-        finalValues.push(finalAcc.c / 1e9);
+        finalValues.push(finalValue / 1e9);
     });
 
     document.getElementById('final-kpi-total').innerHTML = `${formatCurrencyVND(totalApprovedFinal)} <span>VNĐ</span>`;

@@ -96,10 +96,17 @@ export function setupFinalEvents() {
             }
 
             // 2. Add Final Statement Record
+            const fsCount = (state.appData.Final_Statements || []).length + 1;
             const record = {
-                id: 'FS-' + Date.now(),
+                id: 'FS-' + String(fsCount).padStart(2, '0'),
                 contract_id: contractId,
+                contract_name: contract.package_name || contract.contract_name || contract.contract_id,
                 project_id: state.currentProjectId,
+                original_value: finalAcc.a,
+                final_value: finalAcc.c,
+                savings: (Number(contract.original_value) || 0) - finalAcc.c,
+                retention_held: parseFloat(workspace.dataset.f) || 0,
+                status: 'Closed',
                 value_a: finalAcc.a,
                 value_b: finalAcc.b,
                 value_c: finalAcc.c,
