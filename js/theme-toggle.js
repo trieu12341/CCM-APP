@@ -1,5 +1,25 @@
 // theme-toggle.js
 
+window.ccmChartInstances = window.ccmChartInstances || [];
+
+if (window.ApexCharts && !window.ApexCharts.isPatched) {
+    const OriginalApexCharts = window.ApexCharts;
+    window.ApexCharts = function(el, options) {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        options.theme = options.theme || {};
+        options.theme.mode = isDark ? 'dark' : 'light';
+        options.chart = options.chart || {};
+        options.chart.background = 'transparent';
+        
+        const chart = new OriginalApexCharts(el, options);
+        window.ccmChartInstances.push(chart);
+        return chart;
+    };
+    Object.assign(window.ApexCharts, OriginalApexCharts);
+    window.ApexCharts.prototype = OriginalApexCharts.prototype;
+    window.ApexCharts.isPatched = true;
+}
+
 function applyTheme(theme) {
     if (theme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
@@ -7,6 +27,17 @@ function applyTheme(theme) {
         document.documentElement.setAttribute('data-theme', 'light');
     }
     
+    // Update ApexCharts dynamically
+    if (window.ccmChartInstances) {
+        window.ccmChartInstances.forEach(chart => {
+            try {
+                chart.updateOptions({
+                    theme: { mode: theme }
+                });
+            } catch(e) {}
+        });
+    }
+
     // Dispatch custom event for charts (ApexCharts/Chart.js) to re-render
     window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: theme } }));
 }
