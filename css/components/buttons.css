@@ -27,7 +27,7 @@
 }
 
 .btn-secondary {
-    background: white;
+    background: var(--card-bg);
     border: 1px solid var(--border-color);
     color: var(--text-dark);
     transition: background-color 0.2s;
@@ -58,4 +58,5 @@
     color: var(--text-muted);
     cursor: pointer;
 }
+
 

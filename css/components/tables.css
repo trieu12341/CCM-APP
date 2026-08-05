@@ -53,7 +53,7 @@
 
 .editable-table input:focus {
     border: 1px solid var(--primary-blue);
-    background: white;
+    background: var(--card-bg);
 }
 
 .editable-table td {
@@ -122,3 +122,4 @@
     text-align: right !important;
     font-variant-numeric: tabular-nums;
 }
+

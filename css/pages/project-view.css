@@ -25,9 +25,9 @@
 }
 
 .project-tab.active {
-    background: white;
+    background: var(--card-bg);
     color: var(--primary-blue);
-    border-bottom: 2px solid white;
+    border-bottom: 2px solid var(--card-bg);
     margin-bottom: -1px;
 }
 
@@ -72,7 +72,7 @@
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    border: 2px solid white;
+    border: 2px solid var(--card-bg);
     margin-left: -8px;
 }
 
@@ -82,7 +82,7 @@
     border-radius: 50%;
     border: 1px solid var(--border-color);
     margin-left: -8px;
-    background: white;
+    background: var(--card-bg);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -191,3 +191,4 @@
 }
 
 /* Modal */
+
