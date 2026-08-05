@@ -39,7 +39,7 @@
 /* Progress bar inside KPI */
 .overview-progress {
     height: 6px;
-    background: #e2e8f0;
+    background: var(--border-color);
     border-radius: 3px;
     margin-top: 0.5rem;
     overflow: hidden;

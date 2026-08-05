@@ -1,9 +1,9 @@
 /* Sidebar Container */
 .sidebar {
     width: 260px;
-    background-color: #ffffff; /* Modern light SaaS background */
-    border-right: 1px solid #e2e8f0; /* Soft border */
-    color: #64748B;
+    background-color: var(--card-bg); /* Modern light SaaS background */
+    border-right: 1px solid var(--border-color); /* Soft border */
+    color: var(--text-muted);
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
@@ -20,7 +20,7 @@
     padding: 1.5rem 1rem;
     font-size: 1.1rem;
     font-weight: 600;
-    color: #0f172a;
+    color: var(--text-dark);
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -43,7 +43,7 @@
 }
 
 .sidebar-menu::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: var(--border-color);
     border-radius: 4px;
 }
 
@@ -57,7 +57,7 @@
     align-items: center;
     gap: 14px; /* gap-3.5 */
     padding: 0.5rem 0.75rem;
-    color: #64748B; /* Inactive color */
+    color: var(--text-muted); /* Inactive color */
     text-decoration: none;
     border-radius: 8px;
     margin-bottom: 0.35rem;
@@ -76,7 +76,7 @@
 
 .menu-item:hover {
     background-color: rgba(241, 245, 249, 0.8); /* hover:bg-slate-100/80 */
-    color: #0f172a; /* hover:text-slate-900 */
+    color: var(--text-dark); /* hover:text-slate-900 */
     font-weight: 500;
 }
 
@@ -119,12 +119,12 @@
 /* Sidebar Footer */
 .sidebar-footer {
     padding: 1.5rem 1rem;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--border-color);
 }
 
 .savings-card {
-    background-color: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background-color: var(--main-bg);
+    border: 1px solid var(--border-color);
     padding: 0.75rem;
     border-radius: 8px;
     display: flex;
@@ -132,7 +132,7 @@
     align-items: center;
     font-size: 0.8rem;
     margin-bottom: 1rem;
-    color: #64748B;
+    color: var(--text-muted);
 }
 
 .savings-value {
@@ -160,12 +160,12 @@
 
 .user-details strong {
     font-size: 13px;
-    color: #0f172a;
+    color: var(--text-dark);
 }
 
 .user-details span {
     font-size: 11px;
-    color: #64748B;
+    color: var(--text-muted);
 }
 
 #btn-logout {

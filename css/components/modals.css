@@ -115,7 +115,7 @@ body.modal-open .main-content {
     font-weight: 600;
 }
 
-.status-badge.floating { background: #ffedd5; color: #f97316; }
+.status-badge.floating { background: var(--status-orange-bg); color: #f97316; }
 .status-badge.bidding, .status-badge.evaluating { background: #dbeafe; color: #3b82f6; }
-.status-badge.awarded { background: #dcfce7; color: #10b981; }
+.status-badge.awarded { background: var(--status-green-bg); color: #10b981; }
 

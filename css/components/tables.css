@@ -20,8 +20,8 @@
 }
 
 .data-table th {
-    background: #f8fafc;
-    color: #4b5563;
+    background: var(--main-bg);
+    color: var(--text-muted);
     font-weight: 600;
     font-size: 12px;
     text-transform: uppercase;
@@ -105,16 +105,16 @@
 
 /* Zebra Striping for Budget Table */
 .zebra-odd {
-    background-color: #ffffff; /* bg-white */
+    background-color: var(--card-bg); /* bg-white */
 }
 
 .zebra-even {
-    background-color: #fff7ed; /* orange-50 equivalent */
+    background-color: var(--status-orange-bg); /* orange-50 equivalent */
 }
 
 #budget-tracker-table tbody tr.zebra-odd:hover,
 #budget-tracker-table tbody tr.zebra-even:hover {
-    background-color: #ffedd5; /* orange-100 highlight */
+    background-color: var(--status-orange-bg); /* orange-100 highlight */
 }
 
 /* Numeric alignment and tabular-nums */

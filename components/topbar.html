@@ -1,9 +1,9 @@
-<header class="topbar" style="display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 1.5rem; background-color: white; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 1000;">
+<header class="topbar" style="display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 1.5rem; background-color: var(--card-bg); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 1000;">
     <!-- LEFT: Project Selection -->
     <div style="display: flex; align-items: center; gap: 8px;">
         <i class="fa-solid fa-building" style="color: var(--primary-blue);"></i>
         <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-dark);">Dự án:</span>
-        <select id="project-select" style="padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-weight: 600; font-size: 0.9rem; outline: none; cursor: pointer; min-width: 200px;">
+        <select id="project-select" style="padding: 4px 8px; border: 1px solid var(--border-color); border-radius: 4px; font-weight: 600; font-size: 0.9rem; outline: none; cursor: pointer; min-width: 200px;">
             <!-- JS populated -->
         </select>
         <button id="btn-project-info" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.85rem;" title="Thông tin dự án">
@@ -15,23 +15,26 @@
     </div>
 
     <!-- CENTER: Inline Badges -->
-    <div style="display: flex; align-items: center; gap: 16px; font-size: 0.8rem; font-weight: 500; color: #475569; background: #f8fafc; padding: 4px 16px; border-radius: 9999px; border: 1px solid #e2e8f0;">
+    <div style="display: flex; align-items: center; gap: 16px; font-size: 0.8rem; font-weight: 500; color: var(--text-muted); background: var(--main-bg); padding: 4px 16px; border-radius: 9999px; border: 1px solid var(--border-color);">
         <div><i class="fa-solid fa-wallet text-slate-400"></i> Ngân sách: <span id="hero-total-budget" style="color: var(--text-dark); font-weight: 600;">-</span></div>
-        <div style="width: 4px; height: 4px; background: #cbd5e1; border-radius: 50%;"></div>
+        <div style="width: 4px; height: 4px; background: var(--border-color); border-radius: 50%;"></div>
         <div><i class="fa-solid fa-ruler-combined text-slate-400"></i> CFA: <span id="hero-cfa" style="color: var(--text-dark); font-weight: 600;">-</span></div>
-        <div style="width: 4px; height: 4px; background: #cbd5e1; border-radius: 50%;"></div>
+        <div style="width: 4px; height: 4px; background: var(--border-color); border-radius: 50%;"></div>
         <div><i class="fa-solid fa-building-user text-slate-400"></i> Quy mô: <span id="hero-scale" style="color: var(--text-dark); font-weight: 600;">-</span></div>
-        <div style="width: 4px; height: 4px; background: #cbd5e1; border-radius: 50%;"></div>
+        <div style="width: 4px; height: 4px; background: var(--border-color); border-radius: 50%;"></div>
         <div><i class="fa-solid fa-bars-progress text-slate-400"></i> Tiến độ: <span id="hero-status" style="color: var(--text-dark); font-weight: 600;">-</span></div>
     </div>
 
     <!-- RIGHT: Actions -->
     <div class="topbar-actions" style="display: flex; align-items: center; gap: 15px;">
+        <button id="theme-toggle-btn" style="background: none; border: none; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; transition: background 0.2s;" onmouseover="this.style.background='var(--border-color)'" onmouseout="this.style.background='none'">
+            <i class="fa-solid fa-moon" style="font-size: 20px;"></i>
+        </button>
         <div class="search-bar" style="margin: 0;">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" placeholder="Search" style="padding: 6px 12px 6px 32px; border-radius: 6px; font-size: 0.85rem; width: 160px;">
+            <input type="text" placeholder="Search" style="padding: 6px 12px 6px 32px; border-radius: 6px; font-size: 0.85rem; width: 160px; background: var(--main-bg); color: var(--text-dark); border: 1px solid var(--border-color);">
         </div>
-        <i class="fa-regular fa-bell" style="cursor: pointer; font-size: 1.1rem; color: #64748b;"></i>
+        <i class="fa-regular fa-bell" style="cursor: pointer; font-size: 1.1rem; color: var(--text-muted);"></i>
         <div id="user-info" style="display: flex; align-items: center; gap: 10px;">
             <div style="text-align: right;">
                 <div id="user-name" style="font-weight: 600; font-size: 0.85rem;">-</div>
@@ -39,7 +42,7 @@
             </div>
             <img src="https://i.pravatar.cc/150?img=68" alt="Profile" class="avatar-small" style="width: 32px; height: 32px;">
             
-            <div class="admin-tools manager-only" style="display: none; align-items: center; gap: 8px; border-left: 1px solid #e2e8f0; padding-left: 10px; margin-left: 5px;">
+            <div class="admin-tools manager-only" style="display: none; align-items: center; gap: 8px; border-left: 1px solid var(--border-color); padding-left: 10px; margin-left: 5px;">
                 <button id="btn-admin-restore" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem; color: #3b82f6; border-color: #bfdbfe;" title="Restore Backup">
                     <i class="fa-solid fa-download"></i>
                 </button>

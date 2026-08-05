@@ -19,7 +19,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: #f1f5f9;
+    background: var(--main-bg);
     padding: 0.4rem 0.8rem;
     border-radius: 20px;
     width: 300px;

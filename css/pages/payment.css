@@ -17,7 +17,7 @@
 .payment-section-title {
     font-size: 1rem;
     font-weight: 700;
-    color: var(--text-dark, #1e293b);
+    color: var(--text-dark, var(--text-dark));
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -79,7 +79,7 @@
 
 .payment-widget-card {
     background: #fff;
-    border: 1px solid var(--border-color, #e2e8f0);
+    border: 1px solid var(--border-color, var(--border-color));
     border-radius: 10px;
     padding: 16px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.06);
@@ -88,7 +88,7 @@
 .payment-widget-card h3 {
     font-size: 13px;
     font-weight: 600;
-    color: var(--text-dark, #1e293b);
+    color: var(--text-dark, var(--text-dark));
     margin-bottom: 12px;
     display: flex;
     align-items: center;
@@ -109,19 +109,19 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.4px;
-    color: var(--text-muted, #64748b);
-    border-bottom: 1px solid var(--border-color, #e2e8f0);
-    background: #f8fafc;
+    color: var(--text-muted, var(--text-muted));
+    border-bottom: 1px solid var(--border-color, var(--border-color));
+    background: var(--main-bg);
 }
 
 .pay-pending-table td {
     padding: 8px 10px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--main-bg);
     vertical-align: middle;
 }
 
 .pay-pending-table tbody tr:hover {
-    background: #f8fafc;
+    background: var(--main-bg);
 }
 
 .pay-pending-table .pending-row.urgency-overdue {
@@ -148,8 +148,8 @@
 }
 
 .badge-draft {
-    background: #f1f5f9;
-    color: #64748b;
+    background: var(--main-bg);
+    color: var(--text-muted);
 }
 
 .badge-reviewing {
@@ -158,7 +158,7 @@
 }
 
 .badge-approved {
-    background: #dcfce7;
+    background: var(--status-green-bg);
     color: #15803d;
 }
 
@@ -197,13 +197,13 @@
    ───────────────────────────────────────────────────────────── */
 
 #payment-list-modal {
-    background: var(--bg-light, #f8fafc);
+    background: var(--bg-light, var(--main-bg));
     min-height: 100vh;
 }
 
 .payment-list-header {
     background: #fff;
-    border-bottom: 1px solid var(--border-color, #e2e8f0);
+    border-bottom: 1px solid var(--border-color, var(--border-color));
     padding: 16px 24px;
     display: flex;
     justify-content: space-between;
@@ -232,7 +232,7 @@
 .payment-list-title {
     font-size: 15px;
     font-weight: 700;
-    color: var(--text-dark, #1e293b);
+    color: var(--text-dark, var(--text-dark));
 }
 
 .payment-filter-bar {
@@ -243,7 +243,7 @@
 
 .payment-filter-bar input[type="text"] {
     padding: 7px 12px;
-    border: 1px solid var(--border-color, #e2e8f0);
+    border: 1px solid var(--border-color, var(--border-color));
     border-radius: 8px;
     font-size: 13px;
     font-family: inherit;
@@ -259,7 +259,7 @@
 
 .payment-filter-bar select {
     padding: 7px 10px;
-    border: 1px solid var(--border-color, #e2e8f0);
+    border: 1px solid var(--border-color, var(--border-color));
     border-radius: 8px;
     font-size: 13px;
     font-family: inherit;
@@ -279,7 +279,7 @@
     position: absolute;
     inset: 0;
     min-height: 100%;
-    background: var(--bg-light, #f8fafc);
+    background: var(--bg-light, var(--main-bg));
     z-index: 50;
     display: flex;
     flex-direction: column;
@@ -321,15 +321,15 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.4px;
-    color: var(--text-muted, #64748b);
-    background: #f8fafc;
-    border-bottom: 2px solid var(--border-color, #e2e8f0);
+    color: var(--text-muted, var(--text-muted));
+    background: var(--main-bg);
+    border-bottom: 2px solid var(--border-color, var(--border-color));
     white-space: nowrap;
 }
 
 .ipc-master-table tbody td {
     padding: 10px 12px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--main-bg);
     vertical-align: middle;
 }
 
@@ -367,7 +367,7 @@
 
 .detail-workspace-header {
     padding: 16px 20px;
-    border-bottom: 1px solid var(--border-color, #e2e8f0);
+    border-bottom: 1px solid var(--border-color, var(--border-color));
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -401,7 +401,7 @@
 }
 
 .ipc-info-item {
-    background: #f8fafc;
+    background: var(--main-bg);
     border-radius: 8px;
     padding: 10px 14px;
 }
@@ -410,7 +410,7 @@
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
-    color: var(--text-muted, #64748b);
+    color: var(--text-muted, var(--text-muted));
     margin-bottom: 4px;
     letter-spacing: 0.3px;
 }
@@ -418,7 +418,7 @@
 .ipc-info-value {
     font-size: 14px;
     font-weight: 600;
-    color: var(--text-dark, #1e293b);
+    color: var(--text-dark, var(--text-dark));
 }
 
 /* Financial Breakdown Table */
@@ -427,10 +427,10 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: var(--text-muted, #64748b);
+    color: var(--text-muted, var(--text-muted));
     margin-bottom: 10px;
     padding-bottom: 6px;
-    border-bottom: 2px solid var(--border-color, #e2e8f0);
+    border-bottom: 2px solid var(--border-color, var(--border-color));
 }
 
 .breakdown-table {
@@ -442,12 +442,12 @@
 
 .breakdown-table td {
     padding: 10px 12px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--main-bg);
     vertical-align: top;
 }
 
 .breakdown-table .breakdown-total-row {
-    background: linear-gradient(135deg, #eff6ff, #f0fdf4);
+    background: linear-gradient(135deg, #eff6ff, var(--status-green-bg));
     border-top: 2px solid var(--primary-blue, #2563eb);
 }
 
@@ -482,7 +482,7 @@
 
 /* Approval Section */
 .approval-section {
-    border-top: 2px solid var(--border-color, #e2e8f0);
+    border-top: 2px solid var(--border-color, var(--border-color));
     padding-top: 16px;
     margin-top: 8px;
 }
@@ -491,7 +491,7 @@
     font-size: 13px;
     font-weight: 700;
     text-transform: uppercase;
-    color: var(--text-muted, #64748b);
+    color: var(--text-muted, var(--text-muted));
     letter-spacing: 0.4px;
     margin-bottom: 12px;
 }
@@ -577,7 +577,7 @@
     display: block;
     font-size: 12px;
     font-weight: 600;
-    color: var(--text-dark, #1e293b);
+    color: var(--text-dark, var(--text-dark));
     margin-bottom: 5px;
     text-transform: uppercase;
     letter-spacing: 0.3px;
@@ -588,7 +588,7 @@
 #ipc-form-panel textarea {
     width: 100%;
     padding: 8px 12px;
-    border: 1px solid var(--border-color, #e2e8f0);
+    border: 1px solid var(--border-color, var(--border-color));
     border-radius: 8px;
     font-size: 13px;
     font-family: inherit;
@@ -618,8 +618,8 @@
 }
 
 .form-calc-preview {
-    background: #f8fafc;
-    border: 1px solid var(--border-color, #e2e8f0);
+    background: var(--main-bg);
+    border: 1px solid var(--border-color, var(--border-color));
     border-radius: 10px;
     padding: 14px 16px;
     margin-top: 4px;
@@ -629,7 +629,7 @@
     font-size: 12px;
     font-weight: 700;
     text-transform: uppercase;
-    color: var(--text-muted, #64748b);
+    color: var(--text-muted, var(--text-muted));
     margin-bottom: 10px;
     letter-spacing: 0.4px;
 }
@@ -640,7 +640,7 @@
     align-items: center;
     padding: 4px 0;
     font-size: 12px;
-    border-bottom: 1px dashed #e2e8f0;
+    border-bottom: 1px dashed var(--border-color);
 }
 
 .calc-preview-row:last-child {
@@ -653,7 +653,7 @@
 }
 
 .calc-preview-label {
-    color: var(--text-muted, #64748b);
+    color: var(--text-muted, var(--text-muted));
 }
 
 .calc-preview-value {
@@ -687,7 +687,7 @@
 }
 
 .payment-toast-success {
-    background: #dcfce7;
+    background: var(--status-green-bg);
     color: #15803d;
     border-left: 4px solid #22c55e;
 }
