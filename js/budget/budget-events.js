@@ -160,6 +160,10 @@ export function setupBudgetEvents() {
 
     // --- Excel Import Logic ---
     bindEvent('btnImportBudget', 'click', () => {
+        if (!state.currentProjectId) {
+            alert('Vui lòng tạo hoặc chọn một Dự án ở trang Overview trước khi Import.');
+            return;
+        }
         const fileInput = document.getElementById('budget-excel-upload');
         if (fileInput) fileInput.click();
     });
