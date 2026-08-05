@@ -187,15 +187,15 @@
                     <label style="font-weight: bold; margin-bottom: 10px; display: block;">Chọn phạm vi dữ liệu cần xóa:</label>
                     
                     <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: var(--main-bg); border: 1px solid var(--border-color); border-radius: 4px;">
                             <input type="checkbox" id="reset-scope-payments" value="payments"> 
                             Xóa Dữ liệu Thanh toán (Clear Payments)
                         </label>
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: var(--main-bg); border: 1px solid var(--border-color); border-radius: 4px;">
                             <input type="checkbox" id="reset-scope-cashflow" value="cashflow"> 
                             Xóa Kế hoạch Dòng tiền (Clear Cashflow)
                         </label>
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: var(--main-bg); border: 1px solid var(--border-color); border-radius: 4px;">
                             <input type="checkbox" id="reset-scope-contracts" value="contracts"> 
                             Xóa Hợp đồng & Gói thầu (Clear Contracts & Tenders)
                         </label>
@@ -211,7 +211,7 @@
                     <input type="text" id="reset-confirm-input" placeholder="Gõ RESET viết hoa..." required style="border-color: #ef4444; font-weight: bold; color: #ef4444; outline-color: #ef4444;">
                 </div>
 
-                <div class="form-actions" style="margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 15px; justify-content: space-between;">
+                <div class="form-actions" style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 15px; justify-content: space-between;">
                     <button type="button" class="btn btn-secondary" id="cancel-reset-modal">Hủy bỏ</button>
                     <button type="submit" class="btn btn-primary" id="btn-execute-reset" disabled style="background-color: #ef4444; border-color: #ef4444; opacity: 0.5; cursor: not-allowed;">
                         <i class="fa-solid fa-trash"></i> Xác nhận Xóa Dữ liệu
@@ -220,3 +220,4 @@
             </form>
         </div>
     </div>
+

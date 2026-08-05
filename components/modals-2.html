@@ -255,9 +255,9 @@
 
                 <!-- E. Timeline View Placeholder -->
                 <div id="cashflow-timeline-view" class="cf-table-area"
-                    style="display: none; align-items: center; justify-content: center; background: #f8fafc; flex-direction: column;">
+                    style="display: none; align-items: center; justify-content: center; background: var(--main-bg); flex-direction: column;">
                     <i class="fa-solid fa-chart-gantt"
-                        style="font-size: 4rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+                        style="font-size: 4rem; color: var(--border-color); margin-bottom: 1rem;"></i>
                     <h3 style="color: var(--text-muted); font-size: 1.2rem;">Giao diện Tiến độ Timeline đang được phát
                         triển (Coming Soon)</h3>
                 </div>
@@ -266,8 +266,8 @@
 
             <!-- Placeholder when no package is selected -->
             <div class="cf-right-pane" id="cf-right-pane-empty"
-                style="justify-content: center; align-items: center; background: #f8fafc;">
-                <i class="fa-solid fa-hand-pointer" style="font-size: 4rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+                style="justify-content: center; align-items: center; background: var(--main-bg);">
+                <i class="fa-solid fa-hand-pointer" style="font-size: 4rem; color: var(--border-color); margin-bottom: 1rem;"></i>
                 <h3 style="color: var(--text-muted); font-size: 1.2rem;">Chọn một Gói thầu bên trái để xem chi tiết
                     Cashflow</h3>
             </div>
@@ -334,13 +334,13 @@
         </div>
 
         <!-- Detail Overview -->
-        <div class="metrics-grid" style="background: white; padding: 1.5rem; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 2rem;">
-            <div style="flex: 1; border-right: 1px solid #e2e8f0; padding-right: 1.5rem;">
+        <div class="metrics-grid" style="background: var(--card-bg); padding: 1.5rem; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 2rem;">
+            <div style="flex: 1; border-right: 1px solid var(--border-color); padding-right: 1.5rem;">
                 <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Gói thầu</div>
                 <div id="detail-tender-name" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--primary-blue);">...</div>
                 <div id="detail-tender-code" style="font-size: 0.9rem; font-weight: 500;">...</div>
             </div>
-            <div style="flex: 1; border-right: 1px solid #e2e8f0; padding: 0 1.5rem;">
+            <div style="flex: 1; border-right: 1px solid var(--border-color); padding: 0 1.5rem;">
                 <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Thông tin nộp thầu</div>
                 <div style="margin-top: 0.5rem; font-size: 0.9rem;"><strong>Trạng thái:</strong> <span id="detail-tender-status">...</span></div>
                 <div style="margin-top: 0.25rem; font-size: 0.9rem;"><strong>Hạn nộp:</strong> <span id="detail-tender-deadline">...</span></div>
@@ -361,8 +361,8 @@
         </div>
 
         <!-- CBA Empty State -->
-        <div id="cba-empty-state" class="hidden" style="text-align: center; padding: 4rem 2rem; background: white; border: 1px dashed var(--border-color); border-radius: 8px;">
-            <i class="fa-solid fa-file-invoice-dollar" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+        <div id="cba-empty-state" class="hidden" style="text-align: center; padding: 4rem 2rem; background: var(--card-bg); border: 1px dashed var(--border-color); border-radius: 8px;">
+            <i class="fa-solid fa-file-invoice-dollar" style="font-size: 3rem; color: var(--border-color); margin-bottom: 1rem;"></i>
             <h3 style="margin-bottom: 0.5rem;">Chưa có dữ liệu Bảng So Sánh Giá</h3>
             <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Khởi tạo bảng CBA để bắt đầu phân tích giá thầu.</p>
             <div style="display: flex; gap: 1rem; justify-content: center;" class="manager-hide">
@@ -377,7 +377,7 @@
             <div style="display: flex; gap: 1rem; margin-bottom: 1rem;" class="manager-hide">
                 <button class="btn btn-secondary" id="btn-add-bidder">+ Thêm Nhà thầu</button>
                 <button class="btn btn-secondary" id="btn-add-item">+ Thêm Hạng mục</button>
-                <div style="width: 1px; background: #e2e8f0; margin: 0 0.5rem;"></div>
+                <div style="width: 1px; background: var(--border-color); margin: 0 0.5rem;"></div>
                 <input type="file" id="excel-upload-input" accept=".xlsx, .xls" class="hidden" style="display: none;">
                 <button class="btn btn-secondary" id="btn-import-excel" style="color: #10b981; border-color: #10b981;"><i class="fa-solid fa-file-excel"></i> Import từ file Excel</button>
             </div>
@@ -387,7 +387,7 @@
                         <tr id="cba-thead-tr"><!-- JS injected --></tr>
                     </thead>
                     <tbody id="cba-tbody"><!-- JS injected --></tbody>
-                    <tfoot id="cba-tfoot" style="background: #f8fafc; font-weight: bold;"><!-- JS injected --></tfoot>
+                    <tfoot id="cba-tfoot" style="background: var(--main-bg); font-weight: bold;"><!-- JS injected --></tfoot>
                 </table>
             </div>
         </div>
@@ -548,7 +548,7 @@
      PAYMENT LAYER 2: Master IPC List
      Opened by hiding #module-payment and showing this element.
      ============================================================ -->
-<div id="payment-list-modal" class="hidden" style="background:var(--bg-light,#f8fafc);min-height:100vh;">
+<div id="payment-list-modal" class="hidden" style="background:var(--bg-light,var(--main-bg));min-height:100vh;">
 
     <!-- Layer 2 Header -->
     <div class="payment-list-header">
@@ -699,7 +699,7 @@
             <!-- Notes -->
             <div style="margin-bottom:16px;">
                 <div class="breakdown-section-title">Ghi chú / Notes</div>
-                <div id="pay-detail-notes" style="font-size:13px;color:#64748b;padding:8px 0;line-height:1.6;">—</div>
+                <div id="pay-detail-notes" style="font-size:13px;color:var(--text-muted);padding:8px 0;line-height:1.6;">—</div>
             </div>
 
             <!-- Paid Date Info (shown after marking Paid) -->
@@ -753,7 +753,7 @@
                     <select id="ipc-form-contract" required>
                         <option value="">-- Chọn Gói thầu / Hợp đồng --</option>
                     </select>
-                    <div id="ipc-form-contractor-display" style="font-size:12px;color:#64748b;margin-top:4px;"></div>
+                    <div id="ipc-form-contractor-display" style="font-size:12px;color:var(--text-muted);margin-top:4px;"></div>
                 </div>
 
                 <!-- Payment No + Dates -->
@@ -830,7 +830,7 @@
         </div>
 
         <!-- Sticky Footer -->
-        <div class="detail-workspace-footer" style="padding: 1rem 1.5rem; border-top: 1px solid var(--border-color); background: white; display: flex; justify-content: flex-end; gap: 1rem; position: sticky; bottom: 0;">
+        <div class="detail-workspace-footer" style="padding: 1rem 1.5rem; border-top: 1px solid var(--border-color); background: var(--card-bg); display: flex; justify-content: flex-end; gap: 1rem; position: sticky; bottom: 0;">
             <button type="button" id="btn-close-ipc-form" class="btn btn-secondary">
                 <i class="fa-solid fa-xmark"></i> Hủy
             </button>
@@ -877,7 +877,7 @@
                     </div>
                     <div class="form-group">
                         <label>Trạng thái</label>
-                        <select id="vo-status" style="background-color: #f8fafc; font-weight: 600;">
+                        <select id="vo-status" style="background-color: var(--main-bg); font-weight: 600;">
                             <option value="Pending" class="text-warning">Pending</option>
                             <option value="Approved" class="text-success">Approved</option>
                             <option value="Rejected" class="text-danger">Rejected</option>
@@ -892,7 +892,7 @@
 
                 <!-- BoQ Breakdown -->
                 <div style="margin-bottom: 1.5rem; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden;">
-                    <div style="background: #f1f5f9; padding: 0.75rem 1rem; font-weight: 600; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                    <div style="background: var(--main-bg); padding: 0.75rem 1rem; font-weight: 600; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
                         <span>Bóc tách Chi tiết (BoQ Breakdown)</span>
                     </div>
                     <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
@@ -925,7 +925,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <div style="background: #f8fafc; padding: 0.75rem 1rem; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 2rem; font-weight: 600;">
+                    <div style="background: var(--main-bg); padding: 0.75rem 1rem; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 2rem; font-weight: 600;">
                         <div>Tổng Đệ trình: <span id="vo-claimed-summary" class="text-warning">0 VNĐ</span></div>
                         <div>Tổng QS Duyệt: <span id="vo-approved-summary" class="text-success">0 VNĐ</span></div>
                     </div>
@@ -965,7 +965,7 @@
             Hợp Đồng: ---
         </div>
     </div>
-    <div class="inline-workspace-body" style="padding: 1.5rem; background: #f8fafc; height: calc(100vh - 60px); overflow-y: auto;">
+    <div class="inline-workspace-body" style="padding: 1.5rem; background: var(--main-bg); height: calc(100vh - 60px); overflow-y: auto;">
         
         <div class="card" style="max-width: 900px; margin: 0 auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
             <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color);">
@@ -976,11 +976,11 @@
             <div style="padding: 0;">
                 <table style="width: 100%; border-collapse: collapse;">
                     <tbody>
-                        <tr style="border-bottom: 1px solid #e2e8f0;">
+                        <tr style="border-bottom: 1px solid var(--border-color);">
                             <td style="padding: 1rem 1.5rem; font-weight: 500;">[A] Giá trị Hợp đồng Gốc (Original Contract Value)</td>
                             <td style="padding: 1rem 1.5rem; text-align: right; font-weight: 600;" id="final-val-a">0 VNĐ</td>
                         </tr>
-                        <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
+                        <tr style="border-bottom: 1px solid var(--border-color); background-color: var(--main-bg);">
                             <td style="padding: 1rem 1.5rem; font-weight: 500;">[B] Tổng Phát sinh đã Duyệt (Total Approved VO)</td>
                             <td style="padding: 1rem 1.5rem; text-align: right; font-weight: 600; color: var(--primary-blue);" id="final-val-b">0 VNĐ</td>
                         </tr>
@@ -988,15 +988,15 @@
                             <td style="padding: 1rem 1.5rem; font-weight: 700; color: var(--primary-blue); font-size: 1.1rem;">[C] GIÁ TRỊ QUYẾT TOÁN HỢP ĐỒNG (C = A + B)</td>
                             <td style="padding: 1rem 1.5rem; text-align: right; font-weight: 700; color: var(--primary-blue); font-size: 1.1rem;" id="final-val-c">0 VNĐ</td>
                         </tr>
-                        <tr style="border-bottom: 1px solid #e2e8f0;">
+                        <tr style="border-bottom: 1px solid var(--border-color);">
                             <td style="padding: 1rem 1.5rem; font-weight: 500;">[D] Lũy kế đã Thanh toán qua các kỳ IPC (Total Certified)</td>
                             <td style="padding: 1rem 1.5rem; text-align: right; font-weight: 600; color: var(--danger-color);" id="final-val-d">0 VNĐ</td>
                         </tr>
-                        <tr style="border-bottom: 1px solid #e2e8f0; background-color: #f8fafc;">
+                        <tr style="border-bottom: 1px solid var(--border-color); background-color: var(--main-bg);">
                             <td style="padding: 1rem 1.5rem; font-weight: 500;">[E] Tạm ứng còn lại chưa thu hồi (Remaining Advance)</td>
                             <td style="padding: 1rem 1.5rem; text-align: right; font-weight: 600; color: var(--danger-color);" id="final-val-e">0 VNĐ</td>
                         </tr>
-                        <tr style="border-bottom: 1px solid #e2e8f0;">
+                        <tr style="border-bottom: 1px solid var(--border-color);">
                             <td style="padding: 1rem 1.5rem;">
                                 <div style="font-weight: 500; margin-bottom: 0.5rem;">[F] Giữ lại bảo hành (Retention)</div>
                                 <div style="display: flex; gap: 1rem; align-items: center;">
@@ -1019,7 +1019,7 @@
                 </table>
             </div>
             
-            <div style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; background-color: #f1f5f9; border-bottom-left-radius: 0.5rem; border-bottom-right-radius: 0.5rem;">
+            <div style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; background-color: var(--main-bg); border-bottom-left-radius: 0.5rem; border-bottom-right-radius: 0.5rem;">
                 <div style="color: var(--text-muted); font-size: 0.9rem;">
                     <i class="fa-solid fa-circle-info"></i> Sau khi chốt, Hợp đồng sẽ chuyển sang trạng thái <strong>Closed</strong> và không thể thêm IPC/VO mới.
                 </div>
@@ -1052,3 +1052,4 @@
         </div>
     </div>
 </div>
+

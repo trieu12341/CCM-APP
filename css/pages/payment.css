@@ -78,7 +78,7 @@
 }
 
 .payment-widget-card {
-    background: #fff;
+    background: var(--card-bg);
     border: 1px solid var(--border-color, var(--border-color));
     border-radius: 10px;
     padding: 16px;
@@ -202,7 +202,7 @@
 }
 
 .payment-list-header {
-    background: #fff;
+    background: var(--card-bg);
     border-bottom: 1px solid var(--border-color, var(--border-color));
     padding: 16px 24px;
     display: flex;
@@ -264,7 +264,7 @@
     font-size: 13px;
     font-family: inherit;
     cursor: pointer;
-    background: #fff;
+    background: var(--card-bg);
 }
 
 .payment-list-body {
@@ -308,7 +308,7 @@
     width: 100%;
     border-collapse: collapse;
     font-size: 13px;
-    background: #fff;
+    background: var(--card-bg);
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 1px 4px rgba(0,0,0,0.08);
@@ -353,7 +353,7 @@
     width: 680px;
     max-width: 90vw;
     height: 100vh;
-    background: #fff;
+    background: var(--card-bg);
     box-shadow: -4px 0 30px rgba(0,0,0,0.15);
     z-index: 500;
     display: flex;
@@ -371,7 +371,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #fff;
+    background: var(--card-bg);
     flex-shrink: 0;
 }
 
@@ -593,7 +593,7 @@
     font-size: 13px;
     font-family: inherit;
     transition: border-color 0.2s, box-shadow 0.2s;
-    background: #fff;
+    background: var(--card-bg);
     box-sizing: border-box;
 }
 
@@ -740,3 +740,4 @@
         grid-template-columns: 1fr;
     }
 }
+
