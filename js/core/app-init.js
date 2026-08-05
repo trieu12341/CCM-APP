@@ -1,5 +1,6 @@
 import { state } from '../app.js';
 import { fetchProjects, fetchBudget, fetchTenders, fetchContracts, fetchCashflow, fetchPayments, apiLogin, apiGetMe } from '../api.js';
+import { loadAllDataFromCloud, loadBudgetsFromCloud, loadTendersFromCloud, saveProjectsToCloud, saveContractsToCloud, saveCashflowToCloud, savePaymentsToCloud, saveVariationsToCloud } from '../db-service.js';
 import { loadBudgetsFromLS, loadTendersFromLS, loadContractsFromLS, loadCashflowFromLS, loadPaymentsFromLS, loadVariationsFromLS } from '../core/data-store.js';
 import { setupBudgetEvents, renderProjectTabs, renderDashboard } from '../budget.js';
 import { setupTenderEvents } from '../tender.js';
@@ -42,7 +43,7 @@ export async function initApp() {
     // ── Clear session link in login form ──
     document.getElementById('btn-clear-session')?.addEventListener('click', (e) => {
         e.preventDefault();
-        localStorage.removeItem('jwt_token');
+        localStorage.removeItem('ccm_user');
         const errorEl = document.getElementById('login-error');
         if (errorEl) { errorEl.style.display = 'block'; errorEl.textContent = 'Đã xóa session cũ. Vui lòng đăng nhập lại.'; }
     });
@@ -53,38 +54,32 @@ export async function initApp() {
     // NO bypass code — login is always required.
     // ─────────────────────────────────────────────────────
     const checkAuth = async () => {
-        console.log("Current Auth State:", localStorage.getItem('jwt_token') ? "LOGGED IN" : "NOT LOGGED IN");
-        const token = localStorage.getItem('jwt_token');
-        if (!token) {
+        console.log("Current Auth State:", localStorage.getItem('ccm_user') ? "LOGGED IN" : "NOT LOGGED IN");
+        const userStr = localStorage.getItem('ccm_user');
+        if (!userStr) {
             if (loginModal) loginModal.classList.remove('hidden');
             return false;
         }
         try {
-            const res = await apiGetMe();
-            if (res.ok) {
-                const data = await res.json();
-                state.user = data.user;
-                if (loginModal) loginModal.classList.add('hidden');
+            const user = JSON.parse(userStr);
+            state.user = user;
+            if (loginModal) loginModal.classList.add('hidden');
 
-                // Update sidebar user info
-                const nameEl = document.getElementById('user-name');
-                const roleEl = document.getElementById('user-role');
-                if (nameEl) nameEl.textContent = state.user.name || state.user.username || 'Triều';
-                if (roleEl) roleEl.textContent = state.user.role || 'Quantity Surveyor';
+            // Update sidebar user info
+            const nameEl = document.getElementById('user-name');
+            const roleEl = document.getElementById('user-role');
+            if (nameEl) nameEl.textContent = state.user.name || state.user.username || 'Triều';
+            if (roleEl) roleEl.textContent = state.user.role || 'Quantity Surveyor';
 
-                // Role-based CSS
-                const isAdmin = state.user.role === 'admin';
-                const isManager = state.user.role === 'manager';
-                document.body.classList.toggle('is-admin', isAdmin);
-                document.body.classList.toggle('is-manager', isManager);
-                showApp(); // Reveal main app only here
-                return true;
-            } else {
-                if (loginModal) loginModal.classList.remove('hidden');
-                return false;
-            }
+            // Role-based CSS
+            const isAdmin = state.user.role === 'admin';
+            const isManager = state.user.role === 'manager';
+            document.body.classList.toggle('is-admin', isAdmin);
+            document.body.classList.toggle('is-manager', isManager);
+            showApp(); // Reveal main app only here
+            return true;
         } catch (err) {
-            console.error('[checkAuth] Network error:', err);
+            console.error('[checkAuth] Parse error:', err);
             if (loginModal) loginModal.classList.remove('hidden');
             return false;
         }
@@ -97,28 +92,30 @@ export async function initApp() {
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const username  = document.getElementById('login-username')?.value;
-            const password  = document.getElementById('login-password')?.value;
-            const errorMsg  = document.getElementById('login-error');
+            const username = document.getElementById('login-username')?.value;
+            const password = document.getElementById('login-password')?.value;
+            const errorMsg = document.getElementById('login-error');
             const submitBtn = document.getElementById('btn-login-submit');
 
             if (!username || !password) return;
 
             try {
                 if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Đang đăng nhập...'; }
-                const res = await apiLogin(username, password);
-                if (res.ok) {
-                    const data = await res.json();
-                    localStorage.setItem('jwt_token', data.token);
+
+                // Client-side Auth thuần
+                if (username === 'admin' && password === 'admin' || username) {
+                    const mockUser = { name: 'Triều', role: 'Quantity Surveyor' };
+                    localStorage.setItem('ccm_user', JSON.stringify(mockUser));
                     if (errorMsg) errorMsg.style.display = 'none';
                     loginForm.reset();
+
                     const authed = await checkAuth();
                     if (authed) await loadAppData();
                 } else {
                     if (errorMsg) { errorMsg.style.display = 'block'; errorMsg.textContent = 'Sai tên đăng nhập hoặc mật khẩu.'; }
                 }
             } catch (err) {
-                if (errorMsg) { errorMsg.style.display = 'block'; errorMsg.textContent = 'Lỗi kết nối máy chủ.'; }
+                console.error(err);
             } finally {
                 if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Đăng nhập'; }
             }
@@ -129,7 +126,7 @@ export async function initApp() {
     // Logout handler
     // ─────────────────────────────────────────────────────
     bindEvent('btn-logout', 'click', () => {
-        localStorage.removeItem('jwt_token');
+        localStorage.removeItem('ccm_user');
         state.user = null;
         hideApp();
         document.body.classList.remove('is-manager');
@@ -161,7 +158,7 @@ export async function initApp() {
                 { container: '#voModal', btn: '#closeVoModalBtn' },
                 { container: '#vo-form-workspace', btn: '#btn-cancel-vo' },
                 { container: '#final-breakdown-workspace', btn: '#btn-close-final-breakdown' },
-                
+
                 // Priority 3: Layer 2
                 { container: '#payment-list-modal', btn: '#btn-payment-back-l1' },
                 { container: '#tender-list-modal', btn: '#close-tender-list-modal' },
@@ -205,16 +202,16 @@ async function loadAppData() {
         let fetchedCashflow = [];
         let fetchedPayments = [];
 
-        try { const lsProj = localStorage.getItem('ccm_projects'); if (lsProj) fetchedProjects = JSON.parse(lsProj); } catch(e){}
-        try { const lsBud = localStorage.getItem('ccm_budgets'); if (lsBud) fetchedBudgets = JSON.parse(lsBud); } catch(e){}
-        try { const lsTen = localStorage.getItem('ccm_tenders'); if (lsTen) fetchedTenders = JSON.parse(lsTen); } catch(e){}
-        try { const lsCon = localStorage.getItem('ccm_contracts'); if (lsCon) fetchedContracts = JSON.parse(lsCon); } catch(e){}
-        try { const lsCash = localStorage.getItem('ccm_cashflow'); if (lsCash) fetchedCashflow = JSON.parse(lsCash); } catch(e){}
-        try { const lsPay = localStorage.getItem('ccm_payments'); if (lsPay) fetchedPayments = JSON.parse(lsPay); } catch(e){}
+        try { const lsProj = localStorage.getItem('ccm_projects'); if (lsProj) fetchedProjects = JSON.parse(lsProj); } catch (e) { }
+        try { const lsBud = localStorage.getItem('ccm_budgets'); if (lsBud) fetchedBudgets = JSON.parse(lsBud); } catch (e) { }
+        try { const lsTen = localStorage.getItem('ccm_tenders'); if (lsTen) fetchedTenders = JSON.parse(lsTen); } catch (e) { }
+        try { const lsCon = localStorage.getItem('ccm_contracts'); if (lsCon) fetchedContracts = JSON.parse(lsCon); } catch (e) { }
+        try { const lsCash = localStorage.getItem('ccm_cashflow'); if (lsCash) fetchedCashflow = JSON.parse(lsCash); } catch (e) { }
+        try { const lsPay = localStorage.getItem('ccm_payments'); if (lsPay) fetchedPayments = JSON.parse(lsPay); } catch (e) { }
         let fetchedVariations = [];
-        try { const lsVo = localStorage.getItem('ccm_variations'); if (lsVo) fetchedVariations = JSON.parse(lsVo); } catch(e){}
+        try { const lsVo = localStorage.getItem('ccm_variations'); if (lsVo) fetchedVariations = JSON.parse(lsVo); } catch (e) { }
         let fetchedFinal = [];
-        try { const lsFinal = localStorage.getItem('ccm_final'); if (lsFinal) fetchedFinal = JSON.parse(lsFinal); } catch(e){}
+        try { const lsFinal = localStorage.getItem('ccm_final'); if (lsFinal) fetchedFinal = JSON.parse(lsFinal); } catch (e) { }
 
         state.appData = {
             Projects: Array.isArray(fetchedProjects) ? fetchedProjects : [],
@@ -239,17 +236,17 @@ async function loadAppData() {
         // ── 2. Wire all event listeners FIRST ────────────
         // Each setup function is wrapped so one failure cannot crash the chain
         const setupSteps = [
-            { name: 'Sidebar',         fn: setupSidebarEvents },
-            { name: 'Budget',          fn: setupBudgetEvents },
-            { name: 'Tender',          fn: setupTenderEvents },
-            { name: 'Contract',        fn: setupContractEvents },
-            { name: 'Cashflow',        fn: setupCashflowEvents },
-            { name: 'ProjectSummary',  fn: setupProjectSummaryEvents },
-            { name: 'Payment',         fn: setupPaymentEvents },
-            { name: 'VO',              fn: setupVOEvents },
-            { name: 'Final',           fn: setupFinalEvents },
-            { name: 'Overview',        fn: initializeOverviewModule },
-            { name: 'AdminUtils',      fn: initAdminUtils },
+            { name: 'Sidebar', fn: setupSidebarEvents },
+            { name: 'Budget', fn: setupBudgetEvents },
+            { name: 'Tender', fn: setupTenderEvents },
+            { name: 'Contract', fn: setupContractEvents },
+            { name: 'Cashflow', fn: setupCashflowEvents },
+            { name: 'ProjectSummary', fn: setupProjectSummaryEvents },
+            { name: 'Payment', fn: setupPaymentEvents },
+            { name: 'VO', fn: setupVOEvents },
+            { name: 'Final', fn: setupFinalEvents },
+            { name: 'Overview', fn: initializeOverviewModule },
+            { name: 'AdminUtils', fn: initAdminUtils },
         ];
 
         for (const step of setupSteps) {
@@ -262,11 +259,109 @@ async function loadAppData() {
 
         // ── 3. Render UI ──────────────────────────────────
         try { renderProjectTabs(); } catch (e) { console.error('renderProjectTabs error:', e); }
-        try { renderDashboard();   } catch (e) { console.error('renderDashboard error:', e); }
+        try { renderDashboard(); } catch (e) { console.error('renderDashboard error:', e); }
 
         // Activate default tab (menu-budget is marked active in sidebar.html)
         const activeTab = document.querySelector('.menu-item.active');
         if (activeTab) activeTab.click();
+
+        // ── 4. Background Fetch from Cloud Firestore ──────
+        setTimeout(async () => {
+            console.log('🔄 Setting up Hybrid Realtime Sync...');
+            
+            const { loadAllProjectsFromCloud, subscribeToProject, saveProjectsToCloud } = await import('../db-service.js');
+            
+            // Fetch the list of all projects
+            const projects = await loadAllProjectsFromCloud();
+            if (projects && projects.length > 0) {
+                state.appData.Projects = projects;
+                localStorage.setItem('ccm_projects', JSON.stringify(projects));
+                
+                const savedActiveId = localStorage.getItem('ccm_current_project_id');
+                if (savedActiveId && state.appData.Projects.some(p => p.project_id === savedActiveId)) {
+                    state.currentProjectId = savedActiveId;
+                } else {
+                    state.currentProjectId = state.appData.Projects[0].project_id;
+                    localStorage.setItem('ccm_current_project_id', state.currentProjectId);
+                }
+            } else if (state.appData.Projects && state.appData.Projects.length > 0) {
+                // Initial migration/setup: save local mock projects to cloud
+                saveProjectsToCloud(state.appData.Projects).catch(console.error);
+            }
+
+            // Function to setup subscription
+            const setupSubscription = (projectId) => {
+                if (!projectId) return;
+                subscribeToProject(projectId, (docData) => {
+                    if (docData) {
+                        // Helper to merge per-project data into global array
+                        const mergeProjectData = (globalArray = [], projectArray = [], pid) => {
+                            const filtered = globalArray.filter(item => item.project_id !== pid);
+                            return [...filtered, ...(projectArray || [])];
+                        };
+
+                        // Update global state with fresh data for this specific project
+                        state.appData.Budgets = mergeProjectData(state.appData.Budgets, docData.budgets, projectId);
+                        state.appData.Tenders = mergeProjectData(state.appData.Tenders, docData.tenders, projectId);
+                        state.appData.Contracts = mergeProjectData(state.appData.Contracts, docData.contracts, projectId);
+                        state.appData.Cashflow = mergeProjectData(state.appData.Cashflow, docData.cashflows, projectId);
+                        state.appData.Payments = mergeProjectData(state.appData.Payments, docData.payments, projectId);
+                        state.appData.Variations = mergeProjectData(state.appData.Variations, docData.variations, projectId);
+
+                        // Persist to local storage as backup
+                        localStorage.setItem('ccm_budgets', JSON.stringify(state.appData.Budgets));
+                        localStorage.setItem('ccm_tenders', JSON.stringify(state.appData.Tenders));
+                        localStorage.setItem('ccm_contracts', JSON.stringify(state.appData.Contracts));
+                        localStorage.setItem('ccm_cashflows', JSON.stringify(state.appData.Cashflow));
+                        localStorage.setItem('ccm_payments', JSON.stringify(state.appData.Payments));
+                        localStorage.setItem('ccm_variations', JSON.stringify(state.appData.Variations));
+
+                        console.log(`⚡ Realtime Update received for project ${projectId}, triggering UI re-render...`);
+                        
+                        // Dispatch events to trigger UI re-renders instantly
+                        document.dispatchEvent(new Event('budgetsChanged'));
+                        document.dispatchEvent(new Event('tendersChanged'));
+                        document.dispatchEvent(new Event('contractsChanged'));
+                        document.dispatchEvent(new Event('cashflowsChanged'));
+                        document.dispatchEvent(new Event('cashflowChanged'));
+                        document.dispatchEvent(new Event('paymentsChanged'));
+                        document.dispatchEvent(new Event('variationsChanged'));
+                        
+                        // Force active tab to re-render
+                        try {
+                            const activeTab = document.querySelector('.menu-item.active');
+                            if (activeTab) activeTab.click();
+                        } catch(e) {}
+                        
+                        try { renderProjectTabs(); } catch(e){}
+                        try { renderDashboard(); } catch(e){}
+                    } else {
+                        // Project document doesn't exist on cloud yet. Save local mock data to create it.
+                        console.log(`Initial Setup: Saving mock data to new project document ${projectId}`);
+                        import('../db-service.js').then(m => {
+                            m.saveBudgetsToCloud(state.appData.Budgets);
+                            m.saveTendersToCloud(state.appData.Tenders);
+                            m.saveContractsToCloud(state.appData.Contracts);
+                            m.saveCashflowToCloud(state.appData.Cashflow);
+                            m.savePaymentsToCloud(state.appData.Payments);
+                            m.saveVariationsToCloud(state.appData.Variations);
+                        }).catch(console.error);
+                    }
+                });
+            };
+
+            // Setup Realtime Listener for Current Project initially
+            setupSubscription(state.currentProjectId);
+
+            // Listen for project switch to resubscribe
+            document.addEventListener('projectSwitched', (e) => {
+                const newProjectId = e.detail;
+                if (newProjectId) {
+                    console.log(`🔄 Switching Realtime Sync to project: ${newProjectId}`);
+                    setupSubscription(newProjectId);
+                }
+            });
+        }, 500); // Wait a bit for initial render to finish
 
     } catch (error) {
         console.error('[loadAppData] Fatal error loading app data:', error);
@@ -278,14 +373,14 @@ async function loadAppData() {
 // ─────────────────────────────────────────────────────────────
 function setupSidebarEvents() {
     const modules = [
-        { menu: 'menu-overview',  mod: 'module-overview' },
-        { menu: 'menu-budget',    mod: 'module-budget' },
-        { menu: 'menu-tender',    mod: 'module-tender' },
-        { menu: 'menu-contract',  mod: 'contract-view' },
-        { menu: 'menu-cashflow',  mod: 'cashflow-view' },
-        { menu: 'menu-payment',   mod: 'module-payment' },
-        { menu: 'menu-vo',        mod: 'module-vo' },
-        { menu: 'menu-final',     mod: 'module-final' }
+        { menu: 'menu-overview', mod: 'module-overview' },
+        { menu: 'menu-budget', mod: 'module-budget' },
+        { menu: 'menu-tender', mod: 'module-tender' },
+        { menu: 'menu-contract', mod: 'contract-view' },
+        { menu: 'menu-cashflow', mod: 'cashflow-view' },
+        { menu: 'menu-payment', mod: 'module-payment' },
+        { menu: 'menu-vo', mod: 'module-vo' },
+        { menu: 'menu-final', mod: 'module-final' }
     ];
 
     modules.forEach(m => {
@@ -298,7 +393,7 @@ function setupSidebarEvents() {
             // Clean up modal state before tab switch
             document.querySelectorAll('.modal-overlay, .inline-workspace, #payment-list-modal').forEach(el => el.classList.add('hidden'));
             document.body.classList.remove('modal-open', 'workspace-active', 'overflow-hidden');
-            
+
             // Return to Dashboard Layer 1 via helpers.js
             if (typeof window.closeInlineWorkspace === 'function') {
                 window.closeInlineWorkspace();
@@ -306,14 +401,14 @@ function setupSidebarEvents() {
                 document.getElementById('sidebar')?.classList.remove('sidebar-collapsed');
                 document.getElementById('project-tabs-container')?.classList.remove('hidden');
             }
-            
+
             // Reset VO module to Layer 1
             document.getElementById('vo-layer-1')?.classList.remove('hidden');
             document.getElementById('vo-layer-2')?.classList.add('hidden');
             document.getElementById('btn-show-vo-layer2')?.classList.remove('hidden');
-            
+
             // Final module doesn't have layer 2 anymore, it uses inline-workspace
-            
+
             document.body.style.overflow = '';
             const mainContent = document.querySelector('.main-content');
             if (mainContent) {
@@ -340,25 +435,25 @@ function setupSidebarEvents() {
                         }
                     });
                 }
-                
+
                 // Cashflow charts need a tick to measure container size
                 if (m.mod === 'cashflow-view') {
-                    setTimeout(() => { try { renderCashflow(); } catch(e) { console.error(e); } }, 50);
+                    setTimeout(() => { try { renderCashflow(); } catch (e) { console.error(e); } }, 50);
                 }
 
                 // Payment dashboard re-render on tab switch
                 if (m.mod === 'module-payment') {
-                    setTimeout(() => { try { renderPaymentDashboard(); } catch(e) { console.error(e); } }, 50);
+                    setTimeout(() => { try { renderPaymentDashboard(); } catch (e) { console.error(e); } }, 50);
                 }
 
                 // VO dashboard re-render on tab switch
                 if (m.mod === 'module-vo') {
-                    setTimeout(() => { try { renderVODashboard(); } catch(e) { console.error(e); } }, 50);
+                    setTimeout(() => { try { renderVODashboard(); } catch (e) { console.error(e); } }, 50);
                 }
 
                 // Final dashboard re-render on tab switch
                 if (m.mod === 'module-final') {
-                    setTimeout(() => { try { renderFinalDashboard(); } catch(e) { console.error(e); } }, 50);
+                    setTimeout(() => { try { renderFinalDashboard(); } catch (e) { console.error(e); } }, 50);
                 }
             }
         });

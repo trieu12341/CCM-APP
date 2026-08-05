@@ -14,6 +14,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <!-- Firebase SDK (v10 compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="js/theme-toggle.js"></script>
 </head>
 
@@ -208,7 +211,10 @@
         </div>
     </div>
 
+    <!-- Firebase Services & Core App -->
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/db-service.js"></script>
+    <script type="module" src="js/app.js"></script>
 </body>
-
 </html>
 

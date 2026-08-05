@@ -1,5 +1,6 @@
 import { state } from '../app.js';
 import { saveBudget, saveTender, saveContracts, saveCashflow, savePayments } from '../api.js';
+import { saveBudgetsToCloud, saveTendersToCloud, saveProjectsToCloud, saveContractsToCloud, saveCashflowToCloud, savePaymentsToCloud, saveVariationsToCloud } from '../db-service.js';
 
 // Centralize all localStorage keys
 export const STORAGE_KEYS = {
@@ -22,10 +23,19 @@ export function clearResetFlag() {
     localStorage.removeItem('ccm_user_reset_cleared');
 }
 
+export function persistProjects(data) {
+    clearResetFlag();
+    state.appData.Projects = data;
+    localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(data));
+    saveProjectsToCloud(data);
+    document.dispatchEvent(new Event('projectsChanged'));
+}
+
 export function persistBudgets(data) {
     clearResetFlag();
     state.appData.Budgets = data;
     localStorage.setItem(STORAGE_KEYS.BUDGETS, JSON.stringify(data));
+    saveBudgetsToCloud(data);
     saveBudget({
         Budgets: data,
         Contracts: state.appData.Contracts || [],
@@ -40,6 +50,7 @@ export function persistTenders(data) {
     clearResetFlag();
     state.appData.Tenders = data;
     localStorage.setItem(STORAGE_KEYS.TENDERS, JSON.stringify(data));
+    saveTendersToCloud(data);
     document.dispatchEvent(new Event('tendersChanged'));
 }
 
@@ -47,6 +58,7 @@ export function persistContracts(data) {
     clearResetFlag();
     state.appData.Contracts = data;
     localStorage.setItem(STORAGE_KEYS.CONTRACTS, JSON.stringify(data));
+    saveContractsToCloud(data);
     saveContracts(data).catch(err => console.error('Failed to sync contracts to API:', err));
     document.dispatchEvent(new Event('contractsChanged'));
 }
@@ -61,6 +73,7 @@ export function persistCashflow(data) {
     clearResetFlag();
     state.appData.Cashflow = data;
     localStorage.setItem(STORAGE_KEYS.CASHFLOW, JSON.stringify(data));
+    saveCashflowToCloud(data);
     saveCashflow(data).catch(err => console.error('Failed to sync cashflow to API:', err));
     document.dispatchEvent(new Event('cashflowChanged'));
 }
@@ -107,6 +120,7 @@ export function persistPayments(data) {
     clearResetFlag();
     state.appData.Payments = data;
     localStorage.setItem(STORAGE_KEYS.PAYMENTS, JSON.stringify(data));
+    savePaymentsToCloud(data);
     savePayments(data).catch(err => console.error('Failed to sync payments to API:', err));
     document.dispatchEvent(new Event('paymentsChanged'));
 }
@@ -133,6 +147,7 @@ export function persistVariations(data) {
     clearResetFlag();
     state.appData.Variations = data;
     localStorage.setItem(STORAGE_KEYS.VARIATIONS, JSON.stringify(data));
+    saveVariationsToCloud(data);
     // Since there's no saveVariations in API yet, we just update localStorage. 
     // It's tied to budget/contracts save later if needed.
     document.dispatchEvent(new Event('variationsChanged'));

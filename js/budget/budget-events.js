@@ -356,6 +356,12 @@ export function setupBudgetEvents() {
             localStorage.setItem('ccm_projects', JSON.stringify(state.appData.Projects));
             localStorage.setItem('ccm_current_project_id', newId);
             
+            // Sync to cloud so other users see the new project
+            import('../db-service.js').then(m => m.saveProjectsToCloud(state.appData.Projects)).catch(console.error);
+            
+            // Notify app to change realtime subscription
+            document.dispatchEvent(new CustomEvent('projectSwitched', { detail: newId }));
+            
             window.dispatchEvent(new CustomEvent('appDataChanged'));
 
             if (typeof renderProjectTabs === 'function') renderProjectTabs();
@@ -364,7 +370,7 @@ export function setupBudgetEvents() {
             newProjectModal.classList.add('hidden');
             
             if (!success) {
-                console.warn('Không thể lưu lên server, đã lưu offline vào LocalStorage');
+                console.warn('Không thể lưu lên json-server, đã lưu offline vào LocalStorage và Firebase');
             }
         });
     }

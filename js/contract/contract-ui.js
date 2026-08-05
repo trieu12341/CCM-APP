@@ -54,6 +54,8 @@ export function renderContracts() {
         }
 
         contracts.forEach(c => {
+            const status = c.status || 'Đang thực hiện';
+            if (status !== 'Đang thực hiện' && status !== 'Active') return;
             const committed = getDynamicContractValue(c, state.appData);
             
             totalCommitted += committed;
@@ -179,7 +181,6 @@ export function renderContractTableModal() {
     
     if (contracts.length === 0) {
         tbodyConstruction.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:2rem; color:var(--text-muted);">Không có Hợp đồng nào.</td></tr>`;
-        window.openInlineWorkspace('contract-list-modal');
         return;
     }
 
@@ -239,14 +240,14 @@ export function renderContractTableModal() {
 
     if (consultancies.length > 0) {
         const headerTR = document.createElement('tr');
-        headerTR.innerHTML = `<td colspan="10" style="background-color: #f1f5f9; font-weight: bold; padding: 0.75rem;">I. Gói thầu Tư vấn</td>`;
+        headerTR.innerHTML = `<td colspan="10" style="background-color: var(--bg-table-header); font-weight: bold; padding: 0.75rem;">I. Gói thầu Tư vấn</td>`;
         tbodyConsultancy.appendChild(headerTR);
         consultancies.forEach(c => tbodyConsultancy.appendChild(createRow(c)));
     }
     
     if (constructions.length > 0) {
         const headerTR = document.createElement('tr');
-        headerTR.innerHTML = `<td colspan="10" style="background-color: #f1f5f9; font-weight: bold; padding: 0.75rem;">II. Gói thầu Xây dựng</td>`;
+        headerTR.innerHTML = `<td colspan="10" style="background-color: var(--bg-table-header); font-weight: bold; padding: 0.75rem;">II. Gói thầu Xây dựng</td>`;
         tbodyConstruction.appendChild(headerTR);
         constructions.forEach(c => tbodyConstruction.appendChild(createRow(c)));
     }
@@ -268,7 +269,6 @@ export function renderContractTableModal() {
         });
     });
 
-    window.openInlineWorkspace('contract-list-modal');
 }
 
 export function openContractModal(contract = null) {

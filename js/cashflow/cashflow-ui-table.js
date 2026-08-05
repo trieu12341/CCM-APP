@@ -237,8 +237,8 @@ function renderRightPane(contractId, contracts, allCashflows) {
             table.style.cssText = 'width: 100%; border-collapse: separate; border-spacing: 0; min-width: 800px; font-size: 0.9rem;';
             
             let thead = `<thead><tr>
-                <th style="padding: 12px; border-bottom: 2px solid #e2e8f0; text-align: left; width: 160px; background: #f8fafc; position: sticky; left: 0; z-index: 2;">Đợt thanh toán</th>
-                <th style="padding: 12px; border-bottom: 2px solid #e2e8f0; text-align: right; width: 140px; background: #f8fafc; position: sticky; left: 160px; z-index: 2; border-right: 1px solid #cbd5e1;">Giá trị (VNĐ)</th>
+                <th style="padding: 12px; border-bottom: 2px solid var(--border-color); text-align: left; width: 160px; background: var(--main-bg); position: sticky; left: 0; z-index: 2;">Đợt thanh toán</th>
+                <th style="padding: 12px; border-bottom: 2px solid var(--border-color); text-align: right; width: 140px; background: var(--main-bg); position: sticky; left: 160px; z-index: 2; border-right: 1px solid var(--border-color);">Giá trị (VNĐ)</th>
             `;
             months.forEach(m => {
                 const displayLabel = m === 'Chưa có ngày' ? m : m.split('-').reverse().join('/');
@@ -266,22 +266,22 @@ function renderRightPane(contractId, contracts, allCashflows) {
                 else if (cf.status === 'Certified') barColor = '#f59e0b';
 
                 tbody += `<tr>
-                    <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; background: white; position: sticky; left: 0; z-index: 1;">
+                    <td style="padding: 12px; border-bottom: 1px solid var(--border-color); background: var(--card-bg); position: sticky; left: 0; z-index: 1;">
                         <strong style="color: var(--text-dark);">${cf.code || 'N/A'}</strong><br>
                         <small style="color: ${barColor}; border: 1px solid ${barColor}; border-radius: 4px; padding: 1px 4px; margin-top: 4px; display: inline-block;">${cf.status || 'Planned'}</small>
                     </td>
-                    <td style="padding: 12px; border-bottom: 1px solid #f1f5f9; text-align: right; font-weight: 600; color: var(--text-dark); background: white; position: sticky; left: 160px; z-index: 1; border-right: 1px solid #cbd5e1;">${valStr}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid var(--border-color); text-align: right; font-weight: 600; color: var(--text-dark); background: var(--card-bg); position: sticky; left: 160px; z-index: 1; border-right: 1px solid var(--border-color);">${valStr}</td>
                 `;
 
                 months.forEach(m => {
                     if (m === mKey) {
-                        tbody += `<td style="padding: 8px; border-bottom: 1px solid #f1f5f9; border-right: 1px dashed #e2e8f0; position: relative;">
+                        tbody += `<td style="padding: 8px; border-bottom: 1px solid var(--border-color); border-right: 1px dashed var(--border-color); position: relative;">
                             <div style="background-color: ${barColor}; height: 26px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); width: 96%; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.8rem; font-weight: 600;" title="${cf.desc || 'Không có diễn giải'}">
                                 ${valStr}
                             </div>
                         </td>`;
                     } else {
-                        tbody += `<td style="padding: 8px; border-bottom: 1px solid #f1f5f9; border-right: 1px dashed #e2e8f0;"></td>`;
+                        tbody += `<td style="padding: 8px; border-bottom: 1px solid var(--border-color); border-right: 1px dashed var(--border-color);"></td>`;
                     }
                 });
                 tbody += `</tr>`;

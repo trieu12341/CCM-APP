@@ -22,6 +22,8 @@ export function renderCashflow() {
 
     let revised = 0;
     contracts.filter(c => c.project_id === state.currentProjectId).forEach(c => {
+        const status = c.status || 'Active';
+        if (status !== 'Active') return;
         revised += getDynamicContractValue(c, state.appData);
     });
 

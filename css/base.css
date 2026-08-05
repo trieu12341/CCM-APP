@@ -6,6 +6,8 @@
   --sidebar-hover: #334155;
   --bg-hover-row: #fff7ed;
   --bg-even-row: #fff7ed;
+  --bg-table-header: #f1f5f9;
+  --bg-table-footer: #e2e8f0;
 
   /* Typography */
   --text-dark: #1e293b;
@@ -35,6 +37,8 @@
   --sidebar-hover: #334155;
   --bg-hover-row: #334155;
   --bg-even-row: #1c2436;
+  --bg-table-header: #334155;
+  --bg-table-footer: #0f172a;
 
   /* Dark Typography */
   --text-dark: #f8fafc;     

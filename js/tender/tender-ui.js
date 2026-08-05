@@ -46,7 +46,7 @@ export function renderTenders() {
                 evaluatingVal += budget;
             } else if (status === 'awarded') {
                 awardedCount++;
-                const actualAwarded = parseBudget(t.awarded_amount || t.final_price || t.awardedAmount || 0);
+                const actualAwarded = parseBudget(t.awardedPrice || t.final_price || t.awarded_amount || t.awardedAmount || 0);
                 awardedVal += (actualAwarded > 0) ? actualAwarded : budget;
             } else {
                 notOpenedVal += budget;
@@ -173,17 +173,19 @@ export function renderTenderTableModal() {
 
     if (tenders.length === 0) {
         tbodyConstruction.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">Không có Gói thầu nào.</td></tr>`;
-        window.openInlineWorkspace('tender-list-modal');
         return;
     }
 
     const createRow = (t) => {
         const tr = document.createElement('tr');
         const budget = parseBudget(t.budgetAmount || t.estimatedValue || t.approved_budget);
+        const awardedPrice = t.awardedPrice || t.final_price || t.awarded_amount || t.awardedAmount || 0;
+        const awardedText = (t.status && t.status.toLowerCase() === 'awarded') ? formatCurrency(awardedPrice) : '-';
         tr.innerHTML = `
             <td>${t.tender_id || '-'}</td>
             <td>${t.tender_name || '-'}</td>
             <td style="font-weight: 600;">${formatCurrency(budget)}</td>
+            <td style="font-weight: 600; color: var(--primary-green);">${awardedText}</td>
             <td>${t.deadline ? formatDate(t.deadline) : '-'}</td>
             <td><span class="status-badge ${t.status ? t.status.toLowerCase() : ''}">${t.status || '-'}</span></td>
             <td>${t.winner || '-'}</td>
@@ -198,19 +200,17 @@ export function renderTenderTableModal() {
 
     if (consultancies.length > 0) {
         const headerTR = document.createElement('tr');
-        headerTR.innerHTML = `<td colspan="6" style="background-color: #f1f5f9; font-weight: bold; padding: 0.75rem;">I. Gói thầu Tư vấn</td>`;
+        headerTR.innerHTML = `<td colspan="7" style="background-color: var(--bg-table-header); font-weight: bold; padding: 0.75rem;">I. Gói thầu Tư vấn</td>`;
         tbodyConsultancy.appendChild(headerTR);
         consultancies.forEach(t => tbodyConsultancy.appendChild(createRow(t)));
     }
     
     if (constructions.length > 0) {
         const headerTR = document.createElement('tr');
-        headerTR.innerHTML = `<td colspan="6" style="background-color: #f1f5f9; font-weight: bold; padding: 0.75rem;">II. Gói thầu Xây dựng / M&E</td>`;
+        headerTR.innerHTML = `<td colspan="7" style="background-color: var(--bg-table-header); font-weight: bold; padding: 0.75rem;">II. Gói thầu Xây dựng / M&E</td>`;
         tbodyConstruction.appendChild(headerTR);
         constructions.forEach(t => tbodyConstruction.appendChild(createRow(t)));
     }
-
-    window.openInlineWorkspace('tender-list-modal');
 }
 
 export function openTenderDetail(tenderId) {

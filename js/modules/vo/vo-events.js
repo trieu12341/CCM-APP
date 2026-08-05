@@ -78,6 +78,16 @@ export function setupVOEvents() {
     });
 
     // Form Submit (Save)
+    window.addEventListener('appDataChanged', () => {
+        renderVODashboard();
+        renderVOTable();
+    });
+
+    document.addEventListener('variationsChanged', () => {
+        renderVODashboard();
+        renderVOTable();
+    });
+
     bindEvent('vo-form', 'submit', (e) => {
         e.preventDefault();
         saveVOForm();

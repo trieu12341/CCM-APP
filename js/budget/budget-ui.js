@@ -24,6 +24,9 @@ export function renderProjectTabs() {
         state.currentProjectId = e.target.value;
         localStorage.setItem('ccm_current_project_id', state.currentProjectId);
         
+        // Notify app to change realtime subscription
+        document.dispatchEvent(new CustomEvent('projectSwitched', { detail: state.currentProjectId }));
+        
         renderDashboard();
         renderContracts();
         
@@ -110,7 +113,12 @@ export function renderDashboard() {
         let expended = 0;
         
         const linkedContracts = (state.appData.Contracts || []).filter(c => c.budget_id === budget.id);
-        linkedContracts.forEach(contract => {
+        const activeContracts = linkedContracts.filter(c => {
+            const status = c.status || 'Đang thực hiện';
+            return status === 'Đang thực hiện' || status === 'Active';
+        });
+        
+        activeContracts.forEach(contract => {
             let contractCommitted = getDynamicContractValue(contract, state.appData);
             
             let contractExpended = 0;
@@ -124,8 +132,8 @@ export function renderDashboard() {
             expended += contractExpended;
         });
 
-        // Fallback: nếu chưa có Contract linked, dùng cached_committed từ Award
-        if (linkedContracts.length === 0 && budget.cached_committed) {
+        // Fallback: nếu chưa có Contract Đang thực hiện, dùng cached_committed từ Award
+        if (activeContracts.length === 0 && budget.cached_committed) {
             committed = Number(budget.cached_committed) || 0;
         }
 
@@ -360,7 +368,7 @@ export function renderBudgetTableModal() {
 
     if (consultancies.length > 0) {
         const headerTR = document.createElement('tr');
-        headerTR.innerHTML = `<td colspan="7" style="background-color: #f1f5f9; font-weight: bold; padding: 0.75rem;">I. Tư vấn (Soft Cost)</td>`;
+        headerTR.innerHTML = `<td colspan="7" style="background-color: var(--bg-table-header); font-weight: bold; padding: 0.75rem;">I. Tư vấn (Soft Cost)</td>`;
         tbodyConsultancy.appendChild(headerTR);
         consultancies.forEach((b, idx) => {
             const rowData = createRow(b, idx);
@@ -373,7 +381,7 @@ export function renderBudgetTableModal() {
 
     if (constructions.length > 0) {
         const headerTR = document.createElement('tr');
-        headerTR.innerHTML = `<td colspan="7" style="background-color: #f1f5f9; font-weight: bold; padding: 0.75rem;">II. Xây dựng / M&E (Hard Cost)</td>`;
+        headerTR.innerHTML = `<td colspan="7" style="background-color: var(--bg-table-header); font-weight: bold; padding: 0.75rem;">II. Xây dựng / M&E (Hard Cost)</td>`;
         tbodyConstruction.appendChild(headerTR);
         constructions.forEach((b, idx) => {
             const rowData = createRow(b, idx);
@@ -386,7 +394,7 @@ export function renderBudgetTableModal() {
 
     if (contingencies.length > 0) {
         const contHeaderTR = document.createElement('tr');
-        contHeaderTR.innerHTML = `<td colspan="7" style="background-color: #f1f5f9; font-weight: bold; padding: 0.75rem;">III. Dự phòng (Contingency)</td>`;
+        contHeaderTR.innerHTML = `<td colspan="7" style="background-color: var(--bg-table-header); font-weight: bold; padding: 0.75rem;">III. Dự phòng (Contingency)</td>`;
         tbodyContingency.appendChild(contHeaderTR);
         contingencies.forEach((b, idx) => {
             const rowData = createRow(b, idx);
@@ -401,7 +409,7 @@ export function renderBudgetTableModal() {
         totalBudgeted += contingencyBudget;
 
         const contHeaderTR = document.createElement('tr');
-        contHeaderTR.innerHTML = `<td colspan="7" style="background-color: #f1f5f9; font-weight: bold; padding: 0.75rem;">III. Dự phòng (Contingency)</td>`;
+        contHeaderTR.innerHTML = `<td colspan="7" style="background-color: var(--bg-table-header); font-weight: bold; padding: 0.75rem;">III. Dự phòng (Contingency)</td>`;
         tbodyContingency.appendChild(contHeaderTR);
 
         const contTR = document.createElement('tr');
@@ -425,7 +433,7 @@ export function renderBudgetTableModal() {
     // Total Footer
     const totalVariance = totalBudgeted - totalCommitted - totalExpended;
     tfootTotal.innerHTML = `
-        <tr style="background: #e2e8f0; font-weight: bold;">
+        <tr style="background: var(--bg-table-footer); font-weight: bold;">
             <td colspan="2" style="text-align: right; padding-right: 1rem;">TỔNG CỘNG</td>
             <td class="numeric-cell">${formatCurrency(totalBudgeted)}</td>
             <td class="numeric-cell">${formatCurrency(totalCommitted)}</td>
@@ -434,8 +442,6 @@ export function renderBudgetTableModal() {
             <td></td>
         </tr>
     `;
-
-    window.openInlineWorkspace('budget-list-modal');
 }
 
 export function renderActivities() {

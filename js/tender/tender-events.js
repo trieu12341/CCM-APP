@@ -62,6 +62,7 @@ export function setupTenderEvents() {
     if (btnOpenList) {
         btnOpenList.addEventListener('click', () => {
             renderTenderTableModal();
+            window.openInlineWorkspace('tender-list-modal');
         });
     }
     if (closeListBtn) {
@@ -148,6 +149,7 @@ export function setupTenderEvents() {
             const price = parseFormattedNumber(document.getElementById('award-price').value);
             
             tender.winner = winner;
+            tender.awardedPrice = price;
             tender.final_price = price;
             tender.status = 'Awarded';
             

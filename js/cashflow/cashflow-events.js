@@ -1,4 +1,4 @@
-import { state } from '../app.js';
+import { state, getDynamicContractValue } from '../app.js';
 import { getLocalCashflow, saveLocalCashflow } from './cashflow-state.js';
 import { getContractOptions, crossCheckValidation } from './cashflow-ui-utils.js';
 import { renderCashflowTable, getCurrentSelectedPackageId } from './cashflow-ui-table.js';
@@ -81,6 +81,72 @@ export function setupCashflowEvents() {
     if (addRowBtn) {
         addRowBtn.addEventListener('click', () => {
             addCashflowRow();
+        });
+    }
+
+    const autoGenBtn = document.getElementById('btn-auto-gen-cashflow');
+    if (autoGenBtn) {
+        autoGenBtn.addEventListener('click', () => {
+            const contractId = getCurrentSelectedPackageId();
+            if (!contractId) return;
+            
+            const allContracts = state.appData.Contracts || [];
+            const contractObj = allContracts.find(c => String(c.id || c.contract_id || c.package_name) === contractId);
+            if (!contractObj) return;
+
+            const contractValue = getDynamicContractValue(contractObj, state.appData);
+            if (contractValue <= 0) {
+                alert("Giá trị Hợp đồng bằng 0 hoặc chưa có giá trị, không thể tạo cashflow.");
+                return;
+            }
+
+            const type = contractObj.type || '';
+            const packageName = contractObj.package_name || '';
+            let newCashflows = [];
+            let baseDate = new Date();
+            
+            let allCashflows = getLocalCashflow();
+            allCashflows = allCashflows.filter(c => c.project_id !== state.currentProjectId || (c.package_name !== packageName && c.contract !== packageName));
+
+            const createCf = (desc, pct, daysOffset, code = '') => {
+                const d = new Date(baseDate);
+                d.setDate(d.getDate() + daysOffset);
+                return {
+                    id: 'cf-' + Date.now() + Math.random().toString(36).substr(2, 5),
+                    project_id: state.currentProjectId,
+                    package_name: packageName,
+                    contract: packageName,
+                    status: 'Planned',
+                    code: code,
+                    desc: desc,
+                    date: d.toISOString().split('T')[0],
+                    value: contractValue * (pct / 100),
+                    total_cert: contractValue * (pct / 100),
+                    netPayable: contractValue * (pct / 100)
+                };
+            };
+
+            if (type === 'Consultancy' || packageName.toLowerCase().includes('tư vấn')) {
+                newCashflows.push(createCf('Tạm ứng hợp đồng (15%)', 15, 0, 'ADV'));
+                newCashflows.push(createCf('Hoàn thành Báo cáo / Concept (30%)', 30, 30, 'IPC'));
+                newCashflows.push(createCf('Bàn giao Hồ sơ Thiết kế Kỹ thuật (30%)', 30, 60, 'IPC'));
+                newCashflows.push(createCf('Bàn giao Hồ sơ Đấu thầu / BVTC (20%)', 20, 90, 'IPC'));
+                newCashflows.push(createCf('Quyết toán & Khai thác (5%)', 5, 120, 'FAC'));
+            } else {
+                newCashflows.push(createCf('Tạm ứng (10%)', 10, 0, 'ADV'));
+                newCashflows.push(createCf('Thanh toán đợt 1 (17%)', 17, 30, 'IPC'));
+                newCashflows.push(createCf('Thanh toán đợt 2 (17%)', 17, 60, 'IPC'));
+                newCashflows.push(createCf('Thanh toán đợt 3 (17%)', 17, 90, 'IPC'));
+                newCashflows.push(createCf('Thanh toán đợt 4 (17%)', 17, 120, 'IPC'));
+                newCashflows.push(createCf('Thanh toán đợt 5 (17%)', 17, 150, 'IPC'));
+                newCashflows.push(createCf('Quyết toán & Bảo hành (5%)', 5, 180, 'FAC'));
+            }
+
+            allCashflows.push(...newCashflows);
+            saveLocalCashflow(allCashflows);
+            
+            crossCheckValidation();
+            renderCashflowTable();
         });
     }
 
@@ -179,6 +245,16 @@ export function setupCashflowEvents() {
     }
 
     window.addEventListener('appDataChanged', () => {
+        renderCashflow();
+        renderCashflowTable();
+    });
+
+    document.addEventListener('cashflowsChanged', () => {
+        renderCashflow();
+        renderCashflowTable();
+    });
+    
+    document.addEventListener('cashflowChanged', () => {
         renderCashflow();
         renderCashflowTable();
     });

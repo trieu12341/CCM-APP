@@ -98,5 +98,9 @@ export function setupContractEvents() {
         renderContracts();
     });
 
+    document.addEventListener('contractsChanged', () => {
+        renderContracts();
+    });
+
     renderContracts();
 }
