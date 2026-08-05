@@ -79,3 +79,13 @@ body {
     height: 100vh;
 }
 
+/* Global Form Elements Default */
+input:not([type="checkbox"]):not([type="radio"]), select, textarea {
+    background-color: var(--main-bg);
+    color: var(--text-dark);
+}
+
+input:not([type="checkbox"]):not([type="radio"]):focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary-blue, #2563eb);
+}
