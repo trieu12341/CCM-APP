@@ -1,6 +1,6 @@
 import { db } from './firebase-config.js';
 import { state } from './app.js';
-import firebase from 'firebase/compat/app';
+
 
 /**
  * db-service.js
