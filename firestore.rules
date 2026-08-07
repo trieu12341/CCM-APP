@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Hàm kiểm tra xem user hiện tại có phải là admin không
+    function isAdmin() {
+       return request.auth != null && 
+              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // ── Users collection ──
+    match /users/{userId} {
+      // User tự sửa profile của mình HOẶC admin đọc/ghi tất cả
+      allow read, write: if request.auth != null && (request.auth.uid == userId || isAdmin());
+    }
+
+    // ── Projects collection ──
+    match /projects/{projectId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // ── Mặc định: từ chối tất cả truy cập không xác thực ──
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

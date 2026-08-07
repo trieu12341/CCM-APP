@@ -1,108 +1,139 @@
 import { formatCurrencyVND } from '../../app.js';
-import { calculateOverviewMetrics, getProjectPackagesData, getRiskAndPendingTasks } from './overview-state.js';
+import { calculateOverviewMetrics } from './overview-state.js';
 
 export function renderOverviewDashboard() {
     const metrics = calculateOverviewMetrics();
 
-    // 1. Render KPIs
-    document.getElementById('ov-kpi-budget').innerHTML = `${formatCurrencyVND(metrics.totalBudget)} <span>VNĐ</span>`;
-    document.getElementById('ov-kpi-committed').innerHTML = `${formatCurrencyVND(metrics.totalCommitted)} <span>VNĐ</span>`;
-    document.getElementById('ov-kpi-certified').innerHTML = `${formatCurrencyVND(metrics.totalCertified)} <span>VNĐ</span>`;
-    document.getElementById('ov-kpi-savings').innerHTML = `${formatCurrencyVND(metrics.savings)} <span>VNĐ</span>`;
+    // HÀNG 1: TOP EXECUTIVE KPI CARDS
+    document.getElementById('ow2-budget-approved').textContent = formatCurrencyVND(metrics.budget.approved);
+    document.getElementById('ow2-budget-committed').textContent = formatCurrencyVND(metrics.budget.committed);
     
-    const savingsBar = document.getElementById('ov-kpi-savings-bar');
-    if (savingsBar) {
-        savingsBar.style.width = `${Math.min(100, metrics.savingsPct)}%`;
-        if (metrics.savingsPct > 100) savingsBar.style.backgroundColor = '#ef4444'; // Red if over budget
-        else savingsBar.style.backgroundColor = '#10b981'; // Green if within budget
+    document.getElementById('ow2-commit-pct').textContent = metrics.budget.pct.toFixed(1) + '%';
+    const commitBar = document.getElementById('ow2-commit-bar');
+    if (commitBar) {
+        commitBar.style.width = Math.min(100, metrics.budget.pct) + '%';
+        commitBar.className = metrics.budget.pct > 100 ? 'bento-progress-fill bg-red-500' : 'bento-progress-fill bg-cyan-500';
     }
 
-    // 2. Render Charts
-    renderOverviewCharts();
-
-    // 3. Render Risk & Pending Tasks
-    renderRiskAndPendingTables();
-}
-
-function renderOverviewCharts() {
-    const packageData = getProjectPackagesData();
-    
-    // Stacked Bar Chart (Packages)
-    if (document.getElementById('ov-chart-packages')) {
-        const options = {
-            series: [
-                { name: 'Original Contract', data: packageData.map(d => d.original) },
-                { name: 'Approved VO', data: packageData.map(d => d.vo) },
-                { name: 'Certified', data: packageData.map(d => d.certified) }
-            ],
-            chart: { type: 'bar', height: 300, stacked: true },
-            xaxis: { categories: packageData.map(d => d.name) },
-            yaxis: { 
-                labels: { formatter: (val) => formatCurrencyVND(val) }
-            },
-            colors: ['#3b82f6', '#f59e0b', '#10b981'],
-            fill: { opacity: 1 },
-            legend: { position: 'bottom' }
-        };
-
-        if (window.ovPackagesChart) window.ovPackagesChart.destroy();
-        window.ovPackagesChart = new ApexCharts(document.querySelector("#ov-chart-packages"), options);
-        window.ovPackagesChart.render();
+    document.getElementById('ow2-pay-paid').textContent = formatCurrencyVND(metrics.payment.paid);
+    document.getElementById('ow2-pay-pct').textContent = metrics.payment.pct.toFixed(1) + '%';
+    const payBar = document.getElementById('ow2-pay-bar');
+    if (payBar) {
+        payBar.style.width = Math.min(100, metrics.payment.pct) + '%';
     }
 
-    // S-Curve Chart (Placeholder logic for S-Curve, using cumulative data over time if available. For now, simple line chart)
-    if (document.getElementById('ov-chart-scurve')) {
-        const options = {
-            series: [
-                { name: 'Budget Baseline', type: 'area', data: packageData.map(d => d.original + d.vo + 1000000000) }, // Mock S-Curve plan
-                { name: 'Actual Certified', type: 'line', data: packageData.map(d => d.certified) }
-            ],
-            chart: { type: 'line', height: 300 },
-            stroke: { curve: 'smooth', width: [0, 3] },
-            fill: { type: ['solid', 'solid'], opacity: [0.1, 1] },
-            xaxis: { categories: packageData.map(d => d.name) },
-            yaxis: { labels: { formatter: (val) => formatCurrencyVND(val) } },
-            colors: ['#94a3b8', '#10b981'],
-            legend: { position: 'bottom' }
-        };
-
-        if (window.ovSCurveChart) window.ovSCurveChart.destroy();
-        window.ovSCurveChart = new ApexCharts(document.querySelector("#ov-chart-scurve"), options);
-        window.ovSCurveChart.render();
-    }
-}
-
-function renderRiskAndPendingTables() {
-    const data = getRiskAndPendingTasks();
+    const uncommitted = metrics.budget.approved - metrics.budget.committed;
+    const uncommittedPct = metrics.budget.approved > 0 ? (uncommitted / metrics.budget.approved) * 100 : 0;
     
-    // Risk Table
-    const riskBody = document.getElementById('ov-risk-table-body');
-    if (riskBody) {
-        if (data.risks.length === 0) {
-            riskBody.innerHTML = '<tr><td colspan="2" style="text-align:center; color:#64748b;">Không có rủi ro nào.</td></tr>';
+    document.getElementById('ow2-budget-uncommitted').textContent = formatCurrencyVND(uncommitted);
+    document.getElementById('ow2-uncommit-pct').textContent = uncommittedPct.toFixed(1) + '%';
+    const uncommitBar = document.getElementById('ow2-uncommit-bar');
+    if (uncommitBar) {
+        uncommitBar.style.width = Math.min(100, uncommittedPct) + '%';
+        if (uncommitted < 0) {
+            uncommitBar.className = 'bento-progress-fill bg-red-500';
+            document.getElementById('ow2-uncommit-pct').textContent = 'Over Budget';
         } else {
-            riskBody.innerHTML = data.risks.map(r => `
-                <tr>
-                    <td style="font-weight: 600;">${r.package}</td>
-                    <td style="color: #ef4444;">${r.issue}</td>
-                </tr>
-            `).join('');
+            uncommitBar.className = 'bento-progress-fill bg-purple-500';
         }
     }
 
-    // Pending Table
-    const pendingBody = document.getElementById('ov-pending-table-body');
-    if (pendingBody) {
-        if (data.pendingTasks.length === 0) {
-            pendingBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#64748b;">Không có tác vụ chờ.</td></tr>';
-        } else {
-            pendingBody.innerHTML = data.pendingTasks.map(p => `
-                <tr>
-                    <td><span class="badge ${p.type === 'Variation Order' ? 'bg-orange' : 'bg-blue'}">${p.type}</span></td>
-                    <td style="font-weight: 600;">${p.name}</td>
-                    <td class="text-right" style="font-weight: 600;">${formatCurrencyVND(p.value)}</td>
-                </tr>
-            `).join('');
-        }
+    // HÀNG 2 - CỘT TRÁI: TENDER PIPELINE
+    document.getElementById('ow2-tender-awarded').textContent = metrics.tender.awarded;
+    document.getElementById('ow2-tender-eval').textContent = metrics.tender.eval;
+    document.getElementById('ow2-tender-bidding').textContent = metrics.tender.bidding;
+    document.getElementById('ow2-tender-draft').textContent = metrics.tender.draft;
+    renderTenderDonut(metrics.tender);
+
+    // HÀNG 2 - CỘT TRÁI: CONTRACT & VO
+    document.getElementById('ow2-contract-original').textContent = formatCurrencyVND(metrics.contract.original) + ' VNĐ';
+    document.getElementById('ow2-contract-vo').textContent = formatCurrencyVND(metrics.contract.vo) + ' VNĐ';
+    document.getElementById('ow2-contract-revised').textContent = formatCurrencyVND(metrics.contract.revised) + ' VNĐ';
+    document.getElementById('ow2-contract-vo-pct').textContent = metrics.contract.voPct.toFixed(1) + '%';
+    const voBar = document.getElementById('ow2-contract-vo-bar');
+    if (voBar) {
+        voBar.style.width = Math.min(100, metrics.contract.voPct) + '%';
     }
+
+    // HÀNG 2 - CỘT PHẢI: CASHFLOW S-CURVE
+    renderMiniSCurve();
+    document.getElementById('ow2-pay-paid-bottom').textContent = formatCurrencyVND(metrics.payment.paid) + ' VNĐ';
+    document.getElementById('ow2-pay-advance').textContent = formatCurrencyVND(metrics.payment.advance) + ' VNĐ';
+    document.getElementById('ow2-pay-retention').textContent = formatCurrencyVND(metrics.payment.retention) + ' VNĐ';
+}
+
+function renderTenderDonut(tenderMetrics) {
+    if (!document.getElementById('ow2-tender-donut')) return;
+    
+    const total = tenderMetrics.awarded + tenderMetrics.eval + tenderMetrics.bidding + tenderMetrics.draft;
+    const series = total === 0 ? [0, 0, 0, 1] : [tenderMetrics.awarded, tenderMetrics.eval, tenderMetrics.bidding, tenderMetrics.draft];
+    
+    const options = {
+        series: series,
+        chart: { type: 'donut', height: 140, sparkline: { enabled: true } },
+        colors: ['#a855f7', '#f59e0b', '#3b82f6', '#cbd5e1'],
+        labels: ['Awarded', 'Eval', 'Bidding', 'Draft'],
+        stroke: { width: 0 },
+        tooltip: {
+            fixed: { enabled: false },
+            x: { show: true },
+            y: { title: { formatter: function (seriesName) { return seriesName } } },
+            marker: { show: false }
+        },
+        plotOptions: {
+            pie: {
+                donut: {
+                    size: '70%',
+                    labels: {
+                        show: true,
+                        name: { show: false },
+                        value: {
+                            show: true,
+                            fontSize: '16px',
+                            fontWeight: 700,
+                            formatter: function (val) {
+                                return total === 0 ? "0" : val;
+                            }
+                        },
+                        total: {
+                            show: true,
+                            showAlways: true,
+                            label: 'Total',
+                            fontSize: '12px',
+                            fontWeight: 600,
+                            formatter: function (w) {
+                                return total;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    if (window.owTenderDonut) window.owTenderDonut.destroy();
+    window.owTenderDonut = new ApexCharts(document.querySelector("#ow2-tender-donut"), options);
+    window.owTenderDonut.render();
+}
+
+function renderMiniSCurve() {
+    if (!document.getElementById('ow2-cashflow-chart')) return;
+    
+    const options = {
+        series: [
+            { name: 'Planned', data: [0, 10, 25, 50, 75, 90, 100] },
+            { name: 'Actual', data: [0, 8, 20, 45, null, null, null] }
+        ],
+        chart: { type: 'line', height: 320, toolbar: { show: false } },
+        stroke: { curve: 'smooth', width: [3, 3] },
+        colors: ['#94a3b8', '#f43f5e'],
+        xaxis: { categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'] },
+        yaxis: { show: false },
+        grid: { show: false },
+        legend: { position: 'top' }
+    };
+
+    if (window.owMiniSCurveChart) window.owMiniSCurveChart.destroy();
+    window.owMiniSCurveChart = new ApexCharts(document.querySelector("#ow2-cashflow-chart"), options);
+    window.owMiniSCurveChart.render();
 }

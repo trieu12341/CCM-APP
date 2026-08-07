@@ -269,7 +269,7 @@ export function renderDashboard() {
     renderTenders();
 }
 
-export function renderBudgetTableModal() {
+export function renderBudgetTableModal(filterType = 'all') {
     const tbodyConsultancy = document.getElementById('budget-tbody-consultancy');
     const tbodyConstruction = document.getElementById('budget-tbody-construction');
     const tbodyContingency = document.getElementById('budget-tbody-contingency');
@@ -281,6 +281,15 @@ export function renderBudgetTableModal() {
     tbodyConstruction.innerHTML = '';
     tbodyContingency.innerHTML = '';
     tfootTotal.innerHTML = '';
+
+    const btnReset = document.getElementById('btn-budget-reset-filter');
+    if (btnReset) {
+        if (filterType !== 'all') {
+            btnReset.classList.remove('hidden');
+        } else {
+            btnReset.classList.add('hidden');
+        }
+    }
 
     const project = state.appData.Projects.find(p => p.project_id === state.currentProjectId);
     if (!project) return;
@@ -317,6 +326,11 @@ export function renderBudgetTableModal() {
         const isTenderCreated = (state.appData.Tenders || []).some(t => t.budget_id === budget.id) || 
                                 (budget.tender_status && budget.tender_status !== 'Draft') || 
                                 !!budget.tender_id;
+
+        // --- FILTER LOGIC ---
+        if (filterType === 'committed' && committed <= 0) return null;
+        if (filterType === 'overbudget' && varianceVal >= 0) return null;
+        // --------------------
 
         const btnCreateHtml = isTenderCreated 
             ? `<button class="w-8 h-8 rounded-md flex items-center justify-center text-slate-300 cursor-not-allowed" disabled title="Đã tạo gói thầu"><i class="fa-solid fa-plus"></i></button>`
@@ -369,13 +383,20 @@ export function renderBudgetTableModal() {
     if (consultancies.length > 0) {
         const headerTR = document.createElement('tr');
         headerTR.innerHTML = `<td colspan="7" style="background-color: var(--bg-table-header); font-weight: bold; padding: 0.75rem;">I. Tư vấn (Soft Cost)</td>`;
-        tbodyConsultancy.appendChild(headerTR);
+        let groupHasRows = false;
+        
         consultancies.forEach((b, idx) => {
             const rowData = createRow(b, idx);
-            tbodyConsultancy.appendChild(rowData.element);
-            totalBudgeted += rowData.budgeted;
-            totalCommitted += rowData.committed;
-            totalExpended += rowData.expended;
+            if (rowData) {
+                if (!groupHasRows) {
+                    tbodyConsultancy.appendChild(headerTR);
+                    groupHasRows = true;
+                }
+                tbodyConsultancy.appendChild(rowData.element);
+                totalBudgeted += rowData.budgeted;
+                totalCommitted += rowData.committed;
+                totalExpended += rowData.expended;
+            }
         });
     }
 

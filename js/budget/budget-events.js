@@ -1,5 +1,5 @@
 import { state, mockActivities } from '../app.js';
-import { saveProject, saveTender } from '../api.js';
+
 import { persistBudgets, persistContracts, persistTenders } from '../core/data-store.js';
 import { renderProjectTabs, renderDashboard, renderBudgetTableModal } from './budget-ui.js';
 import { renderTenders } from '../tender.js';
@@ -32,27 +32,61 @@ export function setupBudgetEvents() {
             winner: ''
         };
         try {
-            const success = await saveTender(newTender);
-            if (success) {
-                state.appData.Tenders.push(newTender);
-                persistTenders(state.appData.Tenders);
-                alert(`Đã tạo hồ sơ Đấu thầu cho gói: ${newTender.tender_name}`);
-                renderBudgetTableModal();
-                if (typeof renderTenders === 'function') renderTenders();
-            } else {
-                alert('Lỗi khi tạo gói thầu!');
-            }
+            state.appData.Tenders.push(newTender);
+            persistTenders(state.appData.Tenders);
+            alert(`Đã tạo hồ sơ Đấu thầu cho gói: ${newTender.tender_name}`);
+            renderBudgetTableModal();
+            if (typeof renderTenders === 'function') renderTenders();
         } catch (e) {
             console.error('[createTenderFromBudget]', e);
             alert('Lỗi khi tạo gói thầu!');
         }
     };
 
-    // --- Budget List Modal ---
+    // --- Budget List Modal & KPI Interactive Filters ---
     bindEvent('btn-open-budget-list', 'click', () => {
-        renderBudgetTableModal();
+        renderBudgetTableModal('all');
         window.openInlineWorkspace('budget-list-modal');
     });
+
+    bindEvent('btn-budget-reset-filter', 'click', () => {
+        renderBudgetTableModal('all');
+    });
+
+    bindEvent('kpi-card-budget', 'click', () => {
+        renderBudgetTableModal('all');
+        window.openInlineWorkspace('budget-list-modal');
+    });
+
+    bindEvent('kpi-card-committed', 'click', () => {
+        renderBudgetTableModal('committed');
+        window.openInlineWorkspace('budget-list-modal');
+    });
+
+    bindEvent('kpi-card-projected', 'click', () => {
+        renderBudgetTableModal('overbudget');
+        window.openInlineWorkspace('budget-list-modal');
+    });
+
+    bindEvent('kpi-card-contingency', 'click', () => {
+        renderBudgetTableModal('all');
+        window.openInlineWorkspace('budget-list-modal');
+        
+        // Highlight contingency row after render
+        setTimeout(() => {
+            const contTbody = document.getElementById('budget-tbody-contingency');
+            if (contTbody) {
+                const rows = contTbody.querySelectorAll('tr:not(:first-child)');
+                rows.forEach(row => {
+                    row.classList.add('highlight-row');
+                    setTimeout(() => row.classList.remove('highlight-row'), 2000);
+                });
+                // Scroll to contingency section
+                contTbody.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 300);
+    });
+
     bindEvent('close-budget-list-modal', 'click', () => {
         window.closeInlineWorkspace();
     });
@@ -347,14 +381,14 @@ export function setupBudgetEvents() {
                 total_budget: 0, 
                 contingency_budget: 0 
             };
-            const success = await saveProject(newProject);
-            
-            // Luôn lưu vào LocalStorage và state (hỗ trợ chế độ offline)
+            // Save project to state and cloud via data-store
             state.appData.Projects.push(newProject);
             state.currentProjectId = newId;
-            
-            localStorage.setItem('ccm_projects', JSON.stringify(state.appData.Projects));
             localStorage.setItem('ccm_current_project_id', newId);
+            
+            // persistProjects handles localStorage + Firestore sync
+            const { persistProjects } = await import('../core/data-store.js');
+            persistProjects(state.appData.Projects);
             
             // Sync to cloud so other users see the new project
             import('../db-service.js').then(m => m.saveProjectsToCloud(state.appData.Projects)).catch(console.error);

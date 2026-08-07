@@ -1,7 +1,7 @@
 import { state } from '../app.js';
 import { renderDashboard, renderProjectTabs } from '../budget.js';
-import { getLocalProjects, saveLocalProjects } from './project-state.js';
-import { saveProject } from '../api.js';
+import { getLocalProjects } from './project-state.js';
+
 
 export function openSummaryModal() {
     const projectId = state.currentProjectId;
@@ -22,7 +22,11 @@ export function openSummaryModal() {
     document.getElementById('summary-end-date-view').textContent = project.end_date ? new Date(project.end_date).toLocaleDateString('en-GB') : '-';
     document.getElementById('summary-cfa-view').textContent = project.cfa || '-';
     document.getElementById('summary-consultants-view').textContent = project.consultants || '-';
-    document.getElementById('summary-contractor-view').textContent = project.main_contractor || '-';
+    
+    // Format budget if needed. Assume it's stored as number or string.
+    const budgetValue = project.total_budget || 0;
+    document.getElementById('summary-budget-view').textContent = budgetValue ? Number(budgetValue).toLocaleString('vi-VN') + ' VNĐ' : '-';
+    document.getElementById('summary-status-view').textContent = project.status || '-';
     
     const imgView = document.getElementById('summary-img-view');
     const imgPlaceholder = document.getElementById('summary-img-placeholder');
@@ -50,7 +54,8 @@ export function openSummaryModal() {
     
     document.getElementById('summary-cfa-input').value = project.cfa || '';
     document.getElementById('summary-consultants-input').value = project.consultants || '';
-    document.getElementById('summary-contractor-input').value = project.main_contractor || '';
+    document.getElementById('summary-budget-input').value = project.total_budget ? Number(project.total_budget).toLocaleString('en-US') : '';
+    document.getElementById('summary-status-input').value = project.status || 'Planning';
     document.getElementById('summary-img-input').value = project.image_url || '';
 
     document.getElementById('summary-view-mode').classList.remove('hidden');
@@ -79,21 +84,24 @@ export async function saveSummaryData() {
     project.end_date         = document.getElementById('summary-end-date-input').value.trim();
     project.cfa              = document.getElementById('summary-cfa-input').value.trim();
     project.consultants      = document.getElementById('summary-consultants-input').value.trim();
-    project.main_contractor  = document.getElementById('summary-contractor-input').value.trim();
+    
+    // Parse budget input
+    const rawBudget = document.getElementById('summary-budget-input').value;
+    project.total_budget     = rawBudget ? Number(rawBudget.replace(/,/g, '')) : 0;
+    project.status           = document.getElementById('summary-status-input').value;
     project.image_url        = document.getElementById('summary-img-input').value.trim();
 
     // 1. Update state in memory
     state.appData.Projects[stateProjIndex] = project;
 
-    // 2. Persist to server (data/projects.json) — source of truth on reload
+    // 2. Persist to Firestore and localStorage via data-store
     try {
-        await saveProject(state.appData.Projects);
+        const { persistProjects } = await import('../core/data-store.js');
+        persistProjects(state.appData.Projects);
     } catch (e) {
-        console.error('[saveSummaryData] Failed to save to server:', e);
+        console.error('[saveSummaryData] Failed to save to Firestore:', e);
     }
 
-    // 3. Also sync localStorage as a quick fallback
-    saveLocalProjects(state.appData.Projects);
     localStorage.setItem('ccm_current_project_id', projectId);
 
     document.getElementById('projectInfoModal').classList.add('hidden');

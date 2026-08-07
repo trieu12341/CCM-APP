@@ -1,5 +1,5 @@
 import { state, formatCurrency } from '../app.js';
-import { updateTender, saveTender, saveBudget } from '../api.js';
+
 import { tenderState } from './tender-state.js';
 import { renderTenders, initCBA, renderTenderRoundTabs, renderCBATable, renderTenderTableModal, closeTenderDetailModal } from './tender-ui.js';
 import { parseFormattedNumber } from './tender-calc.js';
@@ -282,15 +282,10 @@ export function setupTenderEvents() {
                 winner: ""
             };
             
-            const success = await saveTender(newTender);
-            if (success) {
-                state.appData.Tenders.push(newTender);
-                persistTenders(state.appData.Tenders);
-                renderTenders();
-                newTenderModal.classList.add('hidden');
-            } else {
-                console.error("Lỗi khi thêm gói thầu");
-            }
+            state.appData.Tenders.push(newTender);
+            persistTenders(state.appData.Tenders);
+            renderTenders();
+            newTenderModal.classList.add('hidden');
         });
     }
 }

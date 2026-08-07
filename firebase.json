@@ -1,15 +1,41 @@
 {
+  "firestore": {
+    "rules": "firestore.rules"
+  },
   "hosting": {
     "public": ".",
     "ignore": [
       "firebase.json",
+      "firestore.rules",
       "**/.*",
-      "**/node_modules/**"
+      "**/node_modules/**",
+      "render.yaml",
+      "split.js",
+      "split.ps1",
+      "refactor_css.ps1",
+      "package.json",
+      "package-lock.json",
+      "test.html",
+      "test_plan.md",
+      "data.json",
+      "temp_modals2_extract.txt",
+      "New folder/**"
     ],
     "rewrites": [
       {
         "source": "**",
         "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(js|css)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=3600"
+          }
+        ]
       }
     ]
   }

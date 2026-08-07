@@ -1,4 +1,4 @@
-import { saveProject, saveTender, saveBudget, saveContracts, saveCashflow, savePayments } from '../api.js';
+// admin-utils.js - Data Reset and Auto-Backup utilities
 import { state } from '../app.js';
 
 // admin-utils.js
@@ -132,6 +132,8 @@ function executeReset() {
     // 2. Wait slightly to ensure download triggers, then delete and reload
     setTimeout(async () => {
         try {
+            const { saveContractsToCloud, saveCashflowToCloud, savePaymentsToCloud, saveTendersToCloud } = await import('../db-service.js');
+
             if (scopeFull) {
                 localStorage.clear();
                 sessionStorage.clear();
@@ -140,21 +142,21 @@ function executeReset() {
             } else {
                 if (scopePayments) {
                     localStorage.removeItem('ccm_payments');
-                    await savePayments([]);
+                    await savePaymentsToCloud([]);
                 }
                 if (scopeCashflow) {
                     localStorage.removeItem('ccm_cashflow');
-                    await saveCashflow([]);
+                    await saveCashflowToCloud([]);
                 }
                 if (scopeContracts) {
                     localStorage.removeItem('ccm_contracts');
                     localStorage.removeItem('ccm_tenders');
-                    await saveContracts([]);
-                    await saveTender([]);
+                    await saveContractsToCloud([]);
+                    await saveTendersToCloud([]);
                 }
             }
         } catch (err) {
-            console.error("Failed to clear API data", err);
+            console.error("Failed to clear Firestore data", err);
         }
 
         // Clear RAM state
@@ -185,37 +187,25 @@ function handleRestore(file) {
             }
             
             let restoredCount = 0;
+            const { saveProjectsToCloud, saveTendersToCloud, saveContractsToCloud, saveCashflowToCloud, savePaymentsToCloud, saveBudgetsToCloud } = await import('../db-service.js');
+
             for (const key of SYSTEM_KEYS) {
                 if (data.hasOwnProperty(key)) {
                     const value = typeof data[key] === 'object' ? JSON.stringify(data[key]) : data[key];
                     localStorage.setItem(key, value);
                     restoredCount++;
                     
-                    // Sync restored data back to the server via API
+                    // Sync restored data to Firestore
                     try {
-                        if (key === 'ccm_projects') await saveProject(data[key] || []);
-                        if (key === 'ccm_tenders') await saveTender(data[key] || []);
-                        if (key === 'ccm_contracts') await saveContracts(data[key] || []);
-                        if (key === 'ccm_cashflow') await saveCashflow(data[key] || []);
-                        if (key === 'ccm_payments') await savePayments(data[key] || []);
+                        if (key === 'ccm_projects') await saveProjectsToCloud(data[key] || []);
+                        if (key === 'ccm_tenders') await saveTendersToCloud(data[key] || []);
+                        if (key === 'ccm_contracts') await saveContractsToCloud(data[key] || []);
+                        if (key === 'ccm_cashflow') await saveCashflowToCloud(data[key] || []);
+                        if (key === 'ccm_payments') await savePaymentsToCloud(data[key] || []);
+                        if (key === 'ccm_budgets') await saveBudgetsToCloud(data[key] || []);
                     } catch (err) {
-                        console.error('Failed to restore API data for', key, err);
+                        console.error('Failed to restore Firestore data for', key, err);
                     }
-                }
-            }
-
-            // Sync Budget manually if it exists to match the API structure
-            if (data.hasOwnProperty('ccm_budgets')) {
-                try {
-                    await saveBudget({
-                        Budgets: data['ccm_budgets'] || [],
-                        Contracts: data['ccm_contracts'] || [],
-                        Payments: [],
-                        Variations: [],
-                        Documents: []
-                    });
-                } catch (err) {
-                    console.error('Failed to restore Budget API data', err);
                 }
             }
             

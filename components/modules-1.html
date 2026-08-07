@@ -1,72 +1,124 @@
                 <div id="module-overview" class="hidden">
-                    <div class="section-title">Overview (Executive Dashboard)</div>
+                    <div class="section-title">Executive Dashboard</div>
                     
-                    <div class="overview-kpi-grid">
-                        <div class="kpi-card kpi-card-slate">
-                            <div class="kpi-header"><span class="kpi-title">TOTAL BUDGET</span></div>
-                            <div class="kpi-value" id="ov-kpi-budget">0 <span>VNĐ</span></div>
+                    <!-- HÀNG 1: TOP EXECUTIVE KPI CARDS -->
+                    <div class="overview-top-kpi-grid">
+                        <div class="bento-card interactive-widget card-budget" id="widget-budget">
+                            <div class="bento-icon"><i class="fa-solid fa-wallet"></i></div>
+                            <div class="bento-label">APPROVED BUDGET</div>
+                            <div class="bento-value text-white" id="ow2-budget-approved">0</div>
                         </div>
-                        <div class="kpi-card kpi-card-blue">
-                            <div class="kpi-header"><span class="kpi-title">COMMITTED COST</span></div>
-                            <div class="kpi-value" id="ov-kpi-committed">0 <span>VNĐ</span></div>
+                        <div class="bento-card interactive-widget card-committed" id="widget-committed">
+                            <div class="bento-icon bg-cyan-100 text-cyan-600"><i class="fa-solid fa-file-contract"></i></div>
+                            <div class="bento-label">TOTAL COMMITTED</div>
+                            <div class="bento-value text-cyan-600" id="ow2-budget-committed">0</div>
+                            <div class="bento-progress">
+                                <div class="bento-progress-bg"><div class="bento-progress-fill bg-cyan-500" id="ow2-commit-bar" style="width: 0%;"></div></div>
+                                <div class="bento-progress-text" id="ow2-commit-pct">0%</div>
+                            </div>
                         </div>
-                        <div class="kpi-card kpi-card-emerald">
-                            <div class="kpi-header"><span class="kpi-title">ACTUAL CERTIFIED</span></div>
-                            <div class="kpi-value" id="ov-kpi-certified">0 <span>VNĐ</span></div>
+                        <div class="bento-card interactive-widget card-expended" id="widget-expended">
+                            <div class="bento-icon bg-emerald-100 text-emerald-600"><i class="fa-solid fa-money-bill-wave"></i></div>
+                            <div class="bento-label">TOTAL EXPENDED</div>
+                            <div class="bento-value text-emerald-600" id="ow2-pay-paid">0</div>
+                            <div class="bento-progress">
+                                <div class="bento-progress-bg"><div class="bento-progress-fill bg-emerald-500" id="ow2-pay-bar" style="width: 0%;"></div></div>
+                                <div class="bento-progress-text" id="ow2-pay-pct">0%</div>
+                            </div>
                         </div>
-                        <div class="kpi-card kpi-card-orange">
-                            <div class="kpi-header"><span class="kpi-title">SAVINGS / CONTINGENCY</span></div>
-                            <div class="kpi-value" id="ov-kpi-savings">0 <span>VNĐ</span></div>
-                            <div class="overview-progress">
-                                <div class="overview-progress-bar" id="ov-kpi-savings-bar" style="width: 0%; background-color: #f97316;"></div>
+                        <div class="bento-card interactive-widget card-uncommitted" id="widget-uncommitted">
+                            <div class="bento-icon bg-purple-100 text-purple-600"><i class="fa-solid fa-coins"></i></div>
+                            <div class="bento-label">UNCOMMITTED BUDGET</div>
+                            <div class="bento-value text-purple-600" id="ow2-budget-uncommitted">0</div>
+                            <div class="bento-progress">
+                                <div class="bento-progress-bg"><div class="bento-progress-fill bg-purple-500" id="ow2-uncommit-bar" style="width: 0%;"></div></div>
+                                <div class="bento-progress-text"><span id="ow2-uncommit-pct">0%</span> Available</div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="overview-charts-grid">
-                        <div class="overview-chart-card">
-                            <h3><i class="fa-solid fa-chart-bar" style="color:var(--primary-blue);"></i> Budget vs Committed vs Certified (By Package)</h3>
-                            <div id="ov-chart-packages" style="height: 300px; display: flex; align-items: center; justify-content: center;"></div>
-                        </div>
-                        <div class="overview-chart-card">
-                            <h3><i class="fa-solid fa-chart-line" style="color:var(--primary-blue);"></i> S-Curve: Planned vs Actual Cashflow</h3>
-                            <div id="ov-chart-scurve" style="height: 300px; display: flex; align-items: center; justify-content: center;"></div>
-                        </div>
-                    </div>
-
-                    <div class="overview-charts-grid" style="grid-template-columns: 1fr 1fr;">
-                        <div class="overview-risk-table">
-                            <h3 style="margin-top:0; font-size: 1rem; color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> Cảnh Báo Rủi Ro (Risk Alerts)</h3>
-                            <div class="table-responsive">
-                                <table class="table table-hover" style="width: 100%; font-size: 0.9rem;">
-                                    <thead>
-                                        <tr>
-                                            <th>Gói Thầu</th>
-                                            <th>Vấn đề</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="ov-risk-table-body">
-                                        <!-- JS injected -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                    <!-- HÀNG 2: 2 CỘT SONG SONG -->
+                    <div class="overview-2col-grid">
                         
-                        <div class="overview-risk-table">
-                            <h3 style="margin-top:0; font-size: 1rem; color: #f59e0b;"><i class="fa-solid fa-clock"></i> Tác Vụ Đang Chờ (Pending Tasks)</h3>
-                            <div class="table-responsive">
-                                <table class="table table-hover" style="width: 100%; font-size: 0.9rem;">
-                                    <thead>
-                                        <tr>
-                                            <th>Loại</th>
-                                            <th>Mã / Tên</th>
-                                            <th class="text-right">Giá trị</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="ov-pending-table-body">
-                                        <!-- JS injected -->
-                                    </tbody>
-                                </table>
+                        <!-- CỘT TRÁI -->
+                        <div class="col-left">
+                            
+                            <!-- TENDER PIPELINE -->
+                            <div class="bento-widget interactive-widget" id="widget-tender">
+                                <div class="bento-widget-header">
+                                    <span><i class="fa-solid fa-file-signature text-purple-500"></i> TENDER PIPELINE</span>
+                                </div>
+                                <div class="bento-widget-body" style="display: flex; gap: 1rem; align-items: center;">
+                                    <div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                                        <div class="pill-badge pill-purple">
+                                            <span class="pill-val" id="ow2-tender-awarded">0</span> <span class="pill-lbl">Đã trao thầu</span>
+                                        </div>
+                                        <div class="pill-badge pill-amber">
+                                            <span class="pill-val" id="ow2-tender-eval">0</span> <span class="pill-lbl">Đang xét thầu</span>
+                                        </div>
+                                        <div class="pill-badge pill-blue">
+                                            <span class="pill-val" id="ow2-tender-bidding">0</span> <span class="pill-lbl">Đang mời thầu</span>
+                                        </div>
+                                        <div class="pill-badge pill-slate">
+                                            <span class="pill-val" id="ow2-tender-draft">0</span> <span class="pill-lbl">Chưa chạy</span>
+                                        </div>
+                                    </div>
+                                    <div style="width: 140px; height: 140px;" id="ow2-tender-donut"></div>
+                                </div>
+                            </div>
+
+                            <!-- CONTRACT & VO -->
+                            <div class="bento-widget interactive-widget" id="widget-contract">
+                                <div class="bento-widget-header">
+                                    <span><i class="fa-solid fa-file-contract text-indigo-500"></i> CONTRACT & VARIATIONS</span>
+                                </div>
+                                <div class="bento-widget-body">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                        <div class="text-sm text-slate-500">Original Total</div>
+                                        <div class="font-semibold" id="ow2-contract-original">0 VNĐ</div>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                                        <div class="text-sm text-slate-500">Approved VOs</div>
+                                        <div class="font-semibold text-red-500" id="ow2-contract-vo">0 VNĐ</div>
+                                    </div>
+                                    <div class="bento-progress" style="margin-bottom: 1rem;">
+                                        <div class="bento-progress-text text-red-500 text-xs font-semibold" style="margin-bottom: 4px;">VO Ratio: <span id="ow2-contract-vo-pct">0%</span></div>
+                                        <div class="bento-progress-bg"><div class="bento-progress-fill bg-red-500" id="ow2-contract-vo-bar" style="width: 0%;"></div></div>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; padding-top: 0.75rem; border-top: 1px dashed var(--border-color);">
+                                        <div class="text-sm font-semibold">Revised Total</div>
+                                        <div class="font-bold text-lg text-indigo-600" id="ow2-contract-revised">0 VNĐ</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CỘT PHẢI -->
+                        <div class="col-right">
+                            
+                            <!-- CASHFLOW S-CURVE -->
+                            <div class="bento-widget interactive-widget" id="widget-cashflow" style="height: 100%; display: flex; flex-direction: column;">
+                                <div class="bento-widget-header">
+                                    <span><i class="fa-solid fa-chart-line text-rose-500"></i> CASHFLOW S-CURVE</span>
+                                </div>
+                                <div class="bento-widget-body" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div id="ow2-cashflow-chart" style="width: 100%; height: 320px; max-height: 320px;"></div>
+                                    
+                                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                                        <div class="text-center">
+                                            <div class="text-xs text-slate-500 uppercase tracking-wider mb-1">Total Paid</div>
+                                            <div class="font-bold text-emerald-600 text-sm" id="ow2-pay-paid-bottom">0 VNĐ</div>
+                                        </div>
+                                        <div class="text-center" style="border-left: 1px solid var(--border-color); border-right: 1px solid var(--border-color);">
+                                            <div class="text-xs text-slate-500 uppercase tracking-wider mb-1">Unrecouped Adv.</div>
+                                            <div class="font-bold text-orange-500 text-sm" id="ow2-pay-advance">0 VNĐ</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="text-xs text-slate-500 uppercase tracking-wider mb-1">Retention Held</div>
+                                            <div class="font-bold text-slate-700 text-sm" id="ow2-pay-retention">0 VNĐ</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -84,7 +136,7 @@
                     <!-- LAYER 1: KPI Grid -->
                     <div class="kpi-container">
                         <!-- Card 1 -->
-                        <div class="kpi-card kpi-card-slate">
+                        <div class="kpi-card kpi-card-slate interactive-kpi" id="kpi-card-budget" title="Bấm để xem chi tiết Bảng phân bổ (Reset Filter)">
                             <div class="kpi-header">
                                 <span class="kpi-title">APPROVED BUDGET BASELINE</span>
                             </div>
@@ -92,7 +144,7 @@
                         </div>
                         
                         <!-- Card 2 -->
-                        <div class="kpi-card kpi-card-blue">
+                        <div class="kpi-card kpi-card-blue interactive-kpi" id="kpi-card-committed" title="Bấm để xem chi tiết các hạng mục đã Cam kết chi phí (Committed > 0)">
                             <div class="kpi-header">
                                 <span class="kpi-title">COMMITTED COST</span>
                                 <span class="kpi-count" id="metric-allocated-pct">0%</span>
@@ -101,7 +153,7 @@
                         </div>
 
                         <!-- Card 3 -->
-                        <div class="kpi-card kpi-card-slate">
+                        <div class="kpi-card kpi-card-slate interactive-kpi" id="kpi-card-projected" title="Bấm để xem chi tiết các hạng mục VƯỢT NGÂN SÁCH (Projected > Baseline)">
                             <div class="kpi-header">
                                 <span class="kpi-title">PROJECTED FINAL COST</span>
                             </div>
@@ -109,7 +161,7 @@
                         </div>
 
                         <!-- Card 4 -->
-                        <div class="kpi-card kpi-card-orange">
+                        <div class="kpi-card kpi-card-orange interactive-kpi" id="kpi-card-contingency" title="Bấm để tìm và highlight dòng Ngân sách Dự phòng (Contingency)">
                             <div class="kpi-header">
                                 <span class="kpi-title">REMAINING CONTINGENCY</span>
                             </div>

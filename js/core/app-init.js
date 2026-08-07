@@ -1,7 +1,7 @@
 import { state } from '../app.js';
-import { fetchProjects, fetchBudget, fetchTenders, fetchContracts, fetchCashflow, fetchPayments, apiLogin, apiGetMe } from '../api.js';
-import { loadAllDataFromCloud, loadBudgetsFromCloud, loadTendersFromCloud, saveProjectsToCloud, saveContractsToCloud, saveCashflowToCloud, savePaymentsToCloud, saveVariationsToCloud } from '../db-service.js';
-import { loadBudgetsFromLS, loadTendersFromLS, loadContractsFromLS, loadCashflowFromLS, loadPaymentsFromLS, loadVariationsFromLS } from '../core/data-store.js';
+import { apiLogin, apiLogout, onAuthStateChanged } from '../api.js';
+import { loadAllProjectsFromCloud, subscribeToProject, saveProjectsToCloud, getUserProfile } from '../db-service.js';
+
 import { setupBudgetEvents, renderProjectTabs, renderDashboard } from '../budget.js';
 import { setupTenderEvents } from '../tender.js';
 import { setupContractEvents } from '../contract.js';
@@ -12,6 +12,7 @@ import { setupVOEvents, renderVODashboard } from '../vo.js';
 import { setupFinalEvents, renderFinalDashboard } from '../final.js';
 import { initializeOverviewModule, renderOverviewDashboard } from '../overview.js';
 import { initAdminUtils } from './admin-utils.js';
+import { renderUsersTable } from '../admin/admin.js';
 
 // ─────────────────────────────────────────────────────────────
 // MAIN ENTRY POINT — called after all HTML components are loaded
@@ -34,88 +35,49 @@ function hideApp() {
 export async function initApp() {
     const loginModal = document.getElementById('login-modal');
 
-    // ── 401 from API: force back to login ──
-    window.addEventListener('auth-unauthorized', () => {
-        hideApp();
-        document.body.classList.remove('is-manager');
-    });
 
     // ── Clear session link in login form ──
     document.getElementById('btn-clear-session')?.addEventListener('click', (e) => {
         e.preventDefault();
-        localStorage.removeItem('ccm_user');
-        const errorEl = document.getElementById('login-error');
-        if (errorEl) { errorEl.style.display = 'block'; errorEl.textContent = 'Đã xóa session cũ. Vui lòng đăng nhập lại.'; }
+        localStorage.clear();
+        apiLogout().then(() => {
+            const errorEl = document.getElementById('login-error');
+            if (errorEl) { errorEl.style.display = 'block'; errorEl.textContent = 'Đã xóa session cũ. Vui lòng đăng nhập lại.'; }
+        });
     });
 
     // ─────────────────────────────────────────────────────
-    // checkAuth: verifies existing JWT with /api/me
-    // Returns true if authenticated, false otherwise.
-    // NO bypass code — login is always required.
-    // ─────────────────────────────────────────────────────
-    const checkAuth = async () => {
-        console.log("Current Auth State:", localStorage.getItem('ccm_user') ? "LOGGED IN" : "NOT LOGGED IN");
-        const userStr = localStorage.getItem('ccm_user');
-        if (!userStr) {
-            if (loginModal) loginModal.classList.remove('hidden');
-            return false;
-        }
-        try {
-            const user = JSON.parse(userStr);
-            state.user = user;
-            if (loginModal) loginModal.classList.add('hidden');
-
-            // Update sidebar user info
-            const nameEl = document.getElementById('user-name');
-            const roleEl = document.getElementById('user-role');
-            if (nameEl) nameEl.textContent = state.user.name || state.user.username || 'Triều';
-            if (roleEl) roleEl.textContent = state.user.role || 'Quantity Surveyor';
-
-            // Role-based CSS
-            const isAdmin = state.user.role === 'admin';
-            const isManager = state.user.role === 'manager';
-            document.body.classList.toggle('is-admin', isAdmin);
-            document.body.classList.toggle('is-manager', isManager);
-            showApp(); // Reveal main app only here
-            return true;
-        } catch (err) {
-            console.error('[checkAuth] Parse error:', err);
-            if (loginModal) loginModal.classList.remove('hidden');
-            return false;
-        }
-    };
-
-    // ─────────────────────────────────────────────────────
-    // Login Form submit handler
+    // Login Form submit handler (Firebase Email/Password)
     // ─────────────────────────────────────────────────────
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const username = document.getElementById('login-username')?.value;
+            const email = document.getElementById('login-email')?.value.trim();
             const password = document.getElementById('login-password')?.value;
             const errorMsg = document.getElementById('login-error');
             const submitBtn = document.getElementById('btn-login-submit');
 
-            if (!username || !password) return;
+            if (!email || !password) return;
 
             try {
                 if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Đang đăng nhập...'; }
+                if (errorMsg) errorMsg.style.display = 'none';
 
-                // Client-side Auth thuần
-                if (username === 'admin' && password === 'admin' || username) {
-                    const mockUser = { name: 'Triều', role: 'Quantity Surveyor' };
-                    localStorage.setItem('ccm_user', JSON.stringify(mockUser));
-                    if (errorMsg) errorMsg.style.display = 'none';
-                    loginForm.reset();
-
-                    const authed = await checkAuth();
-                    if (authed) await loadAppData();
-                } else {
-                    if (errorMsg) { errorMsg.style.display = 'block'; errorMsg.textContent = 'Sai tên đăng nhập hoặc mật khẩu.'; }
-                }
+                await apiLogin(email, password);
+                // onAuthStateChanged will fire and handle the rest
+                loginForm.reset();
             } catch (err) {
-                console.error(err);
+                console.error('[Login Error]', err);
+                let msg = 'Đăng nhập thất bại. Vui lòng thử lại.';
+                if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+                    msg = 'Email hoặc mật khẩu không đúng.';
+                } else if (err.code === 'auth/invalid-email') {
+                    msg = 'Định dạng email không hợp lệ.';
+                } else if (err.code === 'auth/too-many-requests') {
+                    msg = 'Đăng nhập thất bại quá nhiều lần. Vui lòng thử lại sau.';
+                }
+                if (errorMsg) { errorMsg.style.display = 'block'; errorMsg.textContent = msg; }
             } finally {
                 if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Đăng nhập'; }
             }
@@ -126,19 +88,51 @@ export async function initApp() {
     // Logout handler
     // ─────────────────────────────────────────────────────
     bindEvent('btn-logout', 'click', () => {
-        localStorage.removeItem('ccm_user');
-        state.user = null;
-        hideApp();
-        document.body.classList.remove('is-manager');
+        apiLogout().then(() => {
+            state.user = null;
+            hideApp();
+            document.body.classList.remove('is-manager', 'is-admin');
+        });
     });
 
     // ─────────────────────────────────────────────────────
-    // Initial auth check on page load
+    // Firebase onAuthStateChanged - Single source of auth truth
     // ─────────────────────────────────────────────────────
-    const isAuthenticated = await checkAuth();
-    if (isAuthenticated) {
-        await loadAppData();
-    }
+    onAuthStateChanged(async (firebaseUser) => {
+        if (firebaseUser) {
+            // Load role from Firestore /users/{uid}
+            const profile = await getUserProfile(
+                firebaseUser.uid,
+                firebaseUser.email,
+                firebaseUser.displayName
+            );
+
+            state.user = {
+                uid: firebaseUser.uid,
+                email: firebaseUser.email,
+                name: profile.name || firebaseUser.displayName || firebaseUser.email,
+                role: profile.role || 'user'
+            };
+
+            // Update sidebar user info
+            const nameEl = document.getElementById('user-name');
+            const roleEl = document.getElementById('user-role');
+            if (nameEl) nameEl.textContent = state.user.name;
+            if (roleEl) roleEl.textContent = state.user.role;
+
+            // Role-based CSS
+            document.body.classList.toggle('is-admin', state.user.role === 'admin');
+            document.body.classList.toggle('is-manager', state.user.role === 'manager');
+
+            showApp();
+            await loadAppData();
+        } else {
+            // User is signed out
+            state.user = null;
+            hideApp();
+            document.body.classList.remove('is-admin', 'is-manager');
+        }
+    });
 
     // ─────────────────────────────────────────────────────
     // Global ESC Event Listener (FIFO Layer Stack)
@@ -269,8 +263,6 @@ async function loadAppData() {
         setTimeout(async () => {
             console.log('🔄 Setting up Hybrid Realtime Sync...');
             
-            const { loadAllProjectsFromCloud, subscribeToProject, saveProjectsToCloud } = await import('../db-service.js');
-            
             // Fetch the list of all projects
             const projects = await loadAllProjectsFromCloud();
             if (projects && projects.length > 0) {
@@ -292,7 +284,7 @@ async function loadAppData() {
             // Function to setup subscription
             const setupSubscription = (projectId) => {
                 if (!projectId) return;
-                subscribeToProject(projectId, (docData) => {
+                subscribeToProject(projectId, async (docData) => {
                     if (docData) {
                         // Helper to merge per-project data into global array
                         const mergeProjectData = (globalArray = [], projectArray = [], pid) => {
@@ -336,16 +328,15 @@ async function loadAppData() {
                         try { renderProjectTabs(); } catch(e){}
                         try { renderDashboard(); } catch(e){}
                     } else {
-                        // Project document doesn't exist on cloud yet. Save local mock data to create it.
-                        console.log(`Initial Setup: Saving mock data to new project document ${projectId}`);
-                        import('../db-service.js').then(m => {
-                            m.saveBudgetsToCloud(state.appData.Budgets);
-                            m.saveTendersToCloud(state.appData.Tenders);
-                            m.saveContractsToCloud(state.appData.Contracts);
-                            m.saveCashflowToCloud(state.appData.Cashflow);
-                            m.savePaymentsToCloud(state.appData.Payments);
-                            m.saveVariationsToCloud(state.appData.Variations);
-                        }).catch(console.error);
+                        // Project document doesn't exist on cloud yet. Initialize it.
+                        console.log(`Initial Setup: Initializing new project document ${projectId}`);
+                        const { saveBudgetsToCloud, saveTendersToCloud, saveContractsToCloud, saveCashflowToCloud, savePaymentsToCloud, saveVariationsToCloud } = await import('../db-service.js');
+                        saveBudgetsToCloud(state.appData.Budgets);
+                        saveTendersToCloud(state.appData.Tenders);
+                        saveContractsToCloud(state.appData.Contracts);
+                        saveCashflowToCloud(state.appData.Cashflow);
+                        savePaymentsToCloud(state.appData.Payments);
+                        saveVariationsToCloud(state.appData.Variations);
                     }
                 });
             };
@@ -380,7 +371,8 @@ function setupSidebarEvents() {
         { menu: 'menu-cashflow', mod: 'cashflow-view' },
         { menu: 'menu-payment', mod: 'module-payment' },
         { menu: 'menu-vo', mod: 'module-vo' },
-        { menu: 'menu-final', mod: 'module-final' }
+        { menu: 'menu-final', mod: 'module-final' },
+        { menu: 'menu-admin', mod: 'module-admin' }
     ];
 
     modules.forEach(m => {
@@ -454,6 +446,11 @@ function setupSidebarEvents() {
                 // Final dashboard re-render on tab switch
                 if (m.mod === 'module-final') {
                     setTimeout(() => { try { renderFinalDashboard(); } catch (e) { console.error(e); } }, 50);
+                }
+
+                // Admin dashboard render
+                if (m.mod === 'module-admin') {
+                    setTimeout(() => { try { renderUsersTable(); } catch (e) { console.error(e); } }, 50);
                 }
             }
         });

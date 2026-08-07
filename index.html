@@ -16,6 +16,7 @@
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <!-- Firebase SDK (v10 compat) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="js/theme-toggle.js"></script>
 </head>
@@ -36,8 +37,8 @@
             
             <form id="login-form" style="text-align: left;">
                 <div class="form-group" style="margin-bottom: 1rem;">
-                    <label for="login-username" style="font-weight: 500;">Tên đăng nhập</label>
-                    <input type="text" id="login-username" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px;" required>
+                    <label for="login-email" style="font-weight: 500;">Email</label>
+                    <input type="email" id="login-email" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px;" required autocomplete="email">
                 </div>
                 <div class="form-group" style="margin-bottom: 1.5rem;">
                     <label for="login-password" style="font-weight: 500;">Mật khẩu</label>
@@ -65,6 +66,7 @@
                 <div id="project-header-container"></div>
                 <div id="modules-1-container"></div>
                 <div id="modules-2-container"></div>
+                <div id="module-admin-container"></div>
 
                 <div id="modals-1-container"></div>
                 <div id="modals-2-container"></div>
@@ -85,7 +87,8 @@
                 loadComponent('modules-1-container', 'components/modules-1.html'),
                 loadComponent('modules-2-container', 'components/modules-2.html'),
                 loadComponent('modals-1-container', 'components/modals-1.html'),
-                loadComponent('modals-2-container', 'components/modals-2.html')
+                loadComponent('modals-2-container', 'components/modals-2.html'),
+                loadComponent('module-admin-container', 'components/admin.html')
             ]);
             document.dispatchEvent(new Event('componentsLoaded'));
         }
@@ -131,6 +134,10 @@
                             <div id="summary-name-view" style="font-size: 1.2rem; font-weight: 700;">-</div>
                         </div>
                         <div style="margin-bottom: 1rem;">
+                            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Tổng Ngân sách (Approved Budget)</div>
+                            <div id="summary-budget-view" style="font-size: 1.1rem; font-weight: 700; color: var(--primary-blue);">-</div>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
                             <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Quy mô</div>
                             <div id="summary-scale-view" style="font-weight: 500;">-</div>
                         </div>
@@ -157,8 +164,8 @@
                             <div id="summary-consultants-view" style="font-weight: 500;">-</div>
                         </div>
                         <div style="margin-bottom: 1rem;">
-                            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Nhà thầu chính</div>
-                            <div id="summary-contractor-view" style="font-weight: 500;">-</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Tiến độ / Trạng thái</div>
+                            <div id="summary-status-view" style="font-weight: 500;">-</div>
                         </div>
                     </div>
 
@@ -167,6 +174,10 @@
                         <div class="form-group" style="margin-bottom: 1rem;">
                             <label>Tên dự án</label>
                             <input type="text" id="summary-name-input" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label>Tổng Ngân sách (VNĐ)</label>
+                            <input type="text" id="summary-budget-input" onblur="window.formatInputNumber(this)">
                         </div>
                         <div class="form-group" style="margin-bottom: 1rem;">
                             <label>Quy mô</label>
@@ -196,8 +207,16 @@
                                 style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; font-family: inherit; resize: vertical;"></textarea>
                         </div>
                         <div class="form-group" style="margin-bottom: 1rem;">
-                            <label>Nhà thầu chính</label>
-                            <input type="text" id="summary-contractor-input">
+                            <label>Tiến độ / Trạng thái</label>
+                            <select id="summary-status-input" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px;">
+                                <option value="Planning">Planning (Lên kế hoạch)</option>
+                                <option value="Design">Design (Thiết kế)</option>
+                                <option value="Tendering">Tendering (Đấu thầu)</option>
+                                <option value="Construction">Construction (Thi công)</option>
+                                <option value="Handover">Handover (Bàn giao)</option>
+                                <option value="Completed">Completed (Hoàn thành)</option>
+                                <option value="On Hold">On Hold (Tạm dừng)</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -213,7 +232,6 @@
 
     <!-- Firebase Services & Core App -->
     <script type="module" src="js/firebase-config.js"></script>
-    <script type="module" src="js/db-service.js"></script>
     <script type="module" src="js/app.js"></script>
 </body>
 </html>

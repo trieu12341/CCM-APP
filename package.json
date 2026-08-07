@@ -1,13 +1,8 @@
 {
   "name": "cost-management-app",
   "version": "1.0.0",
-  "description": "Cost Management Application",
-  "main": "server.js",
+  "description": "Cost Management Application - Firebase Serverless",
   "scripts": {
-    "start": "node server.js"
-  },
-  "dependencies": {
-    "express": "^4.18.2",
-    "jsonwebtoken": "^9.0.3"
+    "deploy": "firebase deploy --only hosting"
   }
 }
