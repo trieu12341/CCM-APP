@@ -9,17 +9,14 @@
       "firestore.rules",
       "**/.*",
       "**/node_modules/**",
-      "render.yaml",
-      "split.js",
-      "split.ps1",
-      "refactor_css.ps1",
       "package.json",
       "package-lock.json",
-      "test.html",
       "test_plan.md",
       "data.json",
-      "temp_modals2_extract.txt",
-      "New folder/**"
+      "New folder/**",
+      "tests/**",
+      "README*.md",
+      "CLAUDE.md"
     ],
     "rewrites": [
       {

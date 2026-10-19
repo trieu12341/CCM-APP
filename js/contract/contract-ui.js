@@ -209,7 +209,10 @@ export function renderContractTableModal() {
         const savings = budget - contractVal;
 
         let savingsHtml = formatCurrency(Math.abs(savings));
-        if (savings < 0) {
+        if (!budget) {
+            // Chưa gắn ngân sách → không có cơ sở so sánh (trước hiện "−toàn bộ giá trị" màu đỏ)
+            savingsHtml = `<span style="color: var(--text-muted);" title="Hợp đồng chưa gắn mục ngân sách">—</span>`;
+        } else if (savings < 0) {
             savingsHtml = `<span style="color: var(--danger-color);">- ${savingsHtml}</span>`;
         } else if (savings > 0) {
             savingsHtml = `<span style="color: var(--primary-blue);">${savingsHtml}</span>`;
@@ -223,7 +226,7 @@ export function renderContractTableModal() {
             <td><span class="badge ${contract.type === 'Consultancy' ? 'bg-purple' : 'bg-blue'}" style="padding:4px 8px; border-radius:4px; font-size:0.8rem; background:${contract.type === 'Consultancy' ? '#e9d5ff; color:#6b21a8;' : '#dbeafe; color:#1e40af;'}">${typeStr}</span></td>
             <td>${escapeHtml(contract.package_name || '-')}</td>
             <td>${escapeHtml(contract.contractor || '-')}</td>
-            <td style="font-weight: 600;">${formatCurrency(budget)}</td>
+            <td style="font-weight: 600;">${budget ? formatCurrency(budget) : '<span style="color: var(--text-muted);">—</span>'}</td>
             <td style="font-weight: 600;">${formatCurrency(contractVal)}</td>
             <td style="font-weight: 600;">${savingsHtml}</td>
             <td class="${statusClass}"><i class="fa-solid fa-circle" style="font-size: 0.5rem; margin-right: 4px;"></i>${statusText}</td>

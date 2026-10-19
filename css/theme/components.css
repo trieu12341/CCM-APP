@@ -147,3 +147,10 @@ button.w-8.h-8 { border: 0; background: transparent; cursor: pointer; }
   :root { --fs-kpi: 18px; }
   .content-wrapper { padding: var(--sp-4) !important; }
 }
+
+/* ---------- 15. NÚT PHỤ THỐNG NHẤT ----------
+   .btn-secondary: viền trung tính (trước có chỗ chữ trắng trên nền trắng) */
+.btn-secondary { background: var(--card-bg) !important; color: var(--text-dark) !important; border: 1px solid var(--border-strong) !important; }
+.btn-secondary:hover { background: var(--sidebar-hover) !important; }
+/* style.css cũ định nghĩa .text-white = màu nền thẻ → chữ biến mất trên nền sáng */
+.btn.text-white:not(.btn-primary):not(.bg-amber-700) { color: var(--text-dark) !important; }

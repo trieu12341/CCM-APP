@@ -70,3 +70,14 @@ Run tests via test runner (e.g., Jest/Vitest or lightweight browser runner) to v
 Keep index.html under 150 lines (App shell layout only). Use modular HTML components in components/.
 
 style.css must ONLY contain @import statements pointing to modular CSS files in css/base.css, css/components/, and css/pages/.
+---
+
+## 7. IPC & SỐ LIỆU THANH TOÁN (bắt buộc đọc trước khi sửa module Payment)
+- Công thức IPC gói xây dựng: `js/modules/payment/ipc-engine.js` (phương pháp LŨY KẾ theo mẫu CERT,
+  16 dòng). KHÔNG tự tính IPC ở nơi khác.
+- Ghép với dữ liệu (kỳ trước, tính lại chuỗi): `ipc-chain.js`. Đọc sheet FS: `ipc-fs-parser.js`.
+- Tổng hợp số cho mọi màn hình (Payment, Budget, Overview, Cashflow, Quyết toán):
+  `payment-metrics.js`. KHÔNG cộng `net_payable − vat_amount` thủ công.
+- Đọc/ghi trường Hợp đồng qua `js/core/contract-fields.js` (giá trị HĐ, tên gói, nhà thầu).
+- Chèn chuỗi người dùng nhập vào HTML: luôn `escapeHtml()` (utils/formatters.js).
+- Kiểm thử: `npm test` (Node, thư mục `tests/`). GitHub Actions chỉ deploy khi test đạt.

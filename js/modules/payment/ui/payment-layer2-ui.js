@@ -7,7 +7,8 @@ import { escapeHtml } from '../../../utils/formatters.js';
  * - Filters: search, status, contract type (Consultancy / Construction)
  */
 
-import { state, formatCurrencyShort } from '../../../app.js';
+import { state, formatCurrencyVND } from '../../../app.js';
+import { summarizeIPC } from '../ipc-engine.js';
 import { getPaymentsByProject } from '../payment-state.js';
 import { getStatusBadge } from './payment-layer1-ui.js';
 
@@ -64,12 +65,12 @@ export function renderIPCList(filterState = { search: '', status: 'All', contrac
 
     tbody.innerHTML = payments.map((p, idx) => {
         const ipcCode = shortIPCCode(p.ipc_id);
-        const gross    = Number(p.gross_work_done) || 0;
-        const qsDed    = Number(p.qs_deduction) || 0;
-        const certifiedGross = Number(p.certified_value) || Number(p.net_payable) || 0;
-        const vat = Number(p.vat_amount) || 0;
-        const certified = p.sub_total !== undefined ? Number(p.sub_total) : (certifiedGross - vat);
-        const netPay   = certified;
+        // Số đầy đủ đến đồng; cột "Khấu trừ" = KL trình − xác nhận (giữ lại, thu hồi TƯ, phạt…)
+        const s = summarizeIPC(p);
+        const gross = p.is_advance ? s.advance : s.grossThisPeriod;
+        const certified = p.is_advance ? 0 : s.certifiedExVat;
+        const qsDed = p.is_advance ? 0 : Math.max(0, gross - certified);
+        const netPay = s.payment;
         const ctType   = p.contract_type || 'Construction';
         const ctBadge  = ctType === 'Consultancy'
             ? `<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:#fef3c7;color:#d97706;font-weight:700;">Tư vấn</span>`
@@ -87,10 +88,10 @@ export function renderIPCList(filterState = { search: '', status: 'All', contrac
                 </td>
                 <td style="text-align:center;font-weight:600;">${periodLabel(p)}</td>
                 <td style="text-align:center;color:#64748b;font-size:12px;">${formatDateShort(p.submission_date)}</td>
-                <td style="text-align:right;font-size:13px;">${formatCurrencyShort(gross)}</td>
-                <td style="text-align:right;font-size:13px;color:#ef4444;">${qsDed > 0 ? '- ' + formatCurrencyShort(qsDed) : '—'}</td>
-                <td style="text-align:right;font-size:13px;font-weight:600;color:#10b981;">${formatCurrencyShort(certified)}</td>
-                <td style="text-align:right;font-size:13px;font-weight:700;color:var(--primary-blue);">${formatCurrencyShort(netPay)}</td>
+                <td style="text-align:right;font-size:13px;">${formatCurrencyVND(gross)}</td>
+                <td style="text-align:right;font-size:13px;color:#ef4444;">${qsDed > 0 ? '- ' + formatCurrencyVND(qsDed) : '—'}</td>
+                <td style="text-align:right;font-size:13px;font-weight:600;color:#10b981;">${p.is_advance ? '—' : formatCurrencyVND(certified)}</td>
+                <td style="text-align:right;font-size:13px;font-weight:700;color:var(--primary-blue);">${formatCurrencyVND(netPay)}</td>
                 <td style="text-align:center;">${getStatusBadge(p.status)}</td>
                 <td style="text-align:center;">
                     <button class="btn-ipc-detail" data-ipc-id="${p.ipc_id}"

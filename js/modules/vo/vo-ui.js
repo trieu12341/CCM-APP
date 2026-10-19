@@ -100,7 +100,7 @@ export function renderVOTable() {
             <td>${vo.assessment_date ? formatDate(vo.assessment_date) : '-'}</td>
             <td style="text-align:right;">${formatCurrency(claimed)}</td>
             <td style="text-align:right; font-weight:600;" class="text-success">${formatCurrency(approved)}</td>
-            <td style="text-align:right;" class="${variance < 0 ? 'text-danger' : 'text-success'}">${formatCurrency(variance)}</td>
+            <td style="text-align:right;" class="${vo.status === 'Approved' ? (variance < 0 ? 'text-danger' : 'text-success') : 'text-muted'}">${vo.status === 'Approved' ? formatCurrency(variance) : '—'}</td>
             <td><span class="status-badge ${statusClass}">${vo.status || 'Pending'}</span></td>
             <td>
                 <button class="btn-icon btn-view-vo" data-id="${vo.vo_id}" title="Xem Chi tiết"><i class="fa-solid fa-eye"></i></button>

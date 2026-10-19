@@ -160,7 +160,7 @@ function renderPendingTable(payments) {
                     <div style="font-size:11px;color:#64748b;">${escapeHtml(p.contractor_name) || ''}</div>
                 </td>
                 <td style="text-align:center;">${periodLabel(p)}</td>
-                <td>${formatCurrencyShort(p.gross_work_done)}</td>
+                <td style="text-align:right">${formatCurrencyVND(p.net_payable || p.gross_work_done)}</td>
                 <td style="text-align:center;">${daysLabel}</td>
                 <td style="text-align:center;">${getStatusBadge(p.status)}</td>
             </tr>`;
