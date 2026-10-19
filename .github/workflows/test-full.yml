@@ -14,8 +14,17 @@ jobs:
         with: { node-version: 20, cache: npm }
       - run: npm ci
 
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+
       - name: Unit test
         run: npm test
+
+      - name: Lớp dữ liệu — Firestore giả trong bộ nhớ
+        run: npm run test:data
+
+      - name: Lớp dữ liệu — Firestore Emulator thật
+        run: npm run test:data:emulator
 
       - name: Cài Chromium cho E2E
         run: npx playwright install --with-deps chromium
