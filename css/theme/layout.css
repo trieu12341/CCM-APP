@@ -1,0 +1,113 @@
+/* theme/layout.css — Bố cục: nền, sidebar, topbar, tiêu đề trang, nút
+   Thuộc lớp chuẩn hóa giao diện v2 (nạp qua css/theme-v2.css). */
+
+/* ---------- 2. NỀN TẢNG ---------- */
+html { font-size: 14px; }              /* mọi giá trị rem co lại ~12% → bớt "to" */
+body {
+  font-size: var(--fs-base);
+  line-height: 1.45;
+  color: var(--text-dark);
+  background: var(--main-bg);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "tnum" 1, "cv11" 1;   /* số đều cột, dễ so tiền */
+}
+.content-wrapper { padding: var(--sp-5) var(--sp-6) !important; }
+
+/* ---------- 3. SIDEBAR ---------- */
+.sidebar { background: var(--sidebar-bg); border-right: 1px solid var(--border-color); }
+#sidebar:not(.sidebar-collapsed) { width: 224px; }
+.sidebar-header { padding: var(--sp-4) var(--sp-4) var(--sp-3) !important; gap: 6px !important; }
+.sidebar-header > div:first-child > div {
+  width: 26px !important; height: 26px !important; font-size: 14px !important; border-radius: 4px;
+}
+.sidebar-header > .sidebar-text { font-size: var(--fs-2xs) !important; letter-spacing: 0.04em; }
+.sidebar-menu { padding: 0 var(--sp-3); }
+.menu-section { margin-bottom: var(--sp-3); }
+.menu-section h4 { font-size: var(--fs-2xs); color: var(--text-muted); opacity: 0.8; margin-bottom: var(--sp-1); }
+.menu-item {
+  height: 34px; padding: 0 var(--sp-3); gap: 10px; margin-bottom: 2px;
+  font-size: var(--fs-base); color: var(--sidebar-text); border-radius: var(--radius-sm);
+}
+.menu-item i { font-size: 15px; width: 18px; }
+.menu-item:hover { background: var(--sidebar-hover); color: var(--text-dark); font-weight: 400; }
+.menu-item.active { background: var(--brand-soft); color: var(--brand); font-weight: 600; }
+.menu-item.active::before { left: calc(-1 * var(--sp-3)); width: 3px; background: var(--brand); }
+.sidebar-footer { padding: var(--sp-3) !important; }
+.savings-card { font-size: var(--fs-xs) !important; padding: 6px 10px !important; }
+
+.avatar-initials {
+  width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--brand-soft); color: var(--brand);
+  font-size: var(--fs-xs); font-weight: 700; letter-spacing: 0.02em;
+}
+
+/* ---------- 4. TOPBAR ---------- */
+.topbar {
+  height: 52px; padding: 0 var(--sp-6) !important;
+  background: var(--card-bg); border-bottom: 1px solid var(--border-color);
+  font-size: var(--fs-base);
+}
+.topbar select, .topbar input { height: 30px; font-size: var(--fs-base); }
+
+/* ---------- 5. TIÊU ĐỀ TRANG — giống hệt nhau ở mọi tab ---------- */
+.section-title,
+.payment-section-header,
+.final-section-header {
+  display: flex !important; align-items: center; justify-content: space-between;
+  gap: var(--sp-3); flex-wrap: wrap;
+  min-height: 36px; margin: 0 0 var(--sp-4) !important; padding: 0 !important;
+  background: transparent !important; border: 0 !important; box-shadow: none !important;
+  font-size: var(--fs-lg) !important; font-weight: 600 !important; color: var(--text-dark) !important;
+  text-transform: none !important; letter-spacing: -0.01em !important;
+}
+.payment-section-title, .final-section-title {
+  font-size: var(--fs-lg) !important; font-weight: 600 !important; color: var(--text-dark) !important;
+  text-transform: none !important; letter-spacing: -0.01em !important; margin: 0 !important;
+  display: flex; align-items: center;
+}
+.payment-section-title i, .final-section-title i { display: none; }  /* bỏ icon riêng lẻ */
+.final-section-header > .btn { margin-left: 0 !important; }
+.final-section-header > .final-section-title { margin-right: auto !important; }
+
+/* tiêu đề nhỏ bên trong khối (Key Project Documents, mục trong modal…) */
+.section-title.sub, .card .section-title, .modal-content .section-title,
+.quick-actions .section-title, [class*="widget"] .section-title {
+  font-size: var(--fs-md) !important; min-height: 0; margin-bottom: var(--sp-3) !important;
+}
+
+/* ---------- 6. NÚT ---------- */
+#btn-cashflow-detail { width: 100%; height: 36px; margin-top: var(--sp-3) !important; font-size: var(--fs-base) !important; padding: 0 !important; }
+.btn {
+  height: var(--control-h); padding: 0 var(--sp-3) !important;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  font-size: var(--fs-base) !important; font-weight: 500 !important; line-height: 1;
+  border-radius: var(--radius-sm) !important; box-shadow: none !important; white-space: nowrap;
+}
+.btn-primary { background: var(--brand) !important; color: #fff !important; border: 1px solid var(--brand) !important; }
+.btn-primary:hover { background: var(--brand-hover) !important; border-color: var(--brand-hover) !important; }
+/* Nút "Bảng chi tiết…" (trước là cam đậm, mỗi tab một màu) → nút phụ viền */
+.btn.bg-amber-700, #btn-open-budget-list, #btn-open-payment-list, #btn-show-vo-layer2,
+#btn-show-final-layer2, #btn-open-tender-list, #btn-open-contract-list {
+  background: var(--card-bg) !important; color: var(--text-dark) !important;
+  border: 1px solid var(--border-strong) !important;
+}
+.btn.bg-amber-700:hover, #btn-open-budget-list:hover, #btn-open-payment-list:hover,
+#btn-show-vo-layer2:hover, #btn-show-final-layer2:hover {
+  background: var(--sidebar-hover) !important;
+}
+
+/* ---------- 14. DỌN KHOẢNG TRỐNG & NÚT TOPBAR ---------- */
+/* dải trống phía trên tiêu đề trang (container tab dự án khi không có tab) */
+.project-tabs-container { margin: 0 0 var(--sp-3) !important; border: 0 !important; padding: 0 !important; min-height: 0 !important; }
+.project-tabs-container:empty { display: none !important; }
+#project-header-container:empty { display: none; }
+/* nút công cụ admin trên topbar: đồng bộ kiểu icon, không còn nền trắng ở chế độ tối */
+.topbar .btn-secondary, #btn-admin-restore, #btn-admin-reset, .topbar #btn-logout {
+  width: 30px; height: 30px !important; padding: 0 !important;
+  background: transparent !important; border: 1px solid var(--border-color) !important;
+  color: var(--text-muted) !important; border-radius: var(--radius-sm) !important;
+}
+#btn-admin-reset { color: var(--accent-red) !important; }
+#btn-admin-restore { color: var(--accent-blue) !important; }
+.topbar .btn-secondary:hover { background: var(--sidebar-hover) !important; color: var(--text-dark) !important; }

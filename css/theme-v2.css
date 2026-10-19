@@ -1,0 +1,9 @@
+/* ==========================================================================
+   theme-v2.css — Lớp chuẩn hóa giao diện (nạp SAU CÙNG trong index.html)
+   Mục tiêu: 1 thang chữ, 1 thang khoảng cách, 1 bảng màu cho cả 8 tab,
+   sáng/tối cân bằng. Muốn quay về giao diện cũ: bỏ dòng <link> của file này.
+   ========================================================================== */
+
+@import url('theme/tokens.css');
+@import url('theme/layout.css');
+@import url('theme/components.css');

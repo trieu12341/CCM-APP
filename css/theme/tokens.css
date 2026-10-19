@@ -1,0 +1,105 @@
+/* theme/tokens.css — Biến thiết kế: thang chữ, khoảng cách, bảng màu sáng/tối
+   Thuộc lớp chuẩn hóa giao diện v2 (nạp qua css/theme-v2.css). */
+
+/* ---------- 1. TOKENS ---------- */
+:root, [data-theme="light"] {
+  /* Thang chữ (dùng chung mọi tab) */
+  --fs-2xs: 10.5px;
+  --fs-xs: 11px;    /* nhãn KPI, tiêu đề cột, nhóm menu */
+  --fs-sm: 12px;    /* chữ phụ, chú thích */
+  --fs-base: 13px;  /* nội dung, bảng, nút */
+  --fs-md: 14px;    /* tiêu đề khối */
+  --fs-lg: 16px;    /* tiêu đề trang */
+  --fs-kpi: 20px;   /* số KPI */
+
+  /* Khoảng cách & bo góc */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 20px; --sp-6: 24px;
+  --radius-sm: 6px; --radius: 8px;
+  --control-h: 32px;
+
+  /* Bảng màu sáng — trung tính, đỏ thương hiệu VCRE làm điểm nhấn */
+  --main-bg: #f4f6f9;
+  --card-bg: #ffffff;
+  --sidebar-bg: #ffffff;
+  --sidebar-hover: #f1f4f8;
+  --bg-hover-row: #f3f6fa;
+  --bg-even-row: #fafbfc;
+  --bg-table-header: #f4f6f9;
+  --bg-table-footer: #eef1f5;
+  --bg-subtle: #f4f6f9;
+
+  --text-dark: #1b2333;
+  --text-body: #334155;
+  --text-muted: #667085;
+  --sidebar-text: #667085;
+  --sidebar-text-active: #1b2333;
+  --border-color: #e4e8ee;
+  --border-strong: #d3d9e2;
+
+  --brand: #c63a25;
+  --brand-hover: #a93020;
+  --brand-soft: #fbeceA;
+  --primary-brand: var(--brand);
+  --primary-blue: var(--brand);     /* biến cũ: giữ màu logo */
+
+  --accent-blue: #2563eb;  --accent-blue-soft: #e8effd;
+  --accent-teal: #0e9f8e;  --accent-teal-soft: #e3f5f2;
+  --accent-amber: #b7791f; --accent-amber-soft: #fbf3e2;
+  --accent-violet: #7c4dd6; --accent-violet-soft: #f1ebfc;
+  --accent-red: #d14343;   --accent-red-soft: #fcebeb;
+  --accent-slate: #64748b; --accent-slate-soft: #eef1f5;
+
+  --primary-green: var(--accent-teal);
+  --primary-orange: var(--accent-amber);
+  --status-green-bg: var(--accent-teal-soft);
+  --status-green-text: #0b7366;
+  --status-orange-bg: var(--accent-amber-soft);
+  --status-orange-text: #8a5a12;
+
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04);
+  --shadow-pop: 0 8px 24px rgba(16, 24, 40, 0.12);
+}
+
+[data-theme="dark"] {
+  /* Nền tối nhiều tầng: nền < sidebar < thẻ, để các khối tách bạch */
+  --main-bg: #0c1220;
+  --card-bg: #141c2c;
+  --sidebar-bg: #101827;
+  --sidebar-hover: #1b2538;
+  --bg-hover-row: #1a2436;
+  --bg-even-row: #172031;
+  --bg-table-header: #1a2334;
+  --bg-table-footer: #111a29;
+  --bg-subtle: #182133;
+
+  --text-dark: #e6eaf2;
+  --text-body: #c4cbd8;
+  --text-muted: #8b96aa;
+  --sidebar-text: #8b96aa;
+  --sidebar-text-active: #e6eaf2;
+  --border-color: #243045;
+  --border-strong: #2f3c55;
+
+  --brand: #e2533c;
+  --brand-hover: #ec6a55;
+  --brand-soft: rgba(226, 83, 60, 0.14);
+  --primary-brand: var(--brand);
+  --primary-blue: var(--brand);
+
+  --accent-blue: #6b9cff;  --accent-blue-soft: rgba(107, 156, 255, 0.14);
+  --accent-teal: #34c3ae;  --accent-teal-soft: rgba(52, 195, 174, 0.14);
+  --accent-amber: #e3a545; --accent-amber-soft: rgba(227, 165, 69, 0.14);
+  --accent-violet: #a98bf0; --accent-violet-soft: rgba(169, 139, 240, 0.14);
+  --accent-red: #f07171;   --accent-red-soft: rgba(240, 113, 113, 0.14);
+  --accent-slate: #94a3b8; --accent-slate-soft: rgba(148, 163, 184, 0.12);
+
+  --primary-green: var(--accent-teal);
+  --primary-orange: var(--accent-amber);
+  --status-green-bg: var(--accent-teal-soft);
+  --status-green-text: #6fe0cd;
+  --status-orange-bg: var(--accent-amber-soft);
+  --status-orange-text: #f2c27a;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-pop: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
