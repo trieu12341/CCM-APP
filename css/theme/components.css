@@ -154,3 +154,16 @@ button.w-8.h-8 { border: 0; background: transparent; cursor: pointer; }
 .btn-secondary:hover { background: var(--sidebar-hover) !important; }
 /* style.css cũ định nghĩa .text-white = màu nền thẻ → chữ biến mất trên nền sáng */
 .btn.text-white:not(.btn-primary):not(.bg-amber-700) { color: var(--text-dark) !important; }
+
+/* ---------- 16. NÚT VIỀN (.btn-outline) ----------
+   Trước đây không có định nghĩa → trình duyệt vẽ nền trắng, chữ mờ ở chế độ tối */
+.btn-outline { background: transparent !important; color: var(--text-dark) !important; border: 1px solid var(--border-strong) !important; }
+.btn-outline:hover { background: var(--sidebar-hover) !important; }
+.btn-outline.btn-ok { color: var(--accent-teal) !important; border-color: var(--accent-teal) !important; }
+.btn-outline.btn-ok:hover { background: var(--accent-teal-soft) !important; }
+.btn-outline.btn-bad { color: var(--accent-red) !important; border-color: var(--accent-red) !important; }
+.btn-outline.btn-bad:hover { background: var(--accent-red-soft) !important; }
+/* Chữ giữa biểu đồ tròn (ApexCharts mặc định xám đậm → chìm ở chế độ tối) */
+.apexcharts-datalabels-group .apexcharts-datalabel-label { fill: var(--text-muted) !important; }
+.apexcharts-datalabels-group .apexcharts-datalabel-value { fill: var(--text-dark) !important; font-weight: 600 !important; }
+.apexcharts-pie-area { stroke: var(--card-bg) !important; }

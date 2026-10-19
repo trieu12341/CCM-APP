@@ -19,13 +19,8 @@ export function calculateOverviewMetrics() {
         }
     });
 
+    // VO đã duyệt KHÔNG cộng vào giá trị cam kết (giá trị HĐ); chỉ vào giá trị quyết toán
     const projectVOs = (state.appData.Variations || []).filter(vo => vo.project_id === projectId && vo.status === 'Approved');
-    const activeVOs = projectVOs.filter(vo => {
-        const contract = projectContracts.find(c => c.contract_id === vo.contract_id);
-        return contract && contract.status !== 'Closed';
-    });
-    const activeTotalVO = activeVOs.reduce((sum, vo) => sum + (Number(vo.approved_amount) || Number(vo.claimed_amount) || 0), 0);
-    totalCommitted += activeTotalVO;
 
     const remainingContingency = totalBudget - totalCommitted;
     const budgetPct = totalBudget > 0 ? (totalCommitted / totalBudget) * 100 : 0;

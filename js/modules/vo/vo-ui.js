@@ -230,7 +230,7 @@ export function renderChartBar(projectVOs, projectContracts) {
             categories: contractNames.length > 0 ? contractNames : ['No Data'],
             labels: {
                 formatter: function (val) {
-                    return "$" + (val / 1e6).toFixed(1) + "M";
+                    return (val / 1e6).toLocaleString('vi-VN', { maximumFractionDigits: 1 }) + " tr";
                 }
             }
         },

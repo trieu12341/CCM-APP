@@ -31,20 +31,23 @@ export function getContractBudgetValue(contract, appData) {
     return budget ? (Number(budget.budgeted) || 0) : 0;
 }
 
-export function getDynamicContractValue(contract, appData) {
+/**
+ * Giá trị HỢP ĐỒNG = giá trị ký gốc. Phát sinh (VO) đã duyệt KHÔNG cộng vào đây:
+ * VO chỉ đi vào giá trị QUYẾT TOÁN (module Quyết toán: [C] = [A] gốc + [B] VO)
+ * và dòng (2)/(3) của chứng chỉ IPC. Giữ tên hàm cũ để không phải sửa các nơi gọi.
+ */
+export function getDynamicContractValue(contract) {
     if (!contract) return 0;
-    
-    // Original contract value
-    const originalValue = getContractValue(contract);
-    
-    // Add approved variations (SSOT logic for VO Layer)
-    let approvedVOValue = 0;
-    if (appData && appData.Variations) {
-        const approvedVOs = appData.Variations.filter(vo => vo.contract_id === contract.contract_id && vo.status === 'Approved');
-        approvedVOValue = approvedVOs.reduce((sum, vo) => sum + (Number(vo.approved_amount) || Number(vo.vo_amount) || 0), 0);
-    }
-    
-    return originalValue + approvedVOValue;
+    return getContractValue(contract);
+}
+
+/** Giá trị quyết toán dự kiến = gốc + VO đã duyệt (chỉ dùng khi cần hiển thị riêng). */
+export function getFinalContractValue(contract, appData) {
+    if (!contract) return 0;
+    const vo = (appData?.Variations || [])
+        .filter(v => v.contract_id === contract.contract_id && v.status === 'Approved')
+        .reduce((sum, v) => sum + (Number(v.approved_amount) || Number(v.vo_amount) || 0), 0);
+    return getContractValue(contract) + vo;
 }
 
 document.addEventListener('componentsLoaded', initApp);

@@ -110,8 +110,8 @@ function openVOModal(voId) {
     if(form) form.reset();
     
     // Reset summaries
-    document.getElementById('vo-claimed-summary').innerText = '$0';
-    document.getElementById('vo-approved-summary').innerText = '$0';
+    document.getElementById('vo-claimed-summary').innerText = '0 VNĐ';
+    document.getElementById('vo-approved-summary').innerText = '0 VNĐ';
     
     if (voId) {
         // Edit Mode
