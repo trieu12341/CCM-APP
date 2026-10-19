@@ -17,9 +17,9 @@ let unsubscribeProject = null;
 
 /**
  * Load user profile from Firestore /users/{uid}.
- * Creates a default 'user' role profile on first login.
- * To make someone admin: update their role in Firebase Console
- * or call updateUserRole(uid, 'admin').
+ * Lần đăng nhập đầu tạo hồ sơ role 'pending' (chờ admin cấp quyền).
+ * firestore.rules chỉ cho phép tự tạo hồ sơ với role 'pending'.
+ * Admin cấp quyền trong tab Quản lý Tài khoản (hoặc Firebase Console).
  */
 export async function getUserProfile(uid, email, displayName) {
     try {
@@ -33,7 +33,7 @@ export async function getUserProfile(uid, email, displayName) {
                 uid,
                 email,
                 name: displayName || email,
-                role: 'user',
+                role: 'pending',
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             };
             await docRef.set(defaultProfile);
@@ -42,8 +42,8 @@ export async function getUserProfile(uid, email, displayName) {
         }
     } catch (err) {
         console.error('Failed to get/create user profile:', err);
-        // Fallback so app does not crash
-        return { uid, email, name: displayName || email, role: 'user' };
+        // Không đọc được hồ sơ → coi như chưa có quyền (an toàn hơn cấp 'user')
+        return { uid, email, name: displayName || email, role: 'pending' };
     }
 }
 

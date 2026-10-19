@@ -1,28 +1,54 @@
 rules_version = '2';
+// ─────────────────────────────────────────────────────────────
+// Phân quyền CCM (phương án A1)
+//   admin   : toàn quyền, cấp quyền cho người khác
+//   user    : QS — xem và sửa dữ liệu dự án
+//   manager : chỉ xem
+//   pending : tài khoản mới, chờ admin cấp quyền → không thấy dữ liệu
+// Không ai tự sửa được trường `role` của chính mình.
+// ─────────────────────────────────────────────────────────────
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Hàm kiểm tra xem user hiện tại có phải là admin không
-    function isAdmin() {
-       return request.auth != null && 
-              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-    }
+    function signedIn() { return request.auth != null; }
 
-    // ── Users collection ──
+    function myRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    function hasProfile() {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+    function isAdmin()  { return signedIn() && hasProfile() && myRole() == 'admin'; }
+    function canEdit()  { return signedIn() && hasProfile() && myRole() in ['admin', 'user']; }
+    function canRead()  { return signedIn() && hasProfile() && myRole() in ['admin', 'user', 'manager']; }
+
+    // ── Hồ sơ người dùng ──
     match /users/{userId} {
-      // User tự sửa profile của mình HOẶC admin đọc/ghi tất cả
-      allow read, write: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      // Đọc: chính mình, hoặc admin
+      allow read: if signedIn() && (request.auth.uid == userId || isAdmin());
+
+      // Tạo lần đầu: chỉ cho chính mình, bắt buộc role = 'pending'
+      allow create: if signedIn() && request.auth.uid == userId
+                    && request.resource.data.role == 'pending';
+
+      // Sửa: admin sửa tất cả; người dùng chỉ sửa thông tin cá nhân, KHÔNG đổi role
+      allow update: if isAdmin()
+                    || (signedIn() && request.auth.uid == userId
+                        && request.resource.data.role == resource.data.role);
+
+      allow delete: if isAdmin();
     }
 
-    // ── Projects collection ──
+    // ── Dữ liệu dự án ──
     match /projects/{projectId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null;
+      allow read: if canRead();
+      allow create, update: if canEdit();
+      allow delete: if isAdmin();
     }
 
-    // ── Mặc định: từ chối tất cả truy cập không xác thực ──
+    // ── Mặc định: từ chối mọi thứ khác ──
     match /{document=**} {
-      allow read, write: if request.auth != null;
+      allow read, write: if false;
     }
   }
 }

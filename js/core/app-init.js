@@ -107,11 +107,24 @@ export async function initApp() {
                 firebaseUser.displayName
             );
 
+            // Tài khoản mới / chưa được cấp quyền: không vào app
+            if (!['admin', 'user', 'manager'].includes(profile.role)) {
+                state.user = null;
+                hideApp();
+                const errorEl = document.getElementById('login-error');
+                if (errorEl) {
+                    errorEl.style.display = 'block';
+                    errorEl.textContent = `Tài khoản ${firebaseUser.email} đang chờ admin cấp quyền. Vui lòng liên hệ quản trị viên.`;
+                }
+                await apiLogout().catch(() => {});
+                return;
+            }
+
             state.user = {
                 uid: firebaseUser.uid,
                 email: firebaseUser.email,
                 name: profile.name || firebaseUser.displayName || firebaseUser.email,
-                role: profile.role || 'user'
+                role: profile.role
             };
 
             // Update sidebar user info

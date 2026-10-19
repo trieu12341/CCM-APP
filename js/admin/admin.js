@@ -1,3 +1,4 @@
+import { escapeHtml } from '../utils/formatters.js';
 import { db } from '../firebase-config.js';
 import { updateUserRole } from '../db-service.js';
 
@@ -58,14 +59,15 @@ export async function renderUsersTable() {
 
         tr.innerHTML = `
             <td>
-                <div style="font-weight: 500;">${user.name || 'No Name'}</div>
+                <div style="font-weight: 500;">${escapeHtml(user.name || 'No Name')}</div>
                 <div style="font-size: 0.75rem; color: var(--text-muted);">UID: ${user.uid}</div>
             </td>
-            <td>${user.email || 'N/A'}</td>
+            <td>${escapeHtml(user.email || 'N/A')}</td>
             <td>
                 <select class="admin-role-select" data-uid="${user.uid}" style="padding: 0.25rem 0.5rem; border: 1px solid var(--border-color); border-radius: 4px; background: var(--main-bg);">
-                    <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
-                    <option value="manager" ${user.role === 'manager' ? 'selected' : ''}>Manager</option>
+                    <option value="pending" ${user.role === 'pending' ? 'selected' : ''}>Chờ duyệt (không truy cập)</option>
+                    <option value="manager" ${user.role === 'manager' ? 'selected' : ''}>Manager (chỉ xem)</option>
+                    <option value="user" ${user.role === 'user' ? 'selected' : ''}>User (QS – xem & sửa)</option>
                     <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
                 </select>
             </td>

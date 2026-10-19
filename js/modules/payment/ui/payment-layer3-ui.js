@@ -1,3 +1,4 @@
+import { escapeHtml } from '../../../utils/formatters.js';
 /**
  * payment-layer3-ui.js
  * Layer 3: IPC Detail Workspace
@@ -125,7 +126,7 @@ function renderFinancialBreakdown(ipc) {
         <tr class="${r.highlight ? 'breakdown-total-row' : ''}">
             <td style="text-align:center;font-weight:600;color:#64748b;width:40px;">${r.no}</td>
             <td>
-                <div style="font-weight:${r.highlight ? '700' : '500'};font-size:${r.highlight ? '14px' : '13px'};">${r.label}</div>
+                <div style="font-weight:${r.highlight ? '700' : '500'};font-size:${r.highlight ? '14px' : '13px'};">${escapeHtml(r.label)}</div>
                 <div style="font-size:11px;color:#94a3b8;font-style:italic;">${r.sublabel}</div>
             </td>
             <td style="text-align:right;font-weight:${r.highlight ? '700' : '500'};
@@ -202,10 +203,10 @@ export function renderIPCForm(ipcId = null) {
                 const ctype = c.type || 'Construction';
                 const label = ctype === 'Consultancy' ? '📋 Tư vấn' : '🏗️ Xây dựng';
                 return `<option value="${c.contract_id || c.id}"
-                    data-name="${escHtml(c.contract_name || c.package_name || '')}"
-                    data-contractor="${escHtml(c.contractor_name || '')}"
+                    data-name="${escapeHtml(c.contract_name || c.package_name || '')}"
+                    data-contractor="${escapeHtml(c.contractor_name || '')}"
                     data-contract-type="${ctype}">
-                    [${label}] ${escHtml(c.contract_name || c.package_name || 'Không rõ')}
+                    [${label}] ${escapeHtml(c.contract_name || c.package_name || 'Không rõ')}
                 </option>`;
             }).join('');
     }
@@ -419,7 +420,3 @@ function formatDateShort(dateStr) {
     return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
 }
 
-function escHtml(str) {
-    if (!str) return '';
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}

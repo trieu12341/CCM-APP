@@ -1,3 +1,4 @@
+import { escapeHtml } from '../utils/formatters.js';
 import { state, formatCurrency, formatCurrencyVND, formatCurrencyDetailed, formatDate, parseBudget } from '../app.js';
 import { tenderState } from './tender-state.js';
 import { recalculateCBA, parseFormattedNumber } from './tender-calc.js';
@@ -148,7 +149,7 @@ export function renderTenders() {
                     const budget = parseBudget(t.budgetAmount || t.estimatedValue || t.approved_budget);
                     tr.innerHTML = `
                         <td style="padding: 0.75rem; border-bottom: 1px solid var(--border-color); font-weight: 500;">${t.tender_id || '-'}</td>
-                        <td style="padding: 0.75rem; border-bottom: 1px solid var(--border-color);">${t.tender_name || '-'}</td>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid var(--border-color);">${escapeHtml(t.tender_name || '-')}</td>
                         <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--border-color); font-weight: 500;">${formatCurrency(budget)}</td>
                         <td style="text-align: center; padding: 0.75rem; border-bottom: 1px solid var(--border-color);"><span class="status-badge ${t.status ? t.status.toLowerCase() : ''}">${t.status || '-'}</span></td>
                     `;
@@ -183,12 +184,12 @@ export function renderTenderTableModal() {
         const awardedText = (t.status && t.status.toLowerCase() === 'awarded') ? formatCurrency(awardedPrice) : '-';
         tr.innerHTML = `
             <td>${t.tender_id || '-'}</td>
-            <td>${t.tender_name || '-'}</td>
+            <td>${escapeHtml(t.tender_name || '-')}</td>
             <td style="font-weight: 600;">${formatCurrency(budget)}</td>
             <td style="font-weight: 600; color: var(--primary-green);">${awardedText}</td>
             <td>${t.deadline ? formatDate(t.deadline) : '-'}</td>
             <td><span class="status-badge ${t.status ? t.status.toLowerCase() : ''}">${t.status || '-'}</span></td>
-            <td>${t.winner || '-'}</td>
+            <td>${escapeHtml(t.winner || '-')}</td>
         `;
         tr.style.cursor = 'pointer';
         tr.onclick = () => openTenderDetail(t.tender_id);
@@ -290,7 +291,7 @@ export function renderTenderRoundTabs() {
         const a = document.createElement('a');
         a.href = '#';
         a.className = 'tab' + (index === tenderState.currentRoundIndex ? ' active' : '');
-        a.innerHTML = `<i class="fa-solid fa-layer-group"></i> ${round.round_name}`;
+        a.innerHTML = `<i class="fa-solid fa-layer-group"></i> ${escapeHtml(round.round_name)}`;
         a.onclick = (e) => {
             e.preventDefault();
             tenderState.currentRoundIndex = index;
@@ -317,7 +318,7 @@ export function renderCBATable() {
     `;
     bidders.forEach((bidder, idx) => {
         theadHtml += `<th style="width: 150px; text-align: right; position: relative; padding-right: 25px;">
-            <input type="text" value="${bidder}" onchange="window.updateBidderName(${idx}, this.value)" placeholder="Tên Nhà thầu" style="text-align: right; font-weight: bold;">
+            <input type="text" value="${escapeHtml(bidder)}" onchange="window.updateBidderName(${idx}, this.value)" placeholder="Tên Nhà thầu" style="text-align: right; font-weight: bold;">
             <button onclick="window.removeBidder(${idx})" class="btn-remove-col" title="Xóa cột này">❌</button>
         </th>`;
     });
@@ -333,14 +334,14 @@ export function renderCBATable() {
         let pteVal = item.pte ? formatCurrencyVND(item.pte) : '';
         let tdHtml = `
             <td>${itemIdx + 1}</td>
-            <td><input type="text" value="${item.description || ''}" onchange="window.updateItemDesc(${itemIdx}, this.value)" placeholder="VD: Bill 1 Preliminaries"></td>
+            <td><input type="text" value="${escapeHtml(item.description || '')}" onchange="window.updateItemDesc(${itemIdx}, this.value)" placeholder="VD: Bill 1 Preliminaries"></td>
             <td><input type="text" value="${pteVal}" oninput="window.updateItemValue(${itemIdx}, 'pte', this.value)" onblur="window.formatInputNumber(this)" placeholder="0"></td>
         `;
 
         bidders.forEach((bidder, bIdx) => {
             let val = (item.bids && item.bids[bidder]) ? item.bids[bidder] : 0;
             let formattedVal = val ? formatCurrencyVND(val) : '';
-            tdHtml += `<td><input type="text" value="${formattedVal}" oninput="window.updateItemValue(${itemIdx}, '${bidder}', this.value)" onblur="window.formatInputNumber(this)" placeholder="0"></td>`;
+            tdHtml += `<td><input type="text" value="${formattedVal}" oninput="window.updateItemValue(${itemIdx}, ${bIdx}, this.value)" onblur="window.formatInputNumber(this)" placeholder="0"></td>`;
         });
 
         tdHtml += `<td style="text-align: center;"><button onclick="window.removeItem(${itemIdx})" class="btn-remove-row" title="Xóa hàng này">🗑️</button></td>`;

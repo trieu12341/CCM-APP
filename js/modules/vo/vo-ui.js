@@ -1,3 +1,4 @@
+import { escapeHtml } from '../../utils/formatters.js';
 import { state, formatCurrency, formatCurrencyVND, formatDate } from '../../app.js';
 import { filterVOs } from './vo-state.js';
 
@@ -92,8 +93,8 @@ export function renderVOTable() {
         
         tr.innerHTML = `
             <td style="font-weight:600; color:var(--primary-blue);">${vo.vo_id}</td>
-            <td>${vo.vo_name || ''}</td>
-            <td>${contractName}</td>
+            <td>${escapeHtml(vo.vo_name || '')}</td>
+            <td>${escapeHtml(contractName)}</td>
             <td>${vo.submission_date ? formatDate(vo.submission_date) : '-'}</td>
             <td>${vo.assessment_date ? formatDate(vo.assessment_date) : '-'}</td>
             <td style="text-align:right;">${formatCurrency(claimed)}</td>

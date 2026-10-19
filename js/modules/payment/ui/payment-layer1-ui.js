@@ -1,3 +1,4 @@
+import { escapeHtml } from '../../../utils/formatters.js';
 /**
  * payment-layer1-ui.js
  * Layer 1: Executive Payment Dashboard
@@ -154,8 +155,8 @@ function renderPendingTable(payments) {
             <tr class="pending-row ${urgencyClass}" data-ipc-id="${p.ipc_id}" style="cursor:pointer;">
                 <td><span class="ipc-code">${p.ipc_id.replace('ipc-', 'IPC-')}</span></td>
                 <td>
-                    <div style="font-weight:600;font-size:13px;">${escHtml(p.contract_name) || '—'}</div>
-                    <div style="font-size:11px;color:#64748b;">${escHtml(p.contractor_name) || ''}</div>
+                    <div style="font-weight:600;font-size:13px;">${escapeHtml(p.contract_name) || '—'}</div>
+                    <div style="font-size:11px;color:#64748b;">${escapeHtml(p.contractor_name) || ''}</div>
                 </td>
                 <td style="text-align:center;">Đợt ${p.payment_number || '—'}</td>
                 <td>${formatCurrencyShort(p.gross_work_done)}</td>
@@ -177,10 +178,6 @@ export function getStatusBadge(status) {
         'Paid':      { label: 'Đã TT',     cls: 'badge-paid' },
     };
     const info = map[status] || { label: status, cls: '' };
-    return `<span class="status-badge ${info.cls}">${info.label}</span>`;
+    return `<span class="status-badge ${info.cls}">${escapeHtml(info.label)}</span>`;
 }
 
-function escHtml(str) {
-    if (!str) return '';
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}

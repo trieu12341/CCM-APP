@@ -1,3 +1,4 @@
+import { escapeHtml } from '../utils/formatters.js';
 import { state, formatCurrency, formatCurrencyVND, getContractBudgetValue, getDynamicContractValue } from '../app.js';
 import { getLocalContracts } from './contract-state.js';
 
@@ -152,8 +153,8 @@ export function renderContracts() {
                 contracts.forEach(c => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td style="padding: 0.75rem; border-bottom: 1px solid var(--border-color);">${c.contract_name || '-'}</td>
-                        <td style="padding: 0.75rem; border-bottom: 1px solid var(--border-color);">${c.contractor || '-'}</td>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid var(--border-color);">${escapeHtml(c.contract_name || '-')}</td>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid var(--border-color);">${escapeHtml(c.contractor || '-')}</td>
                         <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--border-color); font-weight: 500;">${formatCurrency(c.value || 0)}</td>
                         <td style="text-align: center; padding: 0.75rem; border-bottom: 1px solid var(--border-color);">${isConsultancyContract(c) ? 'Tư vấn' : 'Thi công'}</td>
                     `;
@@ -216,11 +217,11 @@ export function renderContractTableModal() {
         }
 
         tr.innerHTML = `
-            <td style="font-weight: 500;">${contract.budget_code || '-'}</td>
-            <td style="font-weight: 500; color: var(--primary-blue);">${contract.contract_code || '-'}</td>
+            <td style="font-weight: 500;">${escapeHtml(contract.budget_code || '-')}</td>
+            <td style="font-weight: 500; color: var(--primary-blue);">${escapeHtml(contract.contract_code || '-')}</td>
             <td><span class="badge ${contract.type === 'Consultancy' ? 'bg-purple' : 'bg-blue'}" style="padding:4px 8px; border-radius:4px; font-size:0.8rem; background:${contract.type === 'Consultancy' ? '#e9d5ff; color:#6b21a8;' : '#dbeafe; color:#1e40af;'}">${typeStr}</span></td>
-            <td>${contract.package_name || '-'}</td>
-            <td>${contract.contractor || '-'}</td>
+            <td>${escapeHtml(contract.package_name || '-')}</td>
+            <td>${escapeHtml(contract.contractor || '-')}</td>
             <td style="font-weight: 600;">${formatCurrency(budget)}</td>
             <td style="font-weight: 600;">${formatCurrency(contractVal)}</td>
             <td style="font-weight: 600;">${savingsHtml}</td>

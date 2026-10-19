@@ -1,3 +1,4 @@
+import { escapeHtml } from '../utils/formatters.js';
 import { state, formatCurrencyVND } from '../app.js';
 import { getLocalCashflow, saveLocalCashflow } from './cashflow-state.js';
 import { parseCurrencyInput } from '../utils/formatters.js';
@@ -11,8 +12,8 @@ export function createCashflowRowNode(item, isEditMode = false) {
     if (isEditMode) {
         tr.innerHTML = `
             <td class="col-desc">
-                <input type="text" class="cf-input cf-code" value="${item.code || ''}" placeholder="Mã đợt (Vd: IPC-01)" style="font-weight: bold; margin-bottom: 4px; width: 100%;">
-                <input type="text" class="cf-input cf-desc" value="${item.desc || ''}" placeholder="Diễn giải công việc" style="width: 100%;">
+                <input type="text" class="cf-input cf-code" value="${escapeHtml(item.code || '')}" placeholder="Mã đợt (Vd: IPC-01)" style="font-weight: bold; margin-bottom: 4px; width: 100%;">
+                <input type="text" class="cf-input cf-desc" value="${escapeHtml(item.desc || '')}" placeholder="Diễn giải công việc" style="width: 100%;">
             </td>
             <td class="col-amount"><input type="text" class="cf-input cf-value" value="${formatCurrencyVND(item.value || 0)}" style="width: 100%; text-align: right;"></td>
             <td class="col-date"><input type="date" class="cf-input cf-date" value="${item.date || ''}" style="width: 100%;"></td>
@@ -68,8 +69,8 @@ export function createCashflowRowNode(item, isEditMode = false) {
 
         tr.innerHTML = `
             <td class="col-desc">
-                <div style="font-weight: 700; color: var(--text-dark);">${item.code || '-'}</div>
-                <div style="font-size: 0.85rem; color: var(--text-muted);">${item.desc || '-'}</div>
+                <div style="font-weight: 700; color: var(--text-dark);">${escapeHtml(item.code || '-')}</div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);">${escapeHtml(item.desc || '-')}</div>
             </td>
             <td class="col-amount">${valueHtml}</td>
             <td class="col-date">${formatToMonthYear(item.date)}</td>

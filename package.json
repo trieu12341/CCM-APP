@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "Cost Management Application - Firebase Serverless",
   "scripts": {
+    "test": "node --test tests/*.test.js",
     "deploy": "firebase deploy --only hosting"
-  }
+  },
+  "type": "module"
 }

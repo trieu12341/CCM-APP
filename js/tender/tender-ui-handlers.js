@@ -32,6 +32,8 @@ window.updateItemValue = function(itemIdx, key, val) {
     if (!tender) return;
     const item = tender.cba.rounds[tenderState.currentRoundIndex].items[itemIdx];
     let numVal = parseFormattedNumber(val);
+    // key là chỉ số cột nhà thầu (số) → đổi sang tên; tránh chèn tên vào mã JS inline
+    if (typeof key === 'number') key = tender.cba.bidders[key];
     
     if (key === 'pte') {
         item.pte = numVal;

@@ -1,3 +1,4 @@
+import { escapeHtml } from '../utils/formatters.js';
 import { state, formatCurrency, formatCurrencyVND, formatDate, mockActivities, getDynamicContractValue } from '../app.js';
 import { renderTenders } from '../tender.js';
 import { renderContracts } from '../contract.js';
@@ -256,7 +257,7 @@ export function renderDashboard() {
                     <i class="fa-regular ${isPdf ? 'fa-file-pdf' : 'fa-file-excel'}"></i>
                 </div>
                 <div class="doc-info">
-                    <h5>${doc.file_name}</h5>
+                    <h5>${escapeHtml(doc.file_name)}</h5>
                     <span>2MB - ${isPdf ? 'PDF' : 'DOC'}</span>
                 </div>
             `;
@@ -347,8 +348,8 @@ export function renderBudgetTableModal(filterType = 'all') {
         const tr = document.createElement('tr');
         tr.classList.add(index % 2 === 0 ? 'zebra-odd' : 'zebra-even');
         tr.innerHTML = `
-            <td>${budget.budgetCode || ''}</td>
-            <td>${budget.packageName || 'Unnamed Package'}</td>
+            <td>${escapeHtml(budget.budgetCode || '')}</td>
+            <td>${escapeHtml(budget.packageName || 'Unnamed Package')}</td>
             <td class="numeric-cell">${formatCurrency(budgeted)}</td>
             <td class="numeric-cell">${formatCurrency(committed)}</td>
             <td class="numeric-cell">${formatCurrency(expended)}</td>
@@ -475,7 +476,7 @@ export function renderActivities() {
         div.innerHTML = `
             <div class="activity-dot"></div>
             <div class="activity-content">
-                <p><strong>${act.text}</strong></p>
+                <p><strong>${escapeHtml(act.text)}</strong></p>
                 <span>${formatDate(act.date)}</span>
             </div>
         `;

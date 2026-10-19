@@ -1,3 +1,4 @@
+import { escapeHtml } from '../utils/formatters.js';
 import { state } from '../app.js';
 import { getLocalCashflow, saveLocalCashflow } from './cashflow-state.js';
 import { renderCashflowTable } from './cashflow-ui-table.js';
@@ -86,9 +87,9 @@ export function handleExcelImport(e) {
             newItems.forEach(item => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${item.package_name || '-'}</td>
-                    <td><span style="font-weight:500; color:var(--primary-blue);">${item.code || '-'}</span></td>
-                    <td>${item.desc || '-'}</td>
+                    <td>${escapeHtml(item.package_name || '-')}</td>
+                    <td><span style="font-weight:500; color:var(--primary-blue);">${escapeHtml(item.code || '-')}</span></td>
+                    <td>${escapeHtml(item.desc || '-')}</td>
                     <td style="text-align: right; font-weight:600;">${(item.value || 0).toLocaleString('en-US')}</td>
                     <td>${formatToMonthYear(item.date)}</td>
                 `;

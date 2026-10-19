@@ -40,3 +40,17 @@ export const parseCurrencyInput = (value) => {
 
 // Keep parseBudget for backwards compatibility if needed elsewhere
 export const parseBudget = parseCurrencyInput;
+
+/**
+ * Chống XSS: thoát ký tự HTML trước khi chèn chuỗi người dùng nhập
+ * (tên gói thầu, nhà thầu, mô tả, email…) vào innerHTML/thuộc tính.
+ */
+export const escapeHtml = (value) => {
+    if (value === null || value === undefined) return '';
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+};

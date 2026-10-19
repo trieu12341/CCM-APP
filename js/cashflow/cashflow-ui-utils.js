@@ -1,3 +1,4 @@
+import { escapeHtml } from '../utils/formatters.js';
 import { state } from '../app.js';
 import { getLocalCashflow } from './cashflow-state.js';
 import { updateCashflowSubtotal } from './cashflow-ui-table.js';
@@ -11,7 +12,7 @@ export function getContractOptions(selectedVal = '') {
             const pkgName = c.package_name || '';
             if (pkgName) {
                 const sel = selectedVal === pkgName ? 'selected' : '';
-                html += `<option value="${pkgName}" ${sel}>${pkgName}</option>`;
+                html += `<option value="${escapeHtml(pkgName)}" ${sel}>${escapeHtml(pkgName)}</option>`;
             }
         });
     }

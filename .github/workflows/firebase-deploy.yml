@@ -1,24 +1,53 @@
-# Tự động deploy lên Firebase Hosting mỗi khi có commit mới trên nhánh master.
+# Tự động kiểm thử và deploy lên Firebase mỗi khi có commit mới trên nhánh master.
 # Cần secret FIREBASE_SERVICE_ACCOUNT (JSON khóa service account) trong
 # GitHub → Settings → Secrets and variables → Actions.
-# Chỉ deploy phần hosting; Firestore rules KHÔNG bị đụng tới.
-name: Deploy Firebase Hosting
+#   1. test   : chạy unit test công thức (npm test). Test hỏng → KHÔNG deploy.
+#   2. deploy : Firestore rules (phân quyền) + Hosting (giao diện).
+name: Deploy Firebase
 
 on:
   push:
     branches: [master]
+  pull_request:
+    branches: [master]
   workflow_dispatch:   # cho phép bấm chạy tay trong tab Actions
 
 concurrency:
-  group: firebase-deploy
+  group: firebase-deploy-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm test
+
+  deploy:
+    needs: test
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Deploy Firestore rules
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
+          npx --yes firebase-tools@13 deploy --only firestore:rules \
+            --project cost-contract-management --non-interactive
+          rm -f "$RUNNER_TEMP/sa.json"
+
+      - name: Deploy Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}

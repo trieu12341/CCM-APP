@@ -1,3 +1,4 @@
+import { escapeHtml } from '../../../utils/formatters.js';
 /**
  * payment-layer2-ui.js
  * Layer 2: Master IPC List
@@ -80,8 +81,8 @@ export function renderIPCList(filterState = { search: '', status: 'All', contrac
                     <span class="ipc-code" style="font-family:monospace;font-weight:700;color:var(--primary-blue);font-size:12px;">${ipcCode}</span>
                 </td>
                 <td>
-                    <div style="font-weight:600;font-size:13px;line-height:1.4;">${escHtml(p.contract_name) || '<span style="color:#94a3b8;">—</span>'}</div>
-                    <div style="font-size:11px;color:#64748b;margin-top:2px;">${escHtml(p.contractor_name) || ''} ${ctBadge}</div>
+                    <div style="font-weight:600;font-size:13px;line-height:1.4;">${escapeHtml(p.contract_name) || '<span style="color:#94a3b8;">—</span>'}</div>
+                    <div style="font-size:11px;color:#64748b;margin-top:2px;">${escapeHtml(p.contractor_name) || ''} ${ctBadge}</div>
                 </td>
                 <td style="text-align:center;font-weight:600;">Đợt ${p.payment_number || '—'}</td>
                 <td style="text-align:center;color:#64748b;font-size:12px;">${formatDateShort(p.submission_date)}</td>
@@ -132,7 +133,3 @@ function formatDateShort(dateStr) {
     return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
 }
 
-function escHtml(str) {
-    if (!str) return '';
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}

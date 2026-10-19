@@ -1,3 +1,4 @@
+import { escapeHtml } from '../utils/formatters.js';
 import { state, formatCurrencyDetailed, formatCurrency, formatCurrencyVND, getContractBudgetValue, getDynamicContractValue } from '../app.js';
 import { getLocalCashflow } from './cashflow-state.js';
 import { calculateForecastEngine, syncCashflowWithPayment, calculatePackageTotalPlanned } from './cashflow-calc.js';
@@ -105,7 +106,7 @@ function renderPackageList(contracts, cashflows) {
         const showWarning = (totalPlan !== contractValue || cCashflows.length === 0);
         
         card.innerHTML = `
-            <div class="cf-pkg-code">${c.package_name}</div>
+            <div class="cf-pkg-code">${escapeHtml(c.package_name)}</div>
             <div class="cf-pkg-name">${c.type || 'Hợp đồng'}</div>
             <div class="cf-mini-progress">
                 <div class="cf-mini-progress-bar" style="width: ${progressPct}%"></div>
@@ -267,7 +268,7 @@ function renderRightPane(contractId, contracts, allCashflows) {
 
                 tbody += `<tr>
                     <td style="padding: 12px; border-bottom: 1px solid var(--border-color); background: var(--card-bg); position: sticky; left: 0; z-index: 1;">
-                        <strong style="color: var(--text-dark);">${cf.code || 'N/A'}</strong><br>
+                        <strong style="color: var(--text-dark);">${escapeHtml(cf.code || 'N/A')}</strong><br>
                         <small style="color: ${barColor}; border: 1px solid ${barColor}; border-radius: 4px; padding: 1px 4px; margin-top: 4px; display: inline-block;">${cf.status || 'Planned'}</small>
                     </td>
                     <td style="padding: 12px; border-bottom: 1px solid var(--border-color); text-align: right; font-weight: 600; color: var(--text-dark); background: var(--card-bg); position: sticky; left: 160px; z-index: 1; border-right: 1px solid var(--border-color);">${valStr}</td>
@@ -276,7 +277,7 @@ function renderRightPane(contractId, contracts, allCashflows) {
                 months.forEach(m => {
                     if (m === mKey) {
                         tbody += `<td style="padding: 8px; border-bottom: 1px solid var(--border-color); border-right: 1px dashed var(--border-color); position: relative;">
-                            <div style="background-color: ${barColor}; height: 26px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); width: 96%; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.8rem; font-weight: 600;" title="${cf.desc || 'Không có diễn giải'}">
+                            <div style="background-color: ${barColor}; height: 26px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); width: 96%; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.8rem; font-weight: 600;" title="${escapeHtml(cf.desc || 'Không có diễn giải')}">
                                 ${valStr}
                             </div>
                         </td>`;
