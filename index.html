@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="css/pages/ipc.css">
     <!-- Lớp chuẩn hóa giao diện: luôn để cuối cùng -->
     <link rel="stylesheet" href="css/theme-v2.css">
+    <link rel="stylesheet" href="css/pages/login.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
@@ -27,11 +28,10 @@
 </head>
 
 <body>
-    <div id="login-modal" class="modal-overlay hidden" style="z-index: 9999; background-color: var(--main-bg); position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;">
-        <div class="modal-content" style="max-width: 400px; width: 90%; padding: 2rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 12px; text-align: center;">
-            <div style="margin-bottom: 2rem;">
-                <div class="ccm-brand ccm-brand-login">
-                    <svg class="ccm-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+    <!-- Màn chờ: hiện khi đang kiểm tra phiên đăng nhập / đang tải dữ liệu -->
+    <div id="app-splash" class="app-splash" role="status" aria-live="polite">
+        <div class="splash-inner">
+            <svg class="ccm-mark splash-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
                 <rect width="32" height="32" rx="8" fill="var(--brand)"/>
                 <rect x="7" y="18" width="4" height="7" rx="1" fill="#fff" opacity=".38"/>
                 <rect x="14" y="14" width="4" height="11" rx="1" fill="#fff" opacity=".38"/>
@@ -39,30 +39,56 @@
                 <path d="M6 24.5C11 24.5 12 13.5 17 12.5S22.5 7.5 26 7" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
                 <circle cx="26" cy="7" r="2.2" fill="#fff"/>
             </svg>
-                    <div class="ccm-wordmark"><span class="ccm-name">CCM</span><span class="ccm-tag">Cost &amp; Contract Management</span></div>
-                </div>
-                <h2 style="color: var(--text-dark); margin-bottom: 0.25rem; font-size: 1.15rem;">Đăng nhập hệ thống</h2>
-                <p style="color: var(--text-muted); font-size: 0.85rem;">Quản lý chi phí &amp; hợp đồng dự án</p>
+            <div class="splash-text" id="app-splash-text">Đang khởi động…</div>
+            <div class="splash-bar"><span></span></div>
+        </div>
+    </div>
+
+    <div id="login-modal" class="login-screen hidden">
+        <div class="login-bg" aria-hidden="true"></div>
+        <div class="login-card" id="login-card">
+            <div class="ccm-brand ccm-brand-login">
+                <svg class="ccm-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+                <rect width="32" height="32" rx="8" fill="var(--brand)"/>
+                <rect x="7" y="18" width="4" height="7" rx="1" fill="#fff" opacity=".38"/>
+                <rect x="14" y="14" width="4" height="11" rx="1" fill="#fff" opacity=".38"/>
+                <rect x="21" y="10" width="4" height="15" rx="1" fill="#fff" opacity=".38"/>
+                <path d="M6 24.5C11 24.5 12 13.5 17 12.5S22.5 7.5 26 7" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+                <circle cx="26" cy="7" r="2.2" fill="#fff"/>
+            </svg>
+                <div class="ccm-wordmark"><span class="ccm-name">CCM</span><span class="ccm-tag">Cost &amp; Contract Management</span></div>
             </div>
-            
-            <form id="login-form" style="text-align: left;">
-                <div class="form-group" style="margin-bottom: 1rem;">
-                    <label for="login-email" style="font-weight: 500;">Email</label>
-                    <input type="email" id="login-email" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px;" required autocomplete="email">
+            <h2 class="login-title">Đăng nhập hệ thống</h2>
+            <p class="login-sub">Quản lý chi phí &amp; hợp đồng dự án</p>
+
+            <form id="login-form" class="login-form" novalidate>
+                <div class="login-field">
+                    <label for="login-email">Email</label>
+                    <div class="login-input">
+                        <i class="fa-regular fa-envelope" aria-hidden="true"></i>
+                        <input type="email" id="login-email" required autocomplete="username" placeholder="ten@congty.vn">
+                    </div>
                 </div>
-                <div class="form-group" style="margin-bottom: 1.5rem;">
-                    <label for="login-password" style="font-weight: 500;">Mật khẩu</label>
-                    <input type="password" id="login-password" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px;" required>
+                <div class="login-field">
+                    <label for="login-password">Mật khẩu</label>
+                    <div class="login-input">
+                        <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                        <input type="password" id="login-password" required autocomplete="current-password" placeholder="••••••••">
+                        <button type="button" class="login-eye" id="btn-toggle-password" aria-label="Hiện mật khẩu" title="Hiện mật khẩu"><i class="fa-regular fa-eye"></i></button>
+                    </div>
+                    <div class="login-hint" id="login-caps" hidden><i class="fa-solid fa-arrow-up"></i> Caps Lock đang bật</div>
                 </div>
-                <div id="login-error" style="color: var(--danger-color); font-size: 0.85rem; margin-bottom: 1rem; text-align: center; display: none;">Tên đăng nhập hoặc mật khẩu không đúng</div>
-                <button type="submit" class="btn btn-primary" id="btn-login-submit" style="width: 100%; padding: 0.75rem; font-size: 1rem; justify-content: center;">Đăng nhập</button>
+                <div id="login-error" class="login-error" role="alert" style="display: none;">Tên đăng nhập hoặc mật khẩu không đúng</div>
+                <button type="submit" class="btn btn-primary login-submit" id="btn-login-submit">
+                    <span class="login-spinner" aria-hidden="true"></span>
+                    <i class="fa-solid fa-check login-ok" aria-hidden="true"></i>
+                    <span class="login-label">Đăng nhập</span>
+                </button>
             </form>
-            
-            <div style="margin-top: 1rem; font-size: 0.8rem; text-align:center;">
-                <a href="#" id="btn-clear-session" style="color: var(--text-muted); text-decoration: underline;">Xóa session cũ &amp; đăng nhập lại</a>
-            </div>
-            <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted);">
-                &copy; CCM — Cost &amp; Contract Management
+
+            <div class="login-foot">
+                <a href="#" id="btn-clear-session">Xóa session cũ &amp; đăng nhập lại</a>
+                <span>&copy; CCM — Cost &amp; Contract Management</span>
             </div>
         </div>
     </div>

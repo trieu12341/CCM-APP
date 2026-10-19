@@ -3,23 +3,14 @@ import { apiLogin, apiLogout, onAuthStateChanged } from '../api.js';
 import { getUserProfile } from '../db-service.js';
 
 import { loadAppData } from './app-data.js';
+import { setBusy, showError, clearError, playSuccess, enterApp, showLogin, setSplash, bindLoginExtras, isLoginInFlight } from './login-ui.js';
 
 // ─────────────────────────────────────────────────────────────
 // MAIN ENTRY POINT — called after all HTML components are loaded
 // ─────────────────────────────────────────────────────────────
 
-function showApp() {
-    const container = document.getElementById('app-container');
-    if (container) container.style.display = '';
-    const loginModal = document.getElementById('login-modal');
-    if (loginModal) loginModal.classList.add('hidden');
-}
-
 function hideApp() {
-    const container = document.getElementById('app-container');
-    if (container) container.style.display = 'none';
-    const loginModal = document.getElementById('login-modal');
-    if (loginModal) loginModal.classList.remove('hidden');
+    showLogin();
 }
 
 export async function initApp() {
@@ -30,8 +21,7 @@ export async function initApp() {
         e.preventDefault();
         localStorage.clear();
         apiLogout().then(() => {
-            const errorEl = document.getElementById('login-error');
-            if (errorEl) { errorEl.style.display = 'block'; errorEl.textContent = 'Đã xóa session cũ. Vui lòng đăng nhập lại.'; }
+            showError('Đã xóa session cũ. Vui lòng đăng nhập lại.', { shake: false, focusPassword: false });
         });
     });
 
@@ -40,22 +30,21 @@ export async function initApp() {
     // ─────────────────────────────────────────────────────
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
+        bindLoginExtras();
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (isLoginInFlight()) return;
             const email = document.getElementById('login-email')?.value.trim();
             const password = document.getElementById('login-password')?.value;
-            const errorMsg = document.getElementById('login-error');
-            const submitBtn = document.getElementById('btn-login-submit');
+            if (!email) { showError('Vui lòng nhập email.', { focusPassword: false }); document.getElementById('login-email')?.focus(); return; }
+            if (!password) { showError('Vui lòng nhập mật khẩu.'); return; }
 
-            if (!email || !password) return;
-
+            clearError();
+            setBusy(true);
             try {
-                if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Đang đăng nhập...'; }
-                if (errorMsg) errorMsg.style.display = 'none';
-
+                // Giữ nguyên thông tin đã nhập. onAuthStateChanged sẽ kiểm tra quyền rồi
+                // chạy hiệu ứng thành công / báo lỗi "chờ cấp quyền".
                 await apiLogin(email, password);
-                // onAuthStateChanged will fire and handle the rest
-                loginForm.reset();
             } catch (err) {
                 console.error('[Login Error]', err);
                 let msg = 'Đăng nhập thất bại. Vui lòng thử lại.';
@@ -64,25 +53,30 @@ export async function initApp() {
                 } else if (err.code === 'auth/invalid-email') {
                     msg = 'Định dạng email không hợp lệ.';
                 } else if (err.code === 'auth/too-many-requests') {
-                    msg = 'Đăng nhập thất bại quá nhiều lần. Vui lòng thử lại sau.';
+                    msg = 'Đăng nhập sai quá nhiều lần. Vui lòng thử lại sau ít phút.';
+                } else if (err.code === 'auth/network-request-failed') {
+                    msg = 'Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.';
                 }
-                if (errorMsg) { errorMsg.style.display = 'block'; errorMsg.textContent = msg; }
-            } finally {
-                if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Đăng nhập'; }
+                setBusy(false);
+                showError(msg);
             }
         });
     }
 
     // ─────────────────────────────────────────────────────
-    // Logout handler
+    // Đăng xuất (nút ở topbar và nút "…" ở sidebar)
     // ─────────────────────────────────────────────────────
     const doLogout = () => apiLogout().then(() => {
         state.user = null;
+        clearError();
         hideApp();
         document.body.classList.remove('is-manager', 'is-admin');
     });
     bindEvent('btn-logout', 'click', doLogout);
     bindEvent('btn-logout-side', 'click', doLogout);
+    document.getElementById('btn-logout-side')?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); doLogout(); }
+    });
 
     // ─────────────────────────────────────────────────────
     // Firebase onAuthStateChanged - Single source of auth truth
@@ -99,12 +93,10 @@ export async function initApp() {
             // Tài khoản mới / chưa được cấp quyền: không vào app
             if (!['admin', 'user', 'manager'].includes(profile.role)) {
                 state.user = null;
+                setSplash(false);
                 hideApp();
-                const errorEl = document.getElementById('login-error');
-                if (errorEl) {
-                    errorEl.style.display = 'block';
-                    errorEl.textContent = `Tài khoản ${firebaseUser.email} đang chờ admin cấp quyền. Vui lòng liên hệ quản trị viên.`;
-                }
+                setBusy(false);
+                showError(`Tài khoản ${firebaseUser.email} đang chờ admin cấp quyền. Vui lòng liên hệ quản trị viên.`, { focusPassword: false });
                 await apiLogout().catch(() => {});
                 return;
             }
@@ -126,11 +118,23 @@ export async function initApp() {
             document.body.classList.toggle('is-admin', state.user.role === 'admin');
             document.body.classList.toggle('is-manager', state.user.role === 'manager');
 
-            showApp();
-            await loadAppData();
+            if (isLoginInFlight()) {
+                // Vừa bấm Đăng nhập: dấu tích + lời chào, rồi chuyển cảnh vào app
+                await playSuccess(state.user.name);
+                const entering = enterApp();
+                await loadAppData();
+                await entering;
+            } else {
+                // Mở lại trang khi còn phiên: màn chờ → app
+                setSplash(true, 'Đang tải dữ liệu dự án…');
+                await enterApp();
+                await loadAppData();
+            }
+            setSplash(false);
         } else {
             // User is signed out
             state.user = null;
+            setSplash(false);
             hideApp();
             document.body.classList.remove('is-admin', 'is-manager');
         }
