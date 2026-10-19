@@ -1,0 +1,33 @@
+# Kiểm thử theo tầng (deploy ở firebase-deploy.yml, chỉ chạy khi master đã qua toàn bộ test).
+#   Đẩy lên nhánh làm việc         → nhanh: unit + lớp dữ liệu (Firestore giả trong bộ nhớ)   ~1 phút
+#   PR, hoặc đẩy lên develop        → đầy đủ: thêm lớp dữ liệu trên Firestore Emulator + E2E   ~5 phút
+#   Chỉ sửa tài liệu (*.md)         → không chạy
+#   Nút "Run workflow" trong tab Actions → chạy đầy đủ bất cứ lúc nào
+name: CI
+
+on:
+  push:
+    branches-ignore: [master]
+    paths-ignore: ['**/*.md']
+  pull_request:
+    paths-ignore: ['**/*.md']
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quick:
+    if: github.event_name == 'push' && github.ref != 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci
+      - run: npm test
+
+  full:
+    if: github.event_name != 'push' || github.ref == 'refs/heads/develop'
+    uses: ./.github/workflows/test-full.yml

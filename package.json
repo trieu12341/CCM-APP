@@ -4,7 +4,12 @@
   "description": "Cost Management Application - Firebase Serverless",
   "scripts": {
     "test": "node --test tests/*.test.js",
+    "test:e2e": "playwright test",
+    "test:all": "npm test && npm run test:e2e",
     "deploy": "firebase deploy --only hosting"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "@playwright/test": "^1.56.0"
+  }
 }
