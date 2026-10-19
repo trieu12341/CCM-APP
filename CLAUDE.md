@@ -46,7 +46,8 @@ nằm ở tài liệu kế hoạch của chủ repo; mỗi bước có mã (1.1,
 ## 6. Chạy test
 ```bash
 npm test              # unit test (node --test), nhanh, chạy mọi lúc
-npm run test:data     # lớp dữ liệu js/data/ trên Firestore giả lập trong bộ nhớ
+npm run test:data     # lớp dữ liệu js/data/ trên Firestore giả trong bộ nhớ
+npm run test:data:emulator  # cùng bộ đó trên Firestore Emulator thật (cần Java; CI chạy)
 npm run test:e2e      # E2E Playwright toàn luồng + đăng nhập + dữ liệu bản cũ (cần Chromium)
 npm run test:all      # cả ba
 ```
