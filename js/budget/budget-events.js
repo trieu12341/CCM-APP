@@ -412,10 +412,7 @@ export function setupBudgetEvents() {
             renderDashboard();
             renderBudgetTableModal();
             newProjectModal.classList.add('hidden');
-            
-            if (!success) {
-                console.warn('Không thể lưu lên json-server, đã lưu offline vào LocalStorage và Firebase');
-            }
+
         });
     }
 }

@@ -192,7 +192,8 @@ export function renderDashboard() {
     const uploader = docsGrid ? docsGrid.querySelector('.document-upload') : null;
     if (docsGrid) {
         docsGrid.innerHTML = '';
-        state.appData.Documents.filter(d => projectContracts.some(c => c.contract_id === d.related_id)).forEach(doc => {
+        const projectContracts = (state.appData.Contracts || []).filter(c => c.project_id === state.currentProjectId);
+        (state.appData.Documents || []).filter(d => projectContracts.some(c => c.contract_id === d.related_id)).forEach(doc => {
             const isPdf = doc.file_name.endsWith('.pdf');
             const docCard = document.createElement('div');
             docCard.className = 'doc-card';

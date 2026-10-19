@@ -37,6 +37,19 @@ function addRound() {
     renderCBATable();
 }
 
+/**
+ * Cập nhật 1 gói thầu trong state (bản cũ gọi API Express đã bị gỡ → hàm không
+ * tồn tại, nút "Chốt chọn nhà thầu" và "Lưu cập nhật" báo lỗi ngầm, không chạy).
+ * Lưu localStorage + cloud do persistTenders đảm nhận.
+ */
+function updateTender(tender) {
+    const list = state.appData.Tenders || [];
+    const i = list.findIndex(t => t.tender_id === tender.tender_id);
+    if (i < 0) return false;
+    list[i] = tender;
+    return true;
+}
+
 async function saveTenderDetail() {
     const tender = state.appData.Tenders.find(t => t.tender_id === tenderState.currentTenderDetailId);
     if (!tender) return;
@@ -52,6 +65,7 @@ async function saveTenderDetail() {
         }
     } catch (error) {
         console.error("Error saving tender detail:", error);
+        alert('Lưu thất bại: ' + (error && error.message ? error.message : error));
     }
 }
 
@@ -206,6 +220,7 @@ export function setupTenderEvents() {
                 }
             } catch (error) {
                 console.error('Error awarding tender:', error);
+                alert('Chốt thầu thất bại: ' + (error && error.message ? error.message : error));
             }
         });
     }

@@ -1,6 +1,9 @@
 import { getContractValue } from './core/contract-fields.js';
 import { initApp } from './core/app-init.js';
 import './utils/helpers.js';
+import { formatCurrency as __fmtCur } from './utils/formatters.js';
+// Dùng trong thuộc tính oninput của HTML (form VO) → cần hàm toàn cục
+window.formatCurrency = __fmtCur;
 export { formatCurrency, formatCurrencyVND, formatCurrencyShort, formatCurrencyDetailed, formatDate, parseBudget } from './utils/formatters.js';
 
 export const state = {
