@@ -1,3 +1,4 @@
+import { getContractValue } from '../core/contract-fields.js';
 import { state } from '../app.js';
 import { getLocalCashflow, saveLocalCashflow } from './cashflow-state.js';
 
@@ -51,10 +52,11 @@ export function calculateForecastEngine(cashflows, contract) {
     const maxRetentionPercent = parseFloat(contract.max_retention_percent) || 0;
     const apPercent = parseFloat(contract.advance_payment_percent) || 0;
     const apRecoveryPercent = parseFloat(contract.ap_recovery_percent) || 0;
-    const totalValue = parseFloat(contract.total_value) || 0;
+    const totalValue = getContractValue(contract);
 
-    const maxRetentionValue = totalValue * (maxRetentionPercent / 100);
-    const totalApValue = totalValue * (apPercent / 100);
+    // Trần giữ lại: để trống/0 nghĩa là KHÔNG giới hạn (trước đây hiểu nhầm là trần = 0)
+    const maxRetentionValue = maxRetentionPercent > 0 ? Math.round(totalValue * (maxRetentionPercent / 100)) : Infinity;
+    const totalApValue = Math.round(totalValue * (apPercent / 100));
 
     let cumRetention = 0;
     let cumApRecovery = 0;
@@ -80,7 +82,7 @@ export function calculateForecastEngine(cashflows, contract) {
             item.type = 'retention';
             item.workdone = 0;
             item.ap_recovery = 0;
-            item.retention = -(cumRetention / 2); // Release 50%
+            item.retention = -Math.round(cumRetention / 2); // Release 50%
             cumRetention += item.retention; // reduces cumulative retention
             item.total_cert = item.workdone - item.retention - item.ap_recovery;
             item.netPayable = item.total_cert;
@@ -100,7 +102,7 @@ export function calculateForecastEngine(cashflows, contract) {
             if (item.has_custom_retention) {
                 item.retention = item.custom_retention || 0;
             } else {
-                let rawRetention = workdone * (retentionPercent / 100);
+                let rawRetention = Math.round(workdone * (retentionPercent / 100));
                 if (cumRetention + rawRetention > maxRetentionValue) {
                     item.retention = Math.max(0, maxRetentionValue - cumRetention);
                 } else {
@@ -113,7 +115,7 @@ export function calculateForecastEngine(cashflows, contract) {
             if (item.has_custom_ap_recovery) {
                 item.ap_recovery = item.custom_ap_recovery || 0;
             } else {
-                let rawAp = workdone * (apRecoveryPercent / 100);
+                let rawAp = Math.round(workdone * (apRecoveryPercent / 100));
                 if (cumApRecovery + rawAp > totalApValue) {
                     item.ap_recovery = Math.max(0, totalApValue - cumApRecovery);
                 } else {

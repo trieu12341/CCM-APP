@@ -1,3 +1,4 @@
+import { getContractValue } from '../../core/contract-fields.js';
 /**
  * payment-calc.js
  * Pure calculation functions — no side effects, no DOM access.
@@ -62,7 +63,7 @@ export function calcPaymentKPIs(payments = [], contracts = []) {
             const st = (c.status || '').toLowerCase();
             return st === 'active' || st === 'đang thực hiện';
         })
-        .reduce((sum, c) => sum + parseCurrencyInput(c.current_value || c.original_value || c.contract_value || c.total_value), 0);
+        .reduce((sum, c) => sum + getContractValue(c), 0);
 
     // Card 2: Total Submitted = sum of gross_work_done across all IPCs
     const totalSubmitted = payments

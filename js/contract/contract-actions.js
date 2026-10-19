@@ -1,3 +1,4 @@
+import { normalizeContract } from '../core/contract-fields.js';
 import { state } from '../app.js';
 import { getLocalContracts, saveLocalContracts } from './contract-state.js';
 import { renderContracts, closeContractDetailModal, renderContractTableModal } from './contract-ui.js';
@@ -41,6 +42,7 @@ export function saveContract() {
         scope_of_work: document.getElementById('contract-scope-input').value.trim()
     };
     
+    normalizeContract(updatedContract);
     if (index >= 0) {
         allContracts[index] = updatedContract;
     } else {
@@ -93,6 +95,7 @@ export function createDraftContractFromTender(tender) {
         attachment_url: ''
     };
 
+    normalizeContract(draftContract);
     allContracts.push(draftContract);
     saveLocalContracts(allContracts);
     generateCashflowForContract(draftContract);

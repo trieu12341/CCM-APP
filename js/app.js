@@ -1,3 +1,4 @@
+import { getContractValue } from './core/contract-fields.js';
 import { initApp } from './core/app-init.js';
 import './utils/helpers.js';
 export { formatCurrency, formatCurrencyVND, formatCurrencyShort, formatCurrencyDetailed, formatDate, parseBudget } from './utils/formatters.js';
@@ -31,7 +32,7 @@ export function getDynamicContractValue(contract, appData) {
     if (!contract) return 0;
     
     // Original contract value
-    const originalValue = Number(contract.original_value) || Number(contract.total_value) || Number(contract.contract_value) || 0;
+    const originalValue = getContractValue(contract);
     
     // Add approved variations (SSOT logic for VO Layer)
     let approvedVOValue = 0;

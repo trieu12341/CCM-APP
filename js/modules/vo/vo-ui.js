@@ -1,3 +1,4 @@
+import { getContractValue, getContractName, getContractorName } from '../../core/contract-fields.js';
 import { escapeHtml } from '../../utils/formatters.js';
 import { state, formatCurrency, formatCurrencyVND, formatDate } from '../../app.js';
 import { filterVOs } from './vo-state.js';
@@ -38,7 +39,7 @@ export function renderVODashboard() {
 
     // Calculate Original Contract Value for the project
     const projectContracts = state.appData.Contracts.filter(c => c.project_id === state.currentProjectId);
-    const originalContractValue = projectContracts.reduce((sum, c) => sum + (Number(c.original_value) || Number(c.total_value) || 0), 0);
+    const originalContractValue = projectContracts.reduce((sum, c) => sum + getContractValue(c), 0);
     
     let ratio = 0;
     if (originalContractValue > 0) {
@@ -75,7 +76,7 @@ export function renderVOTable() {
 
     list.forEach(vo => {
         const contract = state.appData.Contracts.find(c => c.contract_id === vo.contract_id);
-        const contractName = contract ? contract.contract_name : 'Unknown';
+        const contractName = contract ? getContractName(contract) : 'Unknown';
         
         const claimed = Number(vo.claimed_amount) || Number(vo.vo_amount) || 0;
         const approved = Number(vo.approved_amount) || 0;
@@ -121,7 +122,7 @@ export function populateVOContractDropdown() {
     projectContracts.forEach(c => {
         const opt = document.createElement('option');
         opt.value = c.contract_id;
-        opt.textContent = `${c.contract_name} (${c.vendor_name || 'TBD'})`;
+        opt.textContent = `${getContractName(c)} (${getContractorName(c) || 'TBD'})`;
         select.appendChild(opt);
     });
 }
@@ -186,7 +187,7 @@ export function renderChartBar(projectVOs, projectContracts) {
     projectContracts.forEach(contract => {
         const vosForContract = projectVOs.filter(vo => vo.contract_id === contract.contract_id);
         if (vosForContract.length > 0) {
-            contractNames.push(contract.contract_name || contract.contract_id);
+            contractNames.push(getContractName(contract));
             
             let totalClaimed = 0;
             let totalApproved = 0;

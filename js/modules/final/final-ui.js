@@ -1,3 +1,4 @@
+import { getContractName, getContractorName } from '../../core/contract-fields.js';
 import { escapeHtml } from '../../utils/formatters.js';
 import { state } from '../../app.js';
 import { calculateFinalAccount, getContractsForProject } from './final-state.js';
@@ -121,7 +122,7 @@ export function renderFinalTable(contracts = getContractsForProject()) {
 
         tr.innerHTML = `
             <td>${contract.contract_id}</td>
-            <td><strong>${escapeHtml(contract.package_name || 'N/A')}</strong><br><small class="text-muted">${escapeHtml(contract.contractor_name || 'N/A')}</small></td>
+            <td><strong>${escapeHtml(getContractName(contract) || 'N/A')}</strong><br><small class="text-muted">${escapeHtml(getContractorName(contract) || 'N/A')}</small></td>
             <td class="text-right">${formatCurrencyVND(finalAcc.a)}</td>
             <td class="text-right text-blue">${formatCurrencyVND(finalAcc.b)}</td>
             <td class="text-right fw-bold text-blue">${formatCurrencyVND(finalAcc.c)}</td>

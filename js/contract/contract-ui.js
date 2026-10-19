@@ -1,3 +1,4 @@
+import { getContractValue, getContractName, getContractorName } from '../core/contract-fields.js';
 import { escapeHtml } from '../utils/formatters.js';
 import { state, formatCurrency, formatCurrencyVND, getContractBudgetValue, getDynamicContractValue } from '../app.js';
 import { getLocalContracts } from './contract-state.js';
@@ -153,9 +154,9 @@ export function renderContracts() {
                 contracts.forEach(c => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td style="padding: 0.75rem; border-bottom: 1px solid var(--border-color);">${escapeHtml(c.contract_name || '-')}</td>
-                        <td style="padding: 0.75rem; border-bottom: 1px solid var(--border-color);">${escapeHtml(c.contractor || '-')}</td>
-                        <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--border-color); font-weight: 500;">${formatCurrency(c.value || 0)}</td>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid var(--border-color);">${escapeHtml(getContractName(c) || '-')}</td>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid var(--border-color);">${escapeHtml(getContractorName(c) || '-')}</td>
+                        <td style="text-align: right; padding: 0.75rem; border-bottom: 1px solid var(--border-color); font-weight: 500;">${formatCurrency(getContractValue(c))}</td>
                         <td style="text-align: center; padding: 0.75rem; border-bottom: 1px solid var(--border-color);">${isConsultancyContract(c) ? 'Tư vấn' : 'Thi công'}</td>
                     `;
                     tbody.appendChild(tr);

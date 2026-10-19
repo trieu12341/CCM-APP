@@ -1,3 +1,4 @@
+import { getContractName, getContractorName } from '../core/contract-fields.js';
 import { state, mockActivities } from '../app.js';
 
 import { persistBudgets, persistContracts, persistTenders } from '../core/data-store.js';
@@ -278,7 +279,7 @@ export function setupBudgetEvents() {
                 .forEach(c => {
                     const opt = document.createElement('option');
                     opt.value = c.contract_id;
-                    opt.textContent = c.contract_name;
+                    opt.textContent = getContractName(c);
                     select.appendChild(opt);
                 });
             const amtEl = document.getElementById('payment-amount');
@@ -295,14 +296,14 @@ export function setupBudgetEvents() {
             const contract = state.appData.Contracts.find(c => c.contract_id === contractId);
             createIPC({
                 contract_id: contractId,
-                contract_name: contract ? contract.contract_name : '',
-                contractor_name: contract ? contract.vendor_name : '',
+                contract_name: contract ? getContractName(contract) : '',
+                contractor_name: contract ? getContractorName(contract) : '',
                 gross_work_done: amount,
                 certified_value: amount,
                 net_payable: amount,
                 status: 'Approved'
             });
-            const contractName = state.appData.Contracts.find(c => c.contract_id === contractId)?.contract_name;
+            const contractName = getContractName(state.appData.Contracts.find(c => c.contract_id === contractId));
             mockActivities.unshift({ text: `Payment Claim Approved: ${amount.toLocaleString()} VNĐ for ${contractName}`, date: new Date().toISOString() });
             persistBudgets(state.appData.Budgets);
             persistContracts(state.appData.Contracts);

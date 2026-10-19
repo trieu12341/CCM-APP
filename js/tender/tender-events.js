@@ -1,3 +1,4 @@
+import { setContractValue, normalizeContract } from '../core/contract-fields.js';
 import { state, formatCurrency } from '../app.js';
 
 import { tenderState } from './tender-state.js';
@@ -170,8 +171,9 @@ export function setupTenderEvents() {
                     if (contractIndex >= 0) {
                         // Cập nhật contract đã có
                         let contract = allContracts[contractIndex];
-                        contract.total_value = tender.final_price;
+                        setContractValue(contract, tender.final_price);
                         contract.contractor  = tender.winner;
+                        normalizeContract(contract);
                         contract.status      = 'Active';
                         contract.budget_id   = tender.budget_id || contract.budget_id; // ← giữ link
                         allContracts[contractIndex] = contract;

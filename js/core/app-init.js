@@ -1,3 +1,4 @@
+import { normalizeContracts } from './contract-fields.js';
 import { state } from '../app.js';
 import { apiLogin, apiLogout, onAuthStateChanged } from '../api.js';
 import { loadAllProjectsFromCloud, subscribeToProject, saveProjectsToCloud, getUserProfile } from '../db-service.js';
@@ -232,6 +233,8 @@ async function loadAppData() {
             Documents: []
         };
 
+        normalizeContracts(state.appData.Contracts);
+
         const savedActiveId = localStorage.getItem('ccm_current_project_id');
         if (savedActiveId && state.appData.Projects.some(p => p.project_id === savedActiveId)) {
             state.currentProjectId = savedActiveId;
@@ -308,7 +311,7 @@ async function loadAppData() {
                         // Update global state with fresh data for this specific project
                         state.appData.Budgets = mergeProjectData(state.appData.Budgets, docData.budgets, projectId);
                         state.appData.Tenders = mergeProjectData(state.appData.Tenders, docData.tenders, projectId);
-                        state.appData.Contracts = mergeProjectData(state.appData.Contracts, docData.contracts, projectId);
+                        state.appData.Contracts = normalizeContracts(mergeProjectData(state.appData.Contracts, docData.contracts, projectId));
                         state.appData.Cashflow = mergeProjectData(state.appData.Cashflow, docData.cashflows, projectId);
                         state.appData.Payments = mergeProjectData(state.appData.Payments, docData.payments, projectId);
                         state.appData.Variations = mergeProjectData(state.appData.Variations, docData.variations, projectId);

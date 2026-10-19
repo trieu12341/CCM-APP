@@ -1,3 +1,4 @@
+import { getContractName, getContractorName } from '../../../core/contract-fields.js';
 import { escapeHtml } from '../../../utils/formatters.js';
 /**
  * payment-layer3-ui.js
@@ -203,10 +204,10 @@ export function renderIPCForm(ipcId = null) {
                 const ctype = c.type || 'Construction';
                 const label = ctype === 'Consultancy' ? '📋 Tư vấn' : '🏗️ Xây dựng';
                 return `<option value="${c.contract_id || c.id}"
-                    data-name="${escapeHtml(c.contract_name || c.package_name || '')}"
-                    data-contractor="${escapeHtml(c.contractor_name || '')}"
+                    data-name="${escapeHtml(getContractName(c))}"
+                    data-contractor="${escapeHtml(getContractorName(c))}"
                     data-contract-type="${ctype}">
-                    [${label}] ${escapeHtml(c.contract_name || c.package_name || 'Không rõ')}
+                    [${label}] ${escapeHtml(getContractName(c) || 'Không rõ')}
                 </option>`;
             }).join('');
     }
