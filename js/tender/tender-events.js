@@ -42,14 +42,6 @@ function addRound() {
  * tồn tại, nút "Chốt chọn nhà thầu" và "Lưu cập nhật" báo lỗi ngầm, không chạy).
  * Lưu localStorage + cloud do persistTenders đảm nhận.
  */
-function updateTender(tender) {
-    const list = state.appData.Tenders || [];
-    const i = list.findIndex(t => t.tender_id === tender.tender_id);
-    if (i < 0) return false;
-    list[i] = tender;
-    return true;
-}
-
 async function saveTenderDetail() {
     const tender = state.appData.Tenders.find(t => t.tender_id === tenderState.currentTenderDetailId);
     if (!tender) return;
