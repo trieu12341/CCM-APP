@@ -18,7 +18,10 @@ import { initializeOverviewModule } from '../overview.js';
 import { initAdminUtils } from './admin-utils.js';
 import { setupSidebarEvents } from './sidebar-nav.js';
 import { handleProjectSnapshot } from './realtime-sync.js';
-import { mergeProjectLists } from './project-merge.js';
+import { mergeProjectLists, backfillProjectIds } from './project-merge.js';
+import { mergeFieldIntoProject } from '../db-service.js';
+
+let pendingMigrations = Promise.resolve();
 
 let projectSwitchBound = false;
 
@@ -66,6 +69,19 @@ export async function loadAppData() {
 
         normalizeContracts(state.appData.Contracts);
 
+        // Chuyển đổi một lần: VO bản cũ thiếu project_id (chưa từng lên cloud) → vá + đẩy lên
+        {
+            const { items, fixed } = backfillProjectIds(state.appData.Variations, state.appData.Contracts);
+            if (fixed) {
+                state.appData.Variations = items;
+                localStorage.setItem('ccm_variations', JSON.stringify(items));
+                const byProject = new Map();
+                items.forEach(v => { if (v && v.project_id) { if (!byProject.has(v.project_id)) byProject.set(v.project_id, []); byProject.get(v.project_id).push(v); } });
+                // Ghi TRƯỚC khi đăng ký nhận dữ liệu realtime, để bản cloud không xóa mất VO trong máy
+                pendingMigrations = Promise.all([...byProject].map(([pid, list]) => mergeFieldIntoProject(pid, 'variations', list, 'vo_id')));
+            }
+        }
+
         const savedActiveId = localStorage.getItem('ccm_current_project_id');
         if (savedActiveId && state.appData.Projects.some(p => p.project_id === savedActiveId)) {
             state.currentProjectId = savedActiveId;
@@ -110,6 +126,7 @@ export async function loadAppData() {
         setTimeout(async () => {
             console.log('🔄 Setting up Hybrid Realtime Sync...');
             
+            await pendingMigrations.catch(() => {});
             // Fetch the list of all projects
             const projects = await loadAllProjectsFromCloud();
             if (projects && projects.length > 0) {
@@ -120,7 +137,20 @@ export async function loadAppData() {
                 if (needsCloudSave) saveProjectsToCloud(merged).catch(console.error);
                 try { renderProjectTabs(); } catch (e) { console.error('renderProjectTabs error:', e); }
 
-                const savedActiveId = localStorage.getItem('ccm_current_project_id');
+                // Chuyển đổi một lần: VO bản cũ thiếu project_id (chưa từng lên cloud) → vá + đẩy lên
+        {
+            const { items, fixed } = backfillProjectIds(state.appData.Variations, state.appData.Contracts);
+            if (fixed) {
+                state.appData.Variations = items;
+                localStorage.setItem('ccm_variations', JSON.stringify(items));
+                const byProject = new Map();
+                items.forEach(v => { if (v && v.project_id) { if (!byProject.has(v.project_id)) byProject.set(v.project_id, []); byProject.get(v.project_id).push(v); } });
+                // Ghi TRƯỚC khi đăng ký nhận dữ liệu realtime, để bản cloud không xóa mất VO trong máy
+                pendingMigrations = Promise.all([...byProject].map(([pid, list]) => mergeFieldIntoProject(pid, 'variations', list, 'vo_id')));
+            }
+        }
+
+        const savedActiveId = localStorage.getItem('ccm_current_project_id');
                 if (savedActiveId && state.appData.Projects.some(p => p.project_id === savedActiveId)) {
                     state.currentProjectId = savedActiveId;
                 } else {

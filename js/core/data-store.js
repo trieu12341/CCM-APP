@@ -9,6 +9,7 @@
  * Đã loại bỏ hoàn toàn dual-save sang Express API.
  */
 import { state } from '../app.js';
+import { backfillProjectIds } from './project-merge.js';
 import { saveBudgetsToCloud, saveTendersToCloud, saveProjectsToCloud, saveContractsToCloud, saveCashflowToCloud, savePaymentsToCloud, saveVariationsToCloud, saveFinalStatementsToCloud } from '../db-service.js';
 
 // Centralize all localStorage keys
@@ -140,6 +141,8 @@ export function loadPaymentsFromLS() {
 }
 
 export function persistVariations(data) {
+    // VO từ bản cũ thiếu project_id → bổ sung theo hợp đồng để lên được cloud
+    data = backfillProjectIds(data, state.appData.Contracts).items;
     if ((!data || data.length === 0) && state.appData.Variations && state.appData.Variations.length > 0) {
         console.warn('Blocked attempt to persist empty Variations data.');
         return;

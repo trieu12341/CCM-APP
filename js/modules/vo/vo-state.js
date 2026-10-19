@@ -1,5 +1,6 @@
 import { state } from '../../app.js';
 import { persistVariations } from '../../core/data-store.js';
+import { nextVOId } from '../../core/project-merge.js';
 
 let voState = {
     currentFilter: 'all',
@@ -43,9 +44,12 @@ export function filterVOs() {
 }
 
 export function createVO(voData) {
+    // project_id: bắt buộc để VO lên cloud và được tính vào thống kê dự án
+    const contract = (state.appData.Contracts || []).find(c => c.contract_id === voData.contract_id);
     const newVO = {
         ...voData,
-        vo_id: 'VO-' + (state.appData.Variations ? state.appData.Variations.length + 1 : 1).toString().padStart(2, '0'),
+        project_id: voData.project_id || (contract && contract.project_id) || state.currentProjectId,
+        vo_id: nextVOId(state.appData.Variations),   // không trùng kể cả sau khi xóa
     };
     if (!state.appData.Variations) state.appData.Variations = [];
     state.appData.Variations.push(newVO);

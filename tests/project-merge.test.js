@@ -50,3 +50,22 @@ test('cloud có mảng (kể cả rỗng) → thay phần của dự án, giữ 
     assert.deepEqual(mergeProjectField(local, [{ id: 'c', project_id: 'P1' }], 'P1').merged.map(x => x.id), ['b', 'c']);
     assert.equal(mergeProjectField(local, [], 'P1').pushLocal, null);
 });
+
+import { backfillProjectIds, nextVOId, unionByKey } from '../js/core/project-merge.js';
+test('VO bản cũ thiếu project_id → bổ sung theo hợp đồng', () => {
+    const { items, fixed } = backfillProjectIds(
+        [{ vo_id: 'VO-01', contract_id: 'C1' }, { vo_id: 'VO-02', contract_id: 'C9', project_id: 'P2' }, { vo_id: 'VO-03', contract_id: 'CX' }],
+        [{ contract_id: 'C1', project_id: 'P1' }]);
+    assert.equal(fixed, 1);
+    assert.equal(items[0].project_id, 'P1');
+    assert.equal(items[1].project_id, 'P2');
+    assert.equal(items[2].project_id, undefined);
+});
+test('mã VO không trùng kể cả sau khi xóa', () => {
+    assert.equal(nextVOId([]), 'VO-01');
+    assert.equal(nextVOId([{ vo_id: 'VO-01' }, { vo_id: 'VO-07' }]), 'VO-08');
+});
+test('gộp theo khóa: bản trong máy thắng, giữ bản cloud của máy khác', () => {
+    const r = unionByKey([{ vo_id: 'A', v: 1 }, { vo_id: 'B', v: 1 }], [{ vo_id: 'A', v: 2 }, { vo_id: 'C', v: 2 }]);
+    assert.deepEqual(r.map(x => x.vo_id + x.v), ['A2', 'B1', 'C2']);
+});

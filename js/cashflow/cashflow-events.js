@@ -18,6 +18,20 @@ export function setupCashflowEvents() {
     const importFile = document.getElementById('excel-import');
     const filterContract = document.getElementById('cf-filter-contract');
 
+    // Esc thoát chế độ phóng to biểu đồ (trước đây chỉ thoát được bằng nút nhỏ ở góc)
+    if (!window.__cfFullscreenEscBound) {
+        window.__cfFullscreenEscBound = true;
+        document.addEventListener('keydown', (ev) => {
+            if (ev.key !== 'Escape') return;
+            document.querySelectorAll('.cf-chart-card.fullscreen-mode').forEach(card => {
+                card.classList.remove('fullscreen-mode');
+                const icon = card.querySelector('.btn-fullscreen i');
+                if (icon) { icon.classList.add('fa-expand'); icon.classList.remove('fa-compress'); }
+                setTimeout(() => window.dispatchEvent(new Event('resize')), 100);
+            });
+        });
+    }
+
     document.querySelectorAll('.btn-fullscreen').forEach(btn => {
         const newBtn = btn.cloneNode(true);
         btn.parentNode.replaceChild(newBtn, btn);

@@ -70,3 +70,35 @@ export function mergeProjectField(globalArr = [], cloudArr, projectId) {
     }
     return { merged: [...all.filter(i => !i || i.project_id !== projectId), ...cloudArr], pushLocal: null };
 }
+
+/**
+ * Bổ sung project_id còn thiếu (VO tạo từ bản cũ không gán project_id → không
+ * lên được cloud, bị lọc khỏi thống kê dự án). Lấy theo hợp đồng của bản ghi.
+ * @returns {{ items: Array, fixed: number }}
+ */
+export function backfillProjectIds(items = [], contracts = []) {
+    const pidOf = new Map((contracts || []).map(c => [c.contract_id, c.project_id]));
+    let fixed = 0;
+    const out = (items || []).map(it => {
+        if (!it || it.project_id) return it;
+        const pid = pidOf.get(it.contract_id);
+        if (!pid) return it;
+        fixed++;
+        return { ...it, project_id: pid };
+    });
+    return { items: out, fixed };
+}
+
+/** Mã VO kế tiếp, không trùng kể cả sau khi xóa: VO-07 → VO-08. */
+export function nextVOId(variations = []) {
+    const nums = (variations || []).map(v => parseInt((String(v?.vo_id || '').match(/^VO-?(\d+)/i) || [])[1], 10) || 0);
+    return 'VO-' + String((nums.length ? Math.max(...nums) : 0) + 1).padStart(2, '0');
+}
+
+/** Gộp 2 danh sách theo khóa, bản `preferred` thắng khi trùng khóa. */
+export function unionByKey(base = [], preferred = [], key = 'vo_id') {
+    const m = new Map();
+    (base || []).forEach(x => x && m.set(x[key], x));
+    (preferred || []).forEach(x => x && m.set(x[key], x));
+    return [...m.values()];
+}

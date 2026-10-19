@@ -1,6 +1,7 @@
 import { db } from './firebase-config.js';
 import { cleanForFirestore } from './utils/firestore-clean.js';
 import { notifyCloudError } from './utils/notify.js';
+import { unionByKey } from './core/project-merge.js';
 import { state } from './app.js';
 
 /**
@@ -142,6 +143,26 @@ export async function saveProjectsToCloud(projectsData) {
     } catch (err) {
         console.error('Failed to save Projects to Cloud:', err);
         notifyCloudError('Không lưu được danh sách dự án lên cloud. ' + (err && err.message ? err.message.slice(0, 160) : ''));
+    }
+}
+
+/**
+ * Chuyển đổi một lần: gộp danh sách `items` (của dự án projectId) với bản đang
+ * có trên cloud theo khóa rồi ghi lại. Dùng để đẩy dữ liệu bản cũ chỉ có trong
+ * máy (vd VO thiếu project_id) lên cloud mà không xóa dữ liệu máy khác đã ghi.
+ */
+export async function mergeFieldIntoProject(projectId, fieldName, items, key) {
+    if (!projectId || !items || !items.length) return;
+    try {
+        const ref = PROJECTS_COLLECTION.doc(projectId);
+        const snap = await ref.get();
+        const cloud = (snap.exists && Array.isArray(snap.data()[fieldName])) ? snap.data()[fieldName] : [];
+        const merged = unionByKey(cloud, items, key);
+        await ref.set({ [fieldName]: cleanForFirestore(merged), updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+        console.log(`[migrate] ${fieldName}: đẩy ${items.length} bản ghi lên dự án ${projectId}`);
+    } catch (err) {
+        console.error(`[migrate] ${fieldName} → ${projectId} thất bại:`, err);
+        notifyCloudError(`Không đẩy được dữ liệu cũ (${fieldName}) lên cloud cho dự án ${projectId}.`);
     }
 }
 
