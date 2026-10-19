@@ -1,3 +1,4 @@
+import { paymentTotals, isApprovedIPC, isPaidIPC } from '../modules/payment/payment-metrics.js';
 import { state, formatCurrency, formatCurrencyVND, getContractBudgetValue, getDynamicContractValue } from '../app.js';
 import { getLocalCashflow } from './cashflow-state.js';
 import { calculateForecastEngine, calculatePackageTotalPlanned } from './cashflow-calc.js';
@@ -44,22 +45,9 @@ export function renderCashflow() {
     
     // Single Source of Truth for Payments
     if (state.appData.Payments) {
-        state.appData.Payments.filter(p => p.project_id === state.currentProjectId).forEach(p => {
-            const st = (p.status || '').toLowerCase();
-            const gross = parseCurrencyInput(p.certified_amount || p.net_payable || p.certified_value);
-            const vat = parseCurrencyInput(p.vat_amount);
-            const val = p.sub_total !== undefined ? parseCurrencyInput(p.sub_total) : (gross - vat);
-            
-            const paidGross = parseCurrencyInput(p.paid_amount || p.net_payable);
-            const paidVal = paidGross - vat;
-
-            if (st === 'approved' || st === 'đã duyệt' || st === 'paid' || st === 'đã thanh toán') {
-                totalCertified += val;
-            }
-            if (st === 'paid' || st === 'đã thanh toán') {
-                totalPaid += paidVal;
-            }
-        });
+        const pid = state.currentProjectId;
+        totalCertified = paymentTotals(state.appData.Payments, { projectId: pid, filter: isApprovedIPC }).certifiedExVat;
+        totalPaid = paymentTotals(state.appData.Payments, { projectId: pid, filter: isPaidIPC }).certifiedExVat;
     }
 
     let monthlyData = {}; 

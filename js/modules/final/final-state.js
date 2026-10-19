@@ -1,3 +1,4 @@
+import { paymentTotals, isApprovedIPC } from '../payment/payment-metrics.js';
 import { state } from '../../app.js';
 import { parseCurrencyInput } from '../../utils/formatters.js';
 
@@ -35,23 +36,19 @@ export function calculateFinalAccount(contractId) {
     // [D] Đã thanh toán IPC & [E] Thu hồi tạm ứng
     let d = 0; // Lũy kế IPC (Certified Amount)
     let totalAdvanceRecovery = 0; // Lũy kế đã thu hồi
+    let advanceOutstanding = 0;   // Tạm ứng chưa thu hồi
     
     if (state.appData && state.appData.Payments) {
-        const contractPayments = state.appData.Payments.filter(p => p.contract_id === contractId);
-        // D: Chỉ cộng các IPC đã duyệt/thanh toán (Approved/Paid)
-        const certifiedPayments = contractPayments.filter(p => p.status === 'Approved' || p.status === 'Paid');
-        d = certifiedPayments.reduce((sum, p) => {
-            const gross = parseCurrencyInput(p.certified_amount || p.net_payable);
-            const vat = parseCurrencyInput(p.vat_amount);
-            return sum + (p.sub_total !== undefined ? parseCurrencyInput(p.sub_total) : (gross - vat));
-        }, 0);
-        
-        // E: Tổng thu hồi tạm ứng từ các kỳ
-        totalAdvanceRecovery = certifiedPayments.reduce((sum, p) => sum + (parseFloat(p.advance_recovery_amount) || 0), 0);
+        // D = giá trị đã thanh toán cho công việc qua các IPC đã duyệt/đã thanh toán
+        //   = Σ (14) + phần đã bù trừ vào tạm ứng (hoàn trả TƯ lũy kế)
+        // E = tạm ứng đã chi nhưng chưa thu hồi → còn phải trừ khi quyết toán
+        // ⇒ G = C − D − E − F đúng bằng số còn phải trả (trước thuế)
+        const tt = paymentTotals(state.appData.Payments, { contractId, filter: isApprovedIPC });
+        d = tt.certifiedExVat + tt.apRecovered;
+        totalAdvanceRecovery = tt.apRecovered;
+        advanceOutstanding = tt.advanceOutstanding;
     }
-    
-    const advancePayment = parseFloat(contract.advance_payment_amount) || 0;
-    const e = Math.max(0, advancePayment - totalAdvanceRecovery);
+    const e = advanceOutstanding;
 
     // Tính tạm F và G với default retention 5%
     // F (Retention) và G (Balance) sẽ được tinh chỉnh lại trên UI dựa theo User Input

@@ -1,3 +1,4 @@
+import { paymentTotals, isApprovedIPC, expendedByBudget, committedByBudget } from '../modules/payment/payment-metrics.js';
 import { escapeHtml } from '../utils/formatters.js';
 import { state, formatCurrency, formatCurrencyVND, formatDate, mockActivities, getDynamicContractValue } from '../app.js';
 import { renderTenders } from '../tender.js';
@@ -123,11 +124,8 @@ export function renderDashboard() {
             let contractCommitted = getDynamicContractValue(contract, state.appData);
             
             let contractExpended = 0;
-            (state.appData.Payments || []).filter(p => p.contract_id === contract.contract_id && (p.status === 'Approved' || p.status === 'Paid')).forEach(p => {
-                const gross = parseCurrencyInput(p.certified_amount || p.net_payable || p.certified_value);
-                const vat = parseCurrencyInput(p.vat_amount);
-                contractExpended += p.sub_total !== undefined ? parseCurrencyInput(p.sub_total) : (gross - vat);
-            });
+            // Đã chi = Σ (14) các IPC đã duyệt/đã thanh toán (trước thuế, không gồm tạm ứng)
+            contractExpended += paymentTotals(state.appData.Payments || [], { contractId: contract.contract_id, filter: isApprovedIPC }).certifiedExVat;
             
             committed += contractCommitted;
             expended += contractExpended;
@@ -297,32 +295,30 @@ export function renderBudgetTableModal(filterType = 'all') {
 
     const projectBudgets = (state.appData.Budgets || []).filter(b => b.project_id === state.currentProjectId);
 
+    // Đã chi theo mục ngân sách (phân bổ theo mã ngân sách của dòng Bill trong IPC)
+    const expendedMap = expendedByBudget({ payments: state.appData.Payments || [], contracts: state.appData.Contracts || [],
+        budgets: state.appData.Budgets || [], projectId: state.currentProjectId });
+    const committedMap = committedByBudget({ payments: state.appData.Payments || [], contracts: state.appData.Contracts || [],
+        budgets: state.appData.Budgets || [], projectId: state.currentProjectId,
+        valueOf: (c) => getDynamicContractValue(c, state.appData) });
+
     const createRow = (budget, index = 0) => {
         const budgeted = Number(budget.budgeted) || 0;
         let committed = 0;
         let expended = 0;
         
         const linkedContracts = (state.appData.Contracts || []).filter(c => c.budget_id === budget.id);
-        linkedContracts.forEach(contract => {
-            let contractCommitted = getDynamicContractValue(contract, state.appData);
-            
-            let contractExpended = 0;
-            (state.appData.Payments || []).filter(p => p.contract_id === contract.contract_id && (p.status === 'Approved' || p.status === 'Paid')).forEach(p => {
-                const gross = parseCurrencyInput(p.certified_amount || p.net_payable || p.certified_value);
-                const vat = parseCurrencyInput(p.vat_amount);
-                contractExpended += p.sub_total !== undefined ? parseCurrencyInput(p.sub_total) : (gross - vat);
-            });
-            
-            committed += contractCommitted;
-            expended += contractExpended;
-        });
+        // Cam kết / đã chi theo mục ngân sách (phân bổ theo mã của dòng Bill nếu có)
+        committed = committedMap.get(budget.id) || 0;
+        expended = expendedMap.get(budget.id) || 0;
 
         // Fallback: nếu chưa có Contract linked, dùng cached_committed từ Award
-        if (linkedContracts.length === 0 && budget.cached_committed) {
+        if (linkedContracts.length === 0 && !committed && budget.cached_committed) {
             committed = Number(budget.cached_committed) || 0;
         }
 
-        const varianceVal = budgeted - committed - expended;
+        // Chênh lệch = Ngân sách − Dự báo chi phí (đã chi là một phần của cam kết, không trừ hai lần)
+        const varianceVal = budgeted - Math.max(committed, expended);
         const progress = committed > 0 ? (expended / committed) * 100 : 0;
         const isTenderCreated = (state.appData.Tenders || []).some(t => t.budget_id === budget.id) || 
                                 (budget.tender_status && budget.tender_status !== 'Draft') || 
@@ -369,13 +365,16 @@ export function renderBudgetTableModal(filterType = 'all') {
             element: tr,
             budgeted: budgeted,
             committed: committed,
-            expended: expended
+            expended: expended,
+            variance: varianceVal
         };
     };
 
     let totalBudgeted = 0;
     let totalCommitted = 0;
     let totalExpended = 0;
+    let totalVarianceRows = 0;
+    let staticContingency = 0;
 
     const consultancies = projectBudgets.filter(b => b.category === 'Consultancy');
     const constructions = projectBudgets.filter(b => b.category === 'Construction');
@@ -397,6 +396,7 @@ export function renderBudgetTableModal(filterType = 'all') {
                 totalBudgeted += rowData.budgeted;
                 totalCommitted += rowData.committed;
                 totalExpended += rowData.expended;
+            totalVarianceRows += rowData.variance;
             }
         });
     }
@@ -411,6 +411,7 @@ export function renderBudgetTableModal(filterType = 'all') {
             totalBudgeted += rowData.budgeted;
             totalCommitted += rowData.committed;
             totalExpended += rowData.expended;
+            totalVarianceRows += rowData.variance;
         });
     }
 
@@ -424,11 +425,13 @@ export function renderBudgetTableModal(filterType = 'all') {
             totalBudgeted += rowData.budgeted;
             totalCommitted += rowData.committed;
             totalExpended += rowData.expended;
+            totalVarianceRows += rowData.variance;
         });
     } else {
         // Fallback static contingency row if not modeled in budgets
         const contingencyBudget = project.contingency_budget || 0;
         totalBudgeted += contingencyBudget;
+        staticContingency = contingencyBudget;
 
         const contHeaderTR = document.createElement('tr');
         contHeaderTR.innerHTML = `<td colspan="7" style="background-color: var(--bg-table-header); font-weight: bold; padding: 0.75rem;">III. Dự phòng (Contingency)</td>`;
@@ -453,7 +456,8 @@ export function renderBudgetTableModal(filterType = 'all') {
     }
 
     // Total Footer
-    const totalVariance = totalBudgeted - totalCommitted - totalExpended;
+    // Tổng chênh lệch = Σ chênh lệch từng dòng (+ dự phòng tĩnh nếu có)
+    const totalVariance = totalVarianceRows + staticContingency;
     tfootTotal.innerHTML = `
         <tr style="background: var(--bg-table-footer); font-weight: bold;">
             <td colspan="2" style="text-align: right; padding-right: 1rem;">TỔNG CỘNG</td>

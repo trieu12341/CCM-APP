@@ -4,154 +4,27 @@ import { getContractValue } from '../../core/contract-fields.js';
  * Pure calculation functions — no side effects, no DOM access.
  * All QS financial computations for IPC breakdown.
  */
-import { parseCurrencyInput } from '../../utils/formatters.js';
+import { paymentTotals, monthlyTrend, isApprovedIPC, isPaidIPC } from './payment-metrics.js';
 
-// ─────────────────────────────────────────────────────────────
-// IPC FINANCIAL BREAKDOWN (5-line QS Standard)
-// ─────────────────────────────────────────────────────────────
+// Công thức IPC nằm ở ipc-engine.js (lũy kế theo mẫu CERT).
+// Tổng hợp số liệu thanh toán nằm ở payment-metrics.js — file này chỉ ghép cho Dashboard.
 
-/**
- * Calculates the full QS breakdown for a single IPC.
- *
- * Formula:
- *  1. AP Deduction   = grossWorkDone × (apRecoveryPct / 100)
- *  2. Retention      = (grossWorkDone - apDeduction) × (retentionPct / 100)
- *  3. Sub-total      = grossWorkDone - apDeduction - retention
- *  4. VAT Amount     = sub-total × (vatPct / 100)
- *  5. Net Payable    = sub-total + vatAmount
- *
- * @param {Object} params
- * @param {number} params.grossWorkDone    - Gross work done this period
- * @param {number} params.apRecoveryPct   - AP recovery % (default 0)
- * @param {number} params.retentionPct    - Retention % (default 5)
- * @param {number} params.vatPct          - VAT % (default 10)
- * @returns {{ apDeduction, retentionDeduction, subTotal, vatAmount, netPayable }}
- */
-export function calcNetPayable({ grossWorkDone = 0, apRecoveryPct = 0, retentionPct = 5, vatPct = 10 }) {
-    const gross = Number(grossWorkDone) || 0;
-    const apDeduction = gross * (Number(apRecoveryPct) / 100);
-    const afterAP = gross - apDeduction;
-    const retentionDeduction = afterAP * (Number(retentionPct) / 100);
-    const subTotal = afterAP - retentionDeduction;
-    const vatAmount = subTotal * (Number(vatPct) / 100);
-    const netPayable = subTotal + vatAmount;
-
-    return {
-        apDeduction: Math.round(apDeduction),
-        retentionDeduction: Math.round(retentionDeduction),
-        subTotal: Math.round(subTotal),
-        vatAmount: Math.round(vatAmount),
-        netPayable: Math.round(netPayable),
-    };
-}
-
-// ─────────────────────────────────────────────────────────────
-// EXECUTIVE KPI SUMMARY
-// ─────────────────────────────────────────────────────────────
-
-/**
- * Calculates the 4 Executive KPI cards for Layer 1 Dashboard.
- *
- * @param {Array} payments  - All IPC records for this project
- * @param {Array} contracts - All contracts for this project (for Active Contract total)
- * @returns {{ totalActiveContracts, totalSubmitted, totalApproved, totalPaid }}
- */
+/** 4 thẻ KPI của Dashboard Thanh toán (đều trước thuế). */
 export function calcPaymentKPIs(payments = [], contracts = []) {
-    // Card 1: Sum of all Active contract values
     const totalActiveContracts = contracts
-        .filter(c => {
-            const st = (c.status || '').toLowerCase();
-            return st === 'active' || st === 'đang thực hiện';
-        })
+        .filter(c => ['active', 'đang thực hiện'].includes(String(c.status || '').toLowerCase()))
         .reduce((sum, c) => sum + getContractValue(c), 0);
-
-    // Card 2: Total Submitted = sum of gross_work_done across all IPCs
-    const totalSubmitted = payments
-        .reduce((sum, p) => sum + parseCurrencyInput(p.submitted_amount || p.gross_work_done), 0);
-
-    // Card 3: Total Approved/Certified = sum of certified_value for Approved + Paid IPCs
-    const totalApproved = payments
-        .filter(p => {
-            const st = (p.status || '').toLowerCase();
-            return st === 'approved' || st === 'đã duyệt' || st === 'paid' || st === 'đã thanh toán';
-        })
-        .reduce((sum, p) => {
-            const gross = parseCurrencyInput(p.net_payable || p.certified_amount || p.certified_value);
-            const vat = parseCurrencyInput(p.vat_amount);
-            const net = p.sub_total !== undefined ? parseCurrencyInput(p.sub_total) : (gross - vat);
-            return sum + net;
-        }, 0);
-
-    // Card 4: Total Paid = sum of paid_amount for Paid IPCs
-    const totalPaid = payments
-        .filter(p => {
-            const st = (p.status || '').toLowerCase();
-            return st === 'paid' || st === 'đã thanh toán';
-        })
-        .reduce((sum, p) => {
-            const gross = parseCurrencyInput(p.paid_amount || p.net_payable);
-            const vat = parseCurrencyInput(p.vat_amount);
-            const net = gross - vat;
-            return sum + net;
-        }, 0);
-
     return {
         totalActiveContracts,
-        totalSubmitted,
-        totalApproved,
-        totalPaid,
+        totalSubmitted: paymentTotals(payments).grossThisPeriod,                       // KL gộp đã trình
+        totalApproved: paymentTotals(payments, { filter: isApprovedIPC }).certifiedExVat, // (14) đã duyệt
+        totalPaid: paymentTotals(payments, { filter: isPaidIPC }).certifiedExVat,          // (14) đã thanh toán
     };
 }
 
-// ─────────────────────────────────────────────────────────────
-// PAYMENT TREND CHART DATA (Monthly)
-// ─────────────────────────────────────────────────────────────
-
-/**
- * Aggregates IPC data into monthly buckets for the trend chart.
- * Returns arrays of { month, submitted, certified, paid } sorted by date.
- *
- * @param {Array} payments
- * @returns {{ categories: string[], submitted: number[], certified: number[], paid: number[] }}
- */
+/** Biểu đồ theo tháng: trình / xác nhận / đã trả (trước thuế). */
 export function calcPaymentTrend(payments = []) {
-    const monthMap = {};
-
-    payments.forEach(p => {
-        const dateStr = p.submission_date || p.created_at || '';
-        if (!dateStr) return;
-        const d = new Date(dateStr);
-        if (isNaN(d)) return;
-        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-
-        if (!monthMap[key]) {
-            monthMap[key] = { submitted: 0, certified: 0, paid: 0 };
-        }
-        monthMap[key].submitted += parseCurrencyInput(p.gross_work_done || p.submitted_amount);
-        if (p.status === 'Approved' || p.status === 'Paid') {
-            const gross = parseCurrencyInput(p.net_payable || p.certified_value);
-            const vat = parseCurrencyInput(p.vat_amount);
-            const net = p.sub_total !== undefined ? parseCurrencyInput(p.sub_total) : (gross - vat);
-            monthMap[key].certified += net;
-        }
-        if (p.status === 'Paid') {
-            const gross = parseCurrencyInput(p.paid_amount || p.net_payable);
-            const vat = parseCurrencyInput(p.vat_amount);
-            const net = gross - vat;
-            monthMap[key].paid += net;
-        }
-    });
-
-    const sortedKeys = Object.keys(monthMap).sort();
-    return {
-        categories: sortedKeys.map(k => {
-            const [yr, mo] = k.split('-');
-            return `T${mo}/${yr}`;
-        }),
-        submitted: sortedKeys.map(k => Math.round(monthMap[k].submitted)),
-        certified: sortedKeys.map(k => Math.round(monthMap[k].certified)),
-        paid: sortedKeys.map(k => Math.round(monthMap[k].paid)),
-    };
+    return monthlyTrend(payments);
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -165,7 +38,7 @@ export function calcPaymentTrend(payments = []) {
  */
 export function calcPendingIPCs(payments = []) {
     return payments
-        .filter(p => p.status === 'Draft' || p.status === 'Reviewing')
+        .filter(p => ['draft', 'reviewing', 'submitted'].includes(String(p.status || '').toLowerCase()))
         .sort((a, b) => {
             const da = a.due_date ? new Date(a.due_date) : new Date('9999-12-31');
             const db = b.due_date ? new Date(b.due_date) : new Date('9999-12-31');

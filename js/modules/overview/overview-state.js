@@ -1,3 +1,4 @@
+import { paymentTotals, isPaidIPC } from '../payment/payment-metrics.js';
 import { state } from '../../app.js';
 import { parseCurrencyInput } from '../../utils/formatters.js';
 
@@ -58,23 +59,11 @@ export function calculateOverviewMetrics() {
     const voPct = contractOriginalTotal > 0 ? (contractApprovedVOTotal / contractOriginalTotal) * 100 : 0;
 
     // --- PAYMENT & EXPENSE ---
-    const projectPayments = (state.appData.Payments || []).filter(p => p.project_id === projectId && p.status === 'Paid');
-    let totalPaid = 0;
-    let totalRetentionHeld = 0;
-    let totalUnrecoupedAdvance = 0;
-
-    projectPayments.forEach(p => {
-        const gross = parseCurrencyInput(p.certified_amount || p.net_payable);
-        const vat = parseCurrencyInput(p.vat_amount);
-        const subTotal = p.sub_total !== undefined ? parseCurrencyInput(p.sub_total) : (gross - vat);
-        totalPaid += subTotal;
-        totalRetentionHeld += parseCurrencyInput(p.retention_amount || 0);
-    });
-
-    const advancePayments = projectPayments.filter(p => p.payment_no === 'ADV' || p.payment_no == 0);
-    const advanceTotal = advancePayments.reduce((sum, p) => sum + (parseCurrencyInput(p.sub_total) || parseCurrencyInput(p.net_payable)), 0);
-    const recoveryTotal = projectPayments.reduce((sum, p) => sum + parseCurrencyInput(p.advance_recovery_amount || 0), 0);
-    totalUnrecoupedAdvance = Math.max(0, advanceTotal - recoveryTotal);
+    // Chỉ tính IPC đã thanh toán; số giữ lại / thu hồi TƯ là LŨY KẾ đến IPC cuối
+    const paidTotals = paymentTotals(state.appData.Payments || [], { projectId, filter: isPaidIPC });
+    const totalPaid = paidTotals.certifiedExVat;
+    const totalRetentionHeld = paidTotals.retentionHeld;
+    const totalUnrecoupedAdvance = paidTotals.advanceOutstanding;
 
     const paymentPct = totalCommitted > 0 ? (totalPaid / totalCommitted) * 100 : 0;
 
