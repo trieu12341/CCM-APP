@@ -12,6 +12,8 @@
  *  - apRecovered    : hoàn trả tạm ứng LŨY KẾ đến IPC cuối được tính
  *  - retentionHeld  : giữ lại LŨY KẾ đến IPC cuối được tính
  *  - cashIncVat     : Σ số thanh toán (gồm VAT, gồm tạm ứng)
+ *  - paymentExVat   : Σ tiền thanh toán trước thuế GỒM tạm ứng = advancePaid + certifiedExVat
+ *                     (dùng cho thẻ Trình / Duyệt / Đã trả và dòng tiền)
  * Thuần → unit test được.
  */
 import { summarizeIPC } from './ipc-engine.js';
@@ -51,6 +53,7 @@ export function paymentTotals(payments = [], { contractId, projectId, filter = (
         t.grossToDate += (lastV2 ? lastV2.grossToDate : 0) + legacyGross;
     }
     t.advanceOutstanding = Math.max(0, t.advancePaid - t.apRecovered);
+    t.paymentExVat = t.advancePaid + t.certifiedExVat;
     return t;
 }
 
@@ -63,9 +66,11 @@ export function monthlyTrend(payments = []) {
         const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
         m[k] = m[k] || { submitted: 0, certified: 0, paid: 0 };
         const s = summarizeIPC(p);
-        m[k].submitted += s.grossThisPeriod;
-        if (isApprovedIPC(p)) m[k].certified += s.certifiedExVat;
-        if (isPaidIPC(p)) m[k].paid += s.certifiedExVat;
+        // Tiền thanh toán trước thuế, gồm tạm ứng (tạm ứng là một lần thanh toán)
+        const amt = s.advance + s.certifiedExVat;
+        m[k].submitted += s.advance + s.grossThisPeriod;
+        if (isApprovedIPC(p)) m[k].certified += amt;
+        if (isPaidIPC(p)) m[k].paid += amt;
     });
     const keys = Object.keys(m).sort();
     return {

@@ -61,7 +61,7 @@ export function calculateOverviewMetrics() {
     // --- PAYMENT & EXPENSE ---
     // Chỉ tính IPC đã thanh toán; số giữ lại / thu hồi TƯ là LŨY KẾ đến IPC cuối
     const paidTotals = paymentTotals(state.appData.Payments || [], { projectId, filter: isPaidIPC });
-    const totalPaid = paidTotals.certifiedExVat;
+    const totalPaid = paidTotals.paymentExVat;   // tiền đã trả trước thuế, gồm tạm ứng
     const totalRetentionHeld = paidTotals.retentionHeld;
     const totalUnrecoupedAdvance = paidTotals.advanceOutstanding;
 

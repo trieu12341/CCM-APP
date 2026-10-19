@@ -47,7 +47,7 @@ export function renderCashflow() {
     if (state.appData.Payments) {
         const pid = state.currentProjectId;
         totalCertified = paymentTotals(state.appData.Payments, { projectId: pid, filter: isApprovedIPC }).certifiedExVat;
-        totalPaid = paymentTotals(state.appData.Payments, { projectId: pid, filter: isPaidIPC }).certifiedExVat;
+        totalPaid = paymentTotals(state.appData.Payments, { projectId: pid, filter: isPaidIPC }).paymentExVat; // gồm tạm ứng đã chi
     }
 
     let monthlyData = {}; 

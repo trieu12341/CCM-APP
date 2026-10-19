@@ -43,10 +43,11 @@ test('tiền đã chi (gồm VAT, gồm tạm ứng) chỉ tính IPC đã thanh 
     assert.equal(t.cashIncVat, 1_500_000_000 + i1.net_payable);
 });
 
-test('biểu đồ theo tháng: trình = KL gộp kỳ, xác nhận / đã trả = (14)', () => {
+test('biểu đồ theo tháng: trình = tạm ứng + KL gộp kỳ, xác nhận / đã trả = tạm ứng + (14)', () => {
     const tr = monthlyTrend(chain());
     assert.deepEqual(tr.categories, ['T01/2026', 'T02/2026', 'T03/2026', 'T04/2026']);
-    assert.equal(tr.submitted[0], 0);
+    assert.equal(tr.submitted[0], 1_500_000_000);              // tháng 1: tạm ứng
+    assert.equal(tr.paid[0], 1_500_000_000);
     assert.equal(tr.submitted[3], 1_000_000_000);
     assert.equal(tr.certified[3], 0);                          // Draft
     assert.ok(tr.paid[1] > 0 && tr.paid[2] === 0);
@@ -72,4 +73,20 @@ test('phân bổ cam kết theo giá trị HĐ của dòng Bill', async () => {
     assert.equal(m.get('B2'), 3_000);
     assert.equal(m.get('B3'), 7_001);
     assert.equal(m.get('BX'), undefined);
+});
+
+import { calcPaymentKPIs } from '../js/modules/payment/payment-calc.js';
+test('Dashboard tính cả tạm ứng: chỉ có IPC-00 đã duyệt → Trình = Duyệt = số tạm ứng, Đã trả = 0', () => {
+    const adv = { ipc_id: 'A', contract_id: 'C1', project_id: 'P', payment_number: 0, is_advance: true, status: 'Approved', advance_this_period: 13_143_626_246, gross_work_done: 0, engine_version: 0 };
+    const k = calcPaymentKPIs([adv], []);
+    assert.equal(k.totalSubmitted, 13_143_626_246);
+    assert.equal(k.totalApproved, 13_143_626_246);
+    assert.equal(k.totalPaid, 0);
+});
+
+test('Dashboard với chuỗi đầy đủ: Đã trả = tạm ứng + Σ(14) các IPC đã trả', () => {
+    const ps = chain();
+    const k = calcPaymentKPIs(ps, []);
+    const paid = paymentTotals(ps, { filter: isPaidIPC });
+    assert.equal(k.totalPaid, 1_500_000_000 + paid.certifiedExVat);
 });

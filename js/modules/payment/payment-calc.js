@@ -16,9 +16,10 @@ export function calcPaymentKPIs(payments = [], contracts = []) {
         .reduce((sum, c) => sum + getContractValue(c), 0);
     return {
         totalActiveContracts,
-        totalSubmitted: paymentTotals(payments).grossThisPeriod,                       // KL gộp đã trình
-        totalApproved: paymentTotals(payments, { filter: isApprovedIPC }).certifiedExVat, // (14) đã duyệt
-        totalPaid: paymentTotals(payments, { filter: isPaidIPC }).certifiedExVat,          // (14) đã thanh toán
+        // Trước thuế, GỒM tạm ứng: trình = tạm ứng + KL gộp; duyệt / đã trả = tạm ứng + (14)
+        totalSubmitted: (t => t.advancePaid + t.grossThisPeriod)(paymentTotals(payments)),
+        totalApproved: paymentTotals(payments, { filter: isApprovedIPC }).paymentExVat,
+        totalPaid: paymentTotals(payments, { filter: isPaidIPC }).paymentExVat,
     };
 }
 
