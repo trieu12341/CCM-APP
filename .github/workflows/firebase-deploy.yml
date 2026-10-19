@@ -1,0 +1,26 @@
+# Tự động deploy lên Firebase Hosting mỗi khi có commit mới trên nhánh master.
+# Cần secret FIREBASE_SERVICE_ACCOUNT (JSON khóa service account) trong
+# GitHub → Settings → Secrets and variables → Actions.
+# Chỉ deploy phần hosting; Firestore rules KHÔNG bị đụng tới.
+name: Deploy Firebase Hosting
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:   # cho phép bấm chạy tay trong tab Actions
+
+concurrency:
+  group: firebase-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: cost-contract-management
+          channelId: live
