@@ -377,16 +377,18 @@ export function setupBudgetEvents() {
             const status     = document.getElementById('proj-status')?.value;
             const image      = document.getElementById('proj-image')?.value;
 
-            const newId = 'P' + (state.appData.Projects.length + 1).toString().padStart(3, '0');
+            // Mã dự án không trùng kể cả sau khi xóa: lấy số lớn nhất hiện có + 1
+            const maxNo = Math.max(0, ...state.appData.Projects.map(p => parseInt(String(p.project_id || '').replace(/\D/g, ''), 10) || 0));
+            const newId = 'P' + String(maxNo + 1).padStart(3, '0');
             const newProject = { 
                 project_id: newId, 
-                project_name: name, 
-                location: location, 
+                project_name: (name || '').trim(), 
+                location: location || '', 
                 start_date: start, 
                 end_date: end, 
                 cfa: cfa ? Number(cfa) : 0,
                 scale: scale,
-                status: status,
+                status: status || 'Đang thực hiện',
                 image_url: image,
                 total_budget: 0, 
                 contingency_budget: 0 

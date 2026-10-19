@@ -144,3 +144,35 @@ export function committedByBudget({ payments = [], contracts = [], budgets = [],
     }
     return res;
 }
+
+/**
+ * Tiền thanh toán (trước thuế, gồm tạm ứng) theo tháng, để vẽ đường THỰC TẾ
+ * cạnh đường kế hoạch dòng tiền.
+ *  - kind 'certified': IPC đã duyệt, theo ngày nộp hồ sơ
+ *  - kind 'paid'     : IPC đã trả, theo ngày chuyển tiền (paid_date), thiếu thì ngày nộp
+ * @returns {Object<string, number>}  { 'YYYY-MM': số tiền trong tháng }
+ */
+export function paymentsByMonth(payments = [], kind = 'certified', projectId) {
+    const out = {};
+    payments.filter(p => (!projectId || p.project_id === projectId)
+        && (kind === 'paid' ? isPaidIPC(p) : isApprovedIPC(p))).forEach(p => {
+        const d = new Date((kind === 'paid' && p.paid_date) || p.submission_date || p.created_at || '');
+        if (isNaN(d)) return;
+        const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        const s = summarizeIPC(p);
+        out[k] = (out[k] || 0) + s.advance + s.certifiedExVat;
+    });
+    return out;
+}
+
+/**
+ * Dựng chuỗi LŨY KẾ trên trục tháng chung. Tháng sau `untilKey` (thường là
+ * tháng hiện tại) trả null để đường thực tế dừng ở hiện tại, không kéo phẳng tới tương lai.
+ */
+export function cumulativeSeries(monthKeys = [], byMonth = {}, untilKey = null) {
+    let acc = 0;
+    return monthKeys.map(k => {
+        acc += byMonth[k] || 0;
+        return untilKey && k > untilKey ? null : acc;
+    });
+}

@@ -2,6 +2,7 @@ import { paymentTotals, isApprovedIPC, isPaidIPC } from '../modules/payment/paym
 import { state, formatCurrency, formatCurrencyVND, getContractBudgetValue, getDynamicContractValue } from '../app.js';
 import { getLocalCashflow } from './cashflow-state.js';
 import { calculateForecastEngine, calculatePackageTotalPlanned } from './cashflow-calc.js';
+import { buildProgressCharts } from './cashflow-ui-progress.js';
 import { parseCurrencyInput } from '../utils/formatters.js';
 
 let chartInstances = [];
@@ -117,71 +118,10 @@ export function renderCashflow() {
     };
     chartInstances.push(new ApexCharts(document.querySelector("#cf-chart-1"), options1));
 
-    const sortedKeys = Object.keys(monthlyData).sort();
-    let cumulativePlanData = [];
-    let cumulativeLabels = [];
-    let currentCumulative = 0;
-    
-    if (sortedKeys.length === 0) {
-        cumulativeLabels = ['(No Data)'];
-        cumulativePlanData = [0];
-    } else {
-        sortedKeys.forEach(k => {
-            currentCumulative += monthlyData[k].plan;
-            cumulativePlanData.push(currentCumulative / 1000000000); 
-            cumulativeLabels.push(monthlyData[k].display);
-        });
-    }
-    
-    var options2 = {
-        series: [{ name: 'No Data', data: [0] }],
-        chart: { type: 'bar', height: 250, stacked: true, toolbar: { show: false } },
-        xaxis: { categories: ['-'] },
-        yaxis: { labels: { formatter: (val) => val + ' Tỷ' } }
-    };
-    chartInstances.push(new ApexCharts(document.querySelector("#cf-chart-2"), options2));
-
-    var options3 = {
-        series: [{
-            name: 'Planned Cumulative (Tỷ VNĐ)',
-            type: 'line',
-            data: cumulativePlanData
-        }],
-        chart: { 
-            height: '100%', 
-            type: 'line', 
-            toolbar: { show: true, tools: { zoom: true, pan: true, reset: true, download: true } }
-        },
-        stroke: { width: [3], curve: 'smooth' },
-        colors: ['#10b981'],
-        xaxis: { categories: cumulativeLabels, tickAmount: Math.min(12, cumulativeLabels.length) },
-        yaxis: { labels: { formatter: (val) => val.toFixed(1) + ' Tỷ' } },
-        legend: { position: 'top' },
-        tooltip: {
-            y: { formatter: function (val) { return formatCurrency(val * 1000000000); } }
-        }
-    };
-    chartInstances.push(new ApexCharts(document.querySelector("#cf-chart-3"), options3));
-
-    var options4 = {
-        series: [
-            { name: 'Planned', data: cumulativePlanData }
-        ],
-        chart: { 
-            type: 'line', 
-            height: '100%', 
-            toolbar: { show: true, tools: { zoom: true, pan: true, reset: true, download: true } } 
-        },
-        colors: ['#f97316'],
-        stroke: { curve: 'smooth', width: 3 },
-        xaxis: { categories: cumulativeLabels, tickAmount: Math.min(12, cumulativeLabels.length) },
-        yaxis: { labels: { formatter: (val) => val.toFixed(1) + ' Tỷ' } },
-        legend: { position: 'top' },
-        tooltip: {
-            y: { formatter: function (val) { return formatCurrency(val * 1000000000); } }
-        }
-    };
-    chartInstances.push(new ApexCharts(document.querySelector("#cf-chart-4"), options4));
+    // Biểu đồ tiến độ: kế hoạch vs thực tế (đã duyệt / đã trả) + phần còn lại theo HĐ
+    const planByMonth = {};
+    Object.keys(monthlyData).forEach(k => { planByMonth[k] = monthlyData[k].plan; });
+    chartInstances.push(...buildProgressCharts(planByMonth));
 
     chartInstances.forEach(c => c.render());
 }

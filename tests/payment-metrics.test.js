@@ -101,3 +101,17 @@ test('cùng cơ sở tiền thanh toán (gồm TƯ): đã trả không bao giờ
     assert.equal(paymentTotals(only, { filter: isApprovedIPC }).paymentExVat, 1_500_000_000);
     assert.equal(paymentTotals(only, { filter: isPaidIPC }).paymentExVat, 0);
 });
+
+import { paymentsByMonth, cumulativeSeries } from '../js/modules/payment/payment-metrics.js';
+test('đường thực tế: tiền đã duyệt / đã trả theo tháng, lũy kế, dừng ở tháng hiện tại', () => {
+    const ps = chain();   // tạm ứng T01 (Paid), I1 T02 (Paid), I2 T03 (Approved), I3 T04 (Draft)
+    const cert = paymentsByMonth(ps, 'certified', 'P');
+    const paid = paymentsByMonth(ps, 'paid', 'P');
+    assert.deepEqual(Object.keys(cert).sort(), ['2026-01', '2026-02', '2026-03']);
+    assert.equal(paid['2026-03'], undefined);
+    const keys = ['2026-01', '2026-02', '2026-03', '2026-04', '2026-05'];
+    const s = cumulativeSeries(keys, cert, '2026-04');
+    assert.equal(s[0], 1_500_000_000);
+    assert.ok(s[2] > s[1] && s[3] === s[2]);   // T04: Draft không tính → giữ nguyên
+    assert.equal(s[4], null);                  // sau tháng hiện tại → null
+});
