@@ -6,6 +6,8 @@
  * Định nghĩa (đều TRƯỚC THUẾ, trừ cashIncVat):
  *  - certifiedExVat : Σ (14) các IPC — tiền xác nhận cho công việc
  *  - grossThisPeriod: Σ giá trị KL gộp từng kỳ (không gồm tạm ứng)
+ *  - grossToDate    : giá trị công việc gộp LŨY KẾ đến IPC cuối được tính
+ *                     = "đã thực hiện" (Expended) theo nghĩa báo cáo chi phí
  *  - advancePaid    : Σ tạm ứng đã chi
  *  - apRecovered    : hoàn trả tạm ứng LŨY KẾ đến IPC cuối được tính
  *  - retentionHeld  : giữ lại LŨY KẾ đến IPC cuối được tính
@@ -30,10 +32,10 @@ export function paymentTotals(payments = [], { contractId, projectId, filter = (
     const byContract = new Map();
     list.forEach(p => { if (!byContract.has(p.contract_id)) byContract.set(p.contract_id, []); byContract.get(p.contract_id).push(p); });
 
-    const t = { certifiedExVat: 0, vat: 0, cashIncVat: 0, grossThisPeriod: 0, advancePaid: 0, apRecovered: 0, retentionHeld: 0, count: list.length };
+    const t = { certifiedExVat: 0, vat: 0, cashIncVat: 0, grossThisPeriod: 0, grossToDate: 0, advancePaid: 0, apRecovered: 0, retentionHeld: 0, count: list.length };
     for (const ipcs of byContract.values()) {
         ipcs.sort(ORDER);
-        let legacyAp = 0, legacyRet = 0, lastV2 = null;
+        let legacyAp = 0, legacyRet = 0, legacyGross = 0, lastV2 = null;
         for (const p of ipcs) {
             const s = summarizeIPC(p);
             t.certifiedExVat += s.certifiedExVat;
@@ -42,10 +44,11 @@ export function paymentTotals(payments = [], { contractId, projectId, filter = (
             t.grossThisPeriod += s.grossThisPeriod;
             t.advancePaid += s.advance;
             if (p.engine_version >= 2 && p.computed) lastV2 = p.computed;
-            else { legacyAp += Number(p.ap_deduction) || 0; legacyRet += Number(p.retention_deduction) || 0; }
+            else { legacyAp += Number(p.ap_deduction) || 0; legacyRet += Number(p.retention_deduction) || 0; legacyGross += s.grossThisPeriod; }
         }
         t.apRecovered += lastV2 ? lastV2.apRecoveryToDate : legacyAp;
         t.retentionHeld += lastV2 ? lastV2.retentionToDate : legacyRet;
+        t.grossToDate += (lastV2 ? lastV2.grossToDate : 0) + legacyGross;
     }
     t.advanceOutstanding = Math.max(0, t.advancePaid - t.apRecovered);
     return t;
@@ -74,35 +77,34 @@ export function monthlyTrend(payments = []) {
 }
 
 /**
- * Phân bổ "đã chi" (Σ (14) đã duyệt) về từng mục NGÂN SÁCH.
- * - HĐ có IPC xây dựng với dòng Bill mang mã ngân sách trùng mã của mục ngân
- *   sách trong dự án → chia theo tỷ trọng giá trị đến nay của từng dòng.
- * - Dòng không khớp mã nào / HĐ không có dòng → về mục ngân sách gắn với HĐ.
- * Tổng phân bổ luôn bằng tổng đã chi (phần lẻ làm tròn dồn về mục của HĐ).
+ * Phân bổ "đã thực hiện" (giá trị công việc GỘP đến nay của IPC đã duyệt,
+ * trước thuế — khớp cột "Đến nay" của sheet Budget code) về từng mục NGÂN SÁCH.
+ * - IPC xây dựng có dòng Bill: mỗi dòng về mục ngân sách trùng mã; phát sinh
+ *   đến nay (6) và dòng không khớp mã → về mục ngân sách gắn với HĐ.
+ * - HĐ không có dòng mã (tư vấn, IPC kiểu cũ) → toàn bộ về mục của HĐ.
+ * Tổng phân bổ luôn bằng tổng đã thực hiện.
  * @returns {Map<budgetId, number>}
  */
 export function expendedByBudget({ payments = [], contracts = [], budgets = [], projectId }) {
     const res = new Map();
-    const add = (id, v) => { if (id) res.set(id, (res.get(id) || 0) + v); };
+    const add = (id, v) => { if (id && v) res.set(id, (res.get(id) || 0) + v); };
     const byCode = new Map();
     budgets.filter(b => b.project_id === projectId && b.budgetCode)
         .forEach(b => { const k = String(b.budgetCode).trim(); if (!byCode.has(k)) byCode.set(k, b.id); });
 
     for (const c of contracts.filter(x => x.project_id === projectId)) {
-        const total = paymentTotals(payments, { contractId: c.contract_id, filter: isApprovedIPC }).certifiedExVat;
+        const total = paymentTotals(payments, { contractId: c.contract_id, filter: isApprovedIPC }).grossToDate;
         if (!total) continue;
-        const coded = payments.filter(p => p.contract_id === c.contract_id && isApprovedIPC(p)
-            && p.engine_version >= 2 && Array.isArray(p.lines) && p.lines.length).sort(ORDER);
-        const last = coded.at(-1);
-        const sumToDate = last ? last.lines.reduce((s, l) => s + (Number(l.to_date_amount) || 0), 0) : 0;
-        if (!last || !sumToDate) { add(c.budget_id, total); continue; }
+        const last = payments.filter(p => p.contract_id === c.contract_id && isApprovedIPC(p)
+            && p.engine_version >= 2 && Array.isArray(p.lines) && p.lines.length).sort(ORDER).at(-1);
+        if (!last) { add(c.budget_id, total); continue; }
         let allocated = 0;
         last.lines.forEach(l => {
-            const share = Math.round(total * (Number(l.to_date_amount) || 0) / sumToDate);
-            add(byCode.get(String(l.code || '').trim()) || c.budget_id, share);
-            allocated += share;
+            const v = Math.round(Number(l.to_date_amount) || 0);
+            add(byCode.get(String(l.code || '').trim()) || c.budget_id, v);
+            allocated += v;
         });
-        if (total - allocated) add(c.budget_id, total - allocated);
+        add(c.budget_id, total - allocated);   // phát sinh đến nay + phần IPC kiểu cũ (nếu có)
     }
     return res;
 }

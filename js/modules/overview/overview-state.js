@@ -1,4 +1,4 @@
-import { paymentTotals, isPaidIPC } from '../payment/payment-metrics.js';
+import { paymentTotals, isPaidIPC, isApprovedIPC } from '../payment/payment-metrics.js';
 import { state } from '../../app.js';
 import { parseCurrencyInput } from '../../utils/formatters.js';
 
@@ -65,7 +65,9 @@ export function calculateOverviewMetrics() {
     const totalRetentionHeld = paidTotals.retentionHeld;
     const totalUnrecoupedAdvance = paidTotals.advanceOutstanding;
 
-    const paymentPct = totalCommitted > 0 ? (totalPaid / totalCommitted) * 100 : 0;
+    // Đã thực hiện (thẻ "Total Expended"): giá trị công việc gộp đến nay của IPC đã duyệt
+    const totalExpended = paymentTotals(state.appData.Payments || [], { projectId, filter: isApprovedIPC }).grossToDate;
+    const paymentPct = totalCommitted > 0 ? (totalExpended / totalCommitted) * 100 : 0;
 
     return {
         budget: {
@@ -89,6 +91,7 @@ export function calculateOverviewMetrics() {
         },
         payment: {
             paid: totalPaid,
+            expended: totalExpended,
             advance: totalUnrecoupedAdvance,
             retention: totalRetentionHeld,
             pct: paymentPct

@@ -11,7 +11,7 @@ import { escapeHtml } from '../../../utils/formatters.js';
 import { state, formatCurrencyVND, formatCurrencyShort } from '../../../app.js';
 import { getIPCById } from '../payment-state.js';
 import { computeConsultancyIPC } from '../ipc-engine.js';
-import { contractIPCs, shortIPCCode, periodLabel } from '../ipc-chain.js';
+import { contractIPCs, ipcCode, periodLabel } from '../ipc-chain.js';
 import { renderApprovalActions } from './payment-approval-ui.js';
 import { renderCertTable, renderLinesTable, renderSummaryOfPayment, renderAPRecoup } from './ipc-cert-ui.js';
 
@@ -36,7 +36,7 @@ export function renderIPCDetail(ipcId) {
     // ── Header ──────────────────────────────────────────────
     const codeEl = document.getElementById('pay-detail-ipc-code');
     const statusEl = document.getElementById('pay-detail-status-badge');
-    if (codeEl) codeEl.textContent = shortIPCCode(ipc.ipc_id);
+    if (codeEl) codeEl.textContent = ipcCode(ipc);
     if (statusEl) statusEl.innerHTML = getStatusBadge(ipc.status);
 
     workspace.dataset.currentIpcId = ipcId;

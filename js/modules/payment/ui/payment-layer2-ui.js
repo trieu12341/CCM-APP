@@ -1,4 +1,4 @@
-import { shortIPCCode, periodLabel } from '../ipc-chain.js';
+import { ipcCode, periodLabel } from '../ipc-chain.js';
 import { escapeHtml } from '../../../utils/formatters.js';
 /**
  * payment-layer2-ui.js
@@ -64,7 +64,7 @@ export function renderIPCList(filterState = { search: '', status: 'All', contrac
     }
 
     tbody.innerHTML = payments.map((p, idx) => {
-        const ipcCode = shortIPCCode(p.ipc_id);
+        const code = ipcCode(p);
         // Số đầy đủ đến đồng; cột "Khấu trừ" = KL trình − xác nhận (giữ lại, thu hồi TƯ, phạt…)
         const s = summarizeIPC(p);
         const gross = p.is_advance ? s.advance : s.grossThisPeriod;
@@ -80,7 +80,7 @@ export function renderIPCList(filterState = { search: '', status: 'All', contrac
             <tr class="ipc-row" data-ipc-id="${p.ipc_id}" style="cursor:pointer;" title="Nhấn để xem chi tiết IPC">
                 <td style="text-align:center;color:#94a3b8;font-size:12px;">${idx + 1}</td>
                 <td>
-                    <span class="ipc-code" style="font-family:monospace;font-weight:700;color:var(--primary-blue);font-size:12px;">${ipcCode}</span>
+                    <span class="ipc-code" style="font-family:monospace;font-weight:700;color:var(--primary-blue);font-size:12px;">${code}</span>
                 </td>
                 <td>
                     <div style="font-weight:600;font-size:13px;line-height:1.4;">${escapeHtml(p.contract_name) || '<span style="color:#94a3b8;">—</span>'}</div>

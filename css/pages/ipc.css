@@ -53,3 +53,10 @@
 .net-payable-card { background: var(--brand-soft, #fbecea) !important; color: var(--text-dark) !important; border: 1px solid var(--border-color); }
 .net-payable-card .net-payable-label { color: var(--text-muted) !important; }
 .net-payable-card .net-payable-amount { color: var(--brand, #c63a25) !important; }
+
+/* Dòng IPC quá hạn / sắp đến hạn: nền nhạt theo token (trước dùng màu sáng cố định → chói ở chế độ tối) */
+.pay-pending-table .pending-row.urgency-overdue td { background: var(--accent-red-soft, #fcebeb) !important; }
+.pay-pending-table .pending-row.urgency-soon td { background: var(--accent-amber-soft, #fbf3e2) !important; }
+.pay-pending-table .pending-row td { color: var(--text-body, inherit); }
+.overdue-badge { background: var(--accent-red-soft, #fee2e2) !important; color: var(--accent-red, #dc2626) !important; }
+.pay-pending-table .pending-row.urgency-overdue, .pay-pending-table .pending-row.urgency-soon { background: transparent !important; }

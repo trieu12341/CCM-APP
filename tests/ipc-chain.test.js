@@ -67,3 +67,10 @@ test('Lấy dòng Bill từ kỳ trước: đến nay kỳ trước thành "kỳ
     const lines = linesFromPrevious([{ lines: [{ code: '102-02', description: 'Cọc', contract_amount: 100, to_date_amount: 60 }] }]);
     assert.deepEqual(lines[0], { code: '102-02', description: 'Cọc', contract_amount: 100, previous_amount: 60, to_date_amount: 60 });
 });
+
+import { ipcCode } from '../js/modules/payment/ipc-chain.js';
+test('mã IPC hiển thị theo số đợt: tạm ứng IPC-00, đợt 4 IPC-04; IPC cũ dùng mã nội bộ', () => {
+    assert.equal(ipcCode({ ipc_id: 'IPC-07-ab12', is_advance: true, payment_number: 0 }), 'IPC-00');
+    assert.equal(ipcCode({ ipc_id: 'IPC-09-zz11', payment_number: 4 }), 'IPC-04');
+    assert.equal(ipcCode({ ipc_id: 'ipc-3' }), 'IPC-3');
+});

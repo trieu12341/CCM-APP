@@ -14,7 +14,7 @@ export function renderProjectTabs() {
     state.appData.Projects.forEach(project => {
         const option = document.createElement('option');
         option.value = project.project_id;
-        option.textContent = project.project_name;
+        option.textContent = project.project_name || project.name || project.project_id;
         if (project.project_id === state.currentProjectId) {
             option.selected = true;
         }

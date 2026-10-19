@@ -18,7 +18,7 @@ export function renderDashboard() {
     // Update old #project-name if still exists, otherwise skip safely
     const projectNameEl = document.getElementById('project-name');
     if (projectNameEl) {
-        projectNameEl.innerHTML = `${project.project_name} <i class="fa-solid fa-gear" style="color: var(--primary-blue); font-size: 1.2rem;"></i>`;
+        projectNameEl.innerHTML = `${escapeHtml(project.project_name || project.name || '')} <i class="fa-solid fa-gear" style="color: var(--primary-blue); font-size: 1.2rem;"></i>`;
     }
     
     const metaElement = document.getElementById('project-meta-info');
@@ -70,8 +70,8 @@ export function renderDashboard() {
             let contractCommitted = getDynamicContractValue(contract, state.appData);
             
             let contractExpended = 0;
-            // Đã chi = Σ (14) các IPC đã duyệt/đã thanh toán (trước thuế, không gồm tạm ứng)
-            contractExpended += paymentTotals(state.appData.Payments || [], { contractId: contract.contract_id, filter: isApprovedIPC }).certifiedExVat;
+            // Đã thực hiện = giá trị công việc gộp đến nay của IPC đã duyệt (trước thuế)
+            contractExpended += paymentTotals(state.appData.Payments || [], { contractId: contract.contract_id, filter: isApprovedIPC }).grossToDate;
             
             committed += contractCommitted;
             expended += contractExpended;

@@ -112,5 +112,16 @@ export const lineKey = (l) => `${String(l.code || '').trim()}|${String(l.descrip
 /** Mã IPC ngắn để hiển thị (bỏ hậu tố chống trùng): IPC-07-ab12 → IPC-07. */
 export const shortIPCCode = (id) => String(id || '').replace(/^ipc-/i, 'IPC-').replace(/-[a-z0-9]{4}$/i, '');
 
+/**
+ * Mã IPC hiển thị theo SỐ ĐỢT của hợp đồng, khớp cách đánh số trên hồ sơ:
+ * tạm ứng = IPC-00, đợt 1 = IPC-01… (mã nội bộ ipc_id vẫn giữ để không trùng).
+ * IPC cũ chưa có số đợt → dùng mã nội bộ rút gọn.
+ */
+export const ipcCode = (ipc) => {
+    const n = ipc?.is_advance ? 0 : Number(ipc?.payment_number);
+    return Number.isFinite(n) && (ipc?.is_advance || ipc?.payment_number !== undefined && ipc?.payment_number !== '')
+        ? `IPC-${String(n).padStart(2, '0')}` : shortIPCCode(ipc?.ipc_id);
+};
+
 /** Nhãn đợt: "Tạm ứng" cho IPC 0, còn lại "Đợt n". */
 export const periodLabel = (ipc) => (ipc?.is_advance ? 'Tạm ứng' : `Đợt ${ipc?.payment_number ?? '—'}`);

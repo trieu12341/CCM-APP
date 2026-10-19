@@ -15,7 +15,7 @@ export function renderOverviewDashboard() {
         commitBar.className = metrics.budget.pct > 100 ? 'bento-progress-fill bg-red-500' : 'bento-progress-fill bg-cyan-500';
     }
 
-    document.getElementById('ow2-pay-paid').textContent = formatCurrencyVND(metrics.payment.paid);
+    document.getElementById('ow2-pay-paid').textContent = formatCurrencyVND(metrics.payment.expended ?? metrics.payment.paid);
     document.getElementById('ow2-pay-pct').textContent = metrics.payment.pct.toFixed(1) + '%';
     const payBar = document.getElementById('ow2-pay-bar');
     if (payBar) {

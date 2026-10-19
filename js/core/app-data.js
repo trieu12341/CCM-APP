@@ -18,6 +18,7 @@ import { initializeOverviewModule } from '../overview.js';
 import { initAdminUtils } from './admin-utils.js';
 import { setupSidebarEvents } from './sidebar-nav.js';
 import { handleProjectSnapshot } from './realtime-sync.js';
+import { mergeProjectLists } from './project-merge.js';
 
 let projectSwitchBound = false;
 
@@ -112,9 +113,13 @@ export async function loadAppData() {
             // Fetch the list of all projects
             const projects = await loadAllProjectsFromCloud();
             if (projects && projects.length > 0) {
-                state.appData.Projects = projects;
-                localStorage.setItem('ccm_projects', JSON.stringify(projects));
-                
+                // Gộp với bản cục bộ: giữ tên thật nếu cloud thiếu (dữ liệu bản cũ), rồi tự vá lên cloud
+                const { merged, needsCloudSave } = mergeProjectLists(projects, state.appData.Projects);
+                state.appData.Projects = merged;
+                localStorage.setItem('ccm_projects', JSON.stringify(merged));
+                if (needsCloudSave) saveProjectsToCloud(merged).catch(console.error);
+                try { renderProjectTabs(); } catch (e) { console.error('renderProjectTabs error:', e); }
+
                 const savedActiveId = localStorage.getItem('ccm_current_project_id');
                 if (savedActiveId && state.appData.Projects.some(p => p.project_id === savedActiveId)) {
                     state.currentProjectId = savedActiveId;

@@ -1,4 +1,4 @@
-import { periodLabel } from '../ipc-chain.js';
+import { periodLabel, ipcCode } from '../ipc-chain.js';
 import { escapeHtml } from '../../../utils/formatters.js';
 /**
  * payment-layer1-ui.js
@@ -154,7 +154,7 @@ function renderPendingTable(payments) {
 
         return `
             <tr class="pending-row ${urgencyClass}" data-ipc-id="${p.ipc_id}" style="cursor:pointer;">
-                <td><span class="ipc-code">${p.ipc_id.replace('ipc-', 'IPC-')}</span></td>
+                <td><span class="ipc-code">${ipcCode(p)}</span></td>
                 <td>
                     <div style="font-weight:600;font-size:13px;">${escapeHtml(p.contract_name) || '—'}</div>
                     <div style="font-size:11px;color:#64748b;">${escapeHtml(p.contractor_name) || ''}</div>

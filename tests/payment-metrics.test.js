@@ -52,14 +52,15 @@ test('biểu đồ theo tháng: trình = KL gộp kỳ, xác nhận / đã trả
     assert.ok(tr.paid[1] > 0 && tr.paid[2] === 0);
 });
 
-test('phân bổ đã chi theo mã ngân sách; mã không khớp về mục của HĐ; tổng không đổi', () => {
+test('đã thực hiện theo mã ngân sách = giá trị đến nay của từng dòng (gộp, trước thuế); mã không khớp về mục của HĐ', () => {
     const ps = chain();
     const budgets = [{ id: 'B-MAIN', project_id: 'P', budgetCode: '102-99' }, { id: 'B-PILE', project_id: 'P', budgetCode: '102-02' }];
     const m = expendedByBudget({ payments: ps, contracts: [contract], budgets, projectId: 'P' });
-    const total = paymentTotals(ps, { contractId: 'C1', filter: isApprovedIPC }).certifiedExVat;
-    // I2 là IPC đã duyệt cuối: 102-02 chiếm 900/2000
-    assert.equal(m.get('B-PILE'), Math.round(total * 900 / 2000));
+    const total = paymentTotals(ps, { contractId: 'C1', filter: isApprovedIPC }).grossToDate;
+    // I2 là IPC đã duyệt cuối: dòng 102-02 đến nay 900tr → về B-PILE nguyên giá trị
+    assert.equal(m.get('B-PILE'), 900_000_000);
     assert.equal((m.get('B-PILE') || 0) + (m.get('B-MAIN') || 0), total);
+    assert.equal(total, 2_000_000_000);
 });
 
 test('phân bổ cam kết theo giá trị HĐ của dòng Bill', async () => {
