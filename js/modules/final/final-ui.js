@@ -94,7 +94,8 @@ function renderCharts(doughnutData, barCategories, originalValues, finalValues) 
         dataLabels: { enabled: false },
         stroke: { show: true, width: 2, colors: ['transparent'] },
         xaxis: { categories: barCategories },
-        yaxis: { title: { text: 'Tỷ VNĐ' } },
+        yaxis: { title: { text: 'Tỷ VNĐ' }, labels: { formatter: (v) => (Number(v) || 0).toLocaleString('vi-VN', { maximumFractionDigits: 1 }) } },
+        tooltip: { y: { formatter: (v) => `${(Number(v) || 0).toLocaleString('vi-VN', { maximumFractionDigits: 3 })} tỷ` } },
         fill: { opacity: 1 },
         colors: ['#94a3b8', '#0ea5e9']
     };
