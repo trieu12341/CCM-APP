@@ -60,3 +60,14 @@
 .pay-pending-table .pending-row td { color: var(--text-body, inherit); }
 .overdue-badge { background: var(--accent-red-soft, #fee2e2) !important; color: var(--accent-red, #dc2626) !important; }
 .pay-pending-table .pending-row.urgency-overdue, .pay-pending-table .pending-row.urgency-soon { background: transparent !important; }
+
+/* Panel chi tiết IPC: khối bọc phải co giãn theo khung thì vùng thân mới cuộn được
+   (trước đây bảng CERT 16 dòng đẩy nút Phê duyệt ra ngoài màn hình, không cuộn tới). */
+#ipc-detail-panel:not(.hidden) { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+#ipc-detail-panel .detail-workspace-body { min-height: 0; }
+/* Khu Phê duyệt luôn hiện ở đáy panel */
+#ipc-detail-panel .approval-section {
+    position: sticky; bottom: -20px; z-index: 2; margin: 16px -20px -20px; padding: 14px 20px 18px;
+    background: var(--card-bg); border-top: 1px solid var(--border-color);
+    box-shadow: 0 -6px 16px rgba(0,0,0,.08);
+}
