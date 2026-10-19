@@ -1,4 +1,6 @@
-import { formatCurrencyVND } from '../../app.js';
+import { formatCurrencyVND, formatCurrency } from '../../app.js';
+import { setTone } from '../../utils/formatters.js';
+import { progressSeries, projectPlanByMonth } from '../../cashflow/cashflow-ui-progress.js';
 import { calculateOverviewMetrics } from './overview-state.js';
 
 export function renderOverviewDashboard() {
@@ -26,6 +28,7 @@ export function renderOverviewDashboard() {
     const uncommittedPct = metrics.budget.approved > 0 ? (uncommitted / metrics.budget.approved) * 100 : 0;
     
     document.getElementById('ow2-budget-uncommitted').textContent = formatCurrencyVND(uncommitted);
+    setTone(document.getElementById('ow2-budget-uncommitted'), uncommitted);
     document.getElementById('ow2-uncommit-pct').textContent = uncommittedPct.toFixed(1) + '%';
     const uncommitBar = document.getElementById('ow2-uncommit-bar');
     if (uncommitBar) {
@@ -71,8 +74,8 @@ function renderTenderDonut(tenderMetrics) {
     const options = {
         series: series,
         chart: { type: 'donut', height: 140, sparkline: { enabled: true } },
-        colors: ['#a855f7', '#f59e0b', '#3b82f6', '#cbd5e1'],
-        labels: ['Awarded', 'Eval', 'Bidding', 'Draft'],
+        colors: ['approved', 'submitted', 'plan', 'track'],
+        labels: ['Đã trao thầu', 'Đang chấm', 'Đang mời thầu', 'Chưa chạy'],
         stroke: { width: 0 },
         tooltip: {
             fixed: { enabled: false },
@@ -118,18 +121,21 @@ function renderTenderDonut(tenderMetrics) {
 
 function renderMiniSCurve() {
     if (!document.getElementById('ow2-cashflow-chart')) return;
-    
+    // Số thật của dự án (trước đây là dữ liệu mẫu cố định): lũy kế kế hoạch / đã duyệt / đã trả, tỷ VNĐ
+    const { cats, plan, certS, paidS } = progressSeries(projectPlanByMonth());
     const options = {
         series: [
-            { name: 'Planned', data: [0, 10, 25, 50, 75, 90, 100] },
-            { name: 'Actual', data: [0, 8, 20, 45, null, null, null] }
+            { name: 'Kế hoạch', data: plan },
+            { name: 'Đã duyệt', data: certS },
+            { name: 'Đã trả', data: paidS }
         ],
         chart: { type: 'line', height: 320, toolbar: { show: false } },
-        stroke: { curve: 'smooth', width: [3, 3] },
-        colors: ['#94a3b8', '#f43f5e'],
-        xaxis: { categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'] },
-        yaxis: { show: false },
-        grid: { show: false },
+        stroke: { curve: 'smooth', width: [2.5, 2.5, 2.5], dashArray: [5, 0, 0] },
+        colors: ['plan', 'approved', 'paid'],
+        xaxis: { categories: cats, tickAmount: Math.min(8, cats.length) },
+        yaxis: { labels: { formatter: (v) => (v === null || v === undefined ? '' : (Number(v) || 0).toLocaleString('vi-VN', { maximumFractionDigits: 1 }) + ' tỷ') } },
+        tooltip: { y: { formatter: (v) => (v === null || v === undefined ? '—' : formatCurrency(v * 1e9)) } },
+        grid: { strokeDashArray: 3 },
         legend: { position: 'top' }
     };
 

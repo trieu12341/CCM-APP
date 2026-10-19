@@ -18,27 +18,16 @@
 
     <!-- RIGHT: Actions -->
     <div class="topbar-actions" style="display: flex; align-items: center; gap: 15px;">
-        <button id="theme-toggle-btn" style="background: none; border: none; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; transition: background 0.2s;" onmouseover="this.style.background='var(--border-color)'" onmouseout="this.style.background='none'">
+        <button id="theme-toggle-btn" title="Đổi chế độ sáng / tối" aria-label="Đổi chế độ sáng / tối" style="background: none; border: none; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; transition: background 0.2s;" onmouseover="this.style.background='var(--border-color)'" onmouseout="this.style.background='none'">
             <i class="fa-solid fa-moon" style="font-size: 20px;"></i>
         </button>
-        <div class="search-bar" style="margin: 0;">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" placeholder="Search" style="padding: 6px 12px 6px 32px; border-radius: 6px; font-size: 0.85rem; width: 160px; background: var(--main-bg); color: var(--text-dark); border: 1px solid var(--border-color);">
-        </div>
-        <i class="fa-regular fa-bell" style="cursor: pointer; font-size: 1.1rem; color: var(--text-muted);"></i>
         <div id="user-info" style="display: flex; align-items: center; gap: 10px;">
-            <div style="text-align: right;">
-                <div id="user-name" style="font-weight: 600; font-size: 0.85rem;">-</div>
-                <div id="user-role" style="font-size: 0.7rem; color: var(--text-muted); text-transform: capitalize;">-</div>
-            </div>
-            <div class="avatar-initials" aria-hidden="true">QS</div>
-            
             <div class="admin-tools manager-only" style="display: none; align-items: center; gap: 8px; border-left: 1px solid var(--border-color); padding-left: 10px; margin-left: 5px;">
-                <button id="btn-admin-restore" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem; color: #3b82f6; border-color: #bfdbfe;" title="Restore Backup">
+                <button id="btn-admin-restore" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem; " title="Khôi phục bản sao lưu">
                     <i class="fa-solid fa-download"></i>
                 </button>
                 <input type="file" id="admin-restore-file" accept=".json" style="display: none;">
-                <button id="btn-admin-reset" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem; color: #ef4444; border-color: #fecaca; background: #fef2f2;" title="System Reset">
+                <button id="btn-admin-reset" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem; color: var(--accent-red); border-color: var(--accent-red); background: var(--accent-red-soft);" title="Xóa dữ liệu hệ thống">
                     <i class="fa-solid fa-triangle-exclamation"></i>
                 </button>
             </div>

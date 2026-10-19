@@ -164,8 +164,8 @@ function renderRightPane(contractId, contracts, allCashflows) {
     
     if (diff > 1) {
         alertEl.style.display = 'flex';
-        alertEl.style.backgroundColor = '#fffbeb'; // amber-50
-        alertEl.style.color = '#b45309'; // amber-700
+        alertEl.style.backgroundColor = 'var(--accent-amber-soft)';
+        alertEl.style.color = 'var(--status-orange-text)';
         alertEl.style.border = '1px solid #fcd34d'; // amber-300
         alertText.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="margin-right: 8px;"></i>Tổng Cashflow ${formatCurrencyDetailed(totalPlan)} chưa khớp với Giá trị Hợp đồng ${formatCurrencyDetailed(contractValue)}. Lệch ${formatCurrencyDetailed(diff)}.`;
     } else {

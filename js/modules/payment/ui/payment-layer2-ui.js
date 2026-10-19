@@ -55,7 +55,7 @@ export function renderIPCList(filterState = { search: '', status: 'All', contrac
     if (payments.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="10" style="text-align:center;padding:40px 0;color:#94a3b8;">
+                <td colspan="10" style="text-align:center;padding:40px 0;color:var(--text-muted);">
                     <i class="fa-regular fa-folder-open" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
                     Không có Hồ sơ Thanh toán nào phù hợp
                 </td>
@@ -73,29 +73,29 @@ export function renderIPCList(filterState = { search: '', status: 'All', contrac
         const netPay = s.payment;
         const ctType   = p.contract_type || 'Construction';
         const ctBadge  = ctType === 'Consultancy'
-            ? `<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:#fef3c7;color:#d97706;font-weight:700;">Tư vấn</span>`
-            : `<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:#e0f2fe;color:#0369a1;font-weight:700;">Xây dựng</span>`;
+            ? `<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:var(--accent-violet-soft);color:var(--accent-violet);font-weight:700;">Tư vấn</span>`
+            : `<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:var(--accent-blue-soft);color:var(--accent-blue);font-weight:700;">Xây dựng</span>`;
 
         return `
             <tr class="ipc-row" data-ipc-id="${p.ipc_id}" style="cursor:pointer;" title="Nhấn để xem chi tiết IPC">
-                <td style="text-align:center;color:#94a3b8;font-size:12px;">${idx + 1}</td>
+                <td style="text-align:center;color:var(--text-muted);font-size:12px;">${idx + 1}</td>
                 <td>
                     <span class="ipc-code" style="font-family:monospace;font-weight:700;color:var(--primary-blue);font-size:12px;">${code}</span>
                 </td>
                 <td>
-                    <div style="font-weight:600;font-size:13px;line-height:1.4;">${escapeHtml(p.contract_name) || '<span style="color:#94a3b8;">—</span>'}</div>
-                    <div style="font-size:11px;color:#64748b;margin-top:2px;">${escapeHtml(p.contractor_name) || ''} ${ctBadge}</div>
+                    <div style="font-weight:600;font-size:13px;line-height:1.4;">${escapeHtml(p.contract_name) || '<span style="color:var(--text-muted);">—</span>'}</div>
+                    <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${escapeHtml(p.contractor_name) || ''} ${ctBadge}</div>
                 </td>
                 <td style="text-align:center;font-weight:600;">${periodLabel(p)}</td>
-                <td style="text-align:center;color:#64748b;font-size:12px;">${formatDateShort(p.submission_date)}</td>
+                <td style="text-align:center;color:var(--text-muted);font-size:12px;">${formatDateShort(p.submission_date)}</td>
                 <td style="text-align:right;font-size:13px;">${p.is_advance ? '—' : formatCurrencyVND(gross)}</td>
-                <td style="text-align:right;font-size:13px;color:#ef4444;">${qsDed > 0 ? '- ' + formatCurrencyVND(qsDed) : '—'}</td>
-                <td style="text-align:right;font-size:13px;font-weight:600;color:#10b981;">${p.is_advance ? '—' : formatCurrencyVND(certified)}</td>
+                <td style="text-align:right;font-size:13px;color:var(--accent-red);">${qsDed > 0 ? '- ' + formatCurrencyVND(qsDed) : '—'}</td>
+                <td style="text-align:right;font-size:13px;font-weight:600;color:var(--accent-teal);">${p.is_advance ? '—' : formatCurrencyVND(certified)}</td>
                 <td style="text-align:right;font-size:13px;font-weight:700;color:var(--primary-blue);">${formatCurrencyVND(netPay)}</td>
                 <td style="text-align:center;">${getStatusBadge(p.status)}</td>
                 <td style="text-align:center;">
                     <button class="btn-ipc-detail" data-ipc-id="${p.ipc_id}"
-                        style="background:none;border:1px solid #e2e8f0;border-radius:6px;padding:4px 10px;
+                        style="background:none;border:1px solid var(--border-color);border-radius:6px;padding:4px 10px;
                                cursor:pointer;font-size:12px;color:var(--primary-blue);
                                transition:all 0.18s;white-space:nowrap;"
                         title="Xem chi tiết">

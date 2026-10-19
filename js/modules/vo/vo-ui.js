@@ -150,8 +150,8 @@ export function renderChartDoughnut(projectVOs) {
     const options = {
         series: [approved, pending, rejected],
         chart: { type: 'donut', height: 280 },
-        labels: ['Approved', 'Pending', 'Rejected'],
-        colors: ['#10b981', '#f59e0b', '#ef4444'], // green, yellow, red
+        labels: ['Đã duyệt', 'Chờ duyệt', 'Từ chối'],
+        colors: ['approved', 'submitted', 'negative'],
         dataLabels: { enabled: false },
         plotOptions: {
             pie: {
@@ -160,8 +160,8 @@ export function renderChartDoughnut(projectVOs) {
                     labels: {
                         show: true,
                         name: { show: true },
-                        value: { show: true, formatter: (val) => val + " VOs" },
-                        total: { show: true, showAlways: true, label: 'Total VOs', formatter: (w) => w.globals.seriesTotals.reduce((a, b) => a + b, 0) }
+                        value: { show: true, formatter: (val) => val + " VO" },
+                        total: { show: true, showAlways: true, label: 'Tổng số VO', formatter: (w) => w.globals.seriesTotals.reduce((a, b) => a + b, 0) }
                     }
                 }
             }
@@ -206,14 +206,14 @@ export function renderChartBar(projectVOs, projectContracts) {
 
     const options = {
         series: [{
-            name: 'Claimed (Đệ trình)',
+            name: 'NT đề xuất',
             data: claimedData
         }, {
-            name: 'Approved (QS Duyệt)',
+            name: 'QS duyệt',
             data: approvedData
         }],
         chart: { type: 'bar', height: 280, stacked: false },
-        colors: ['#f59e0b', '#10b981'],
+        colors: ['submitted', 'approved'],
         plotOptions: {
             bar: {
                 horizontal: true,

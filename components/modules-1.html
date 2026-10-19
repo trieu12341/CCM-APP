@@ -1,16 +1,16 @@
                 <div id="module-overview" class="hidden">
-                    <div class="section-title">Executive Dashboard</div>
+                    <div class="section-title">Tổng quan dự án</div>
                     
                     <!-- HÀNG 1: TOP EXECUTIVE KPI CARDS -->
                     <div class="overview-top-kpi-grid">
                         <div class="bento-card interactive-widget card-budget" id="widget-budget">
                             <div class="bento-icon"><i class="fa-solid fa-wallet"></i></div>
-                            <div class="bento-label">APPROVED BUDGET</div>
+                            <div class="bento-label">Ngân sách duyệt</div>
                             <div class="bento-value text-white" id="ow2-budget-approved">0</div>
                         </div>
                         <div class="bento-card interactive-widget card-committed" id="widget-committed">
                             <div class="bento-icon bg-cyan-100 text-cyan-600"><i class="fa-solid fa-file-contract"></i></div>
-                            <div class="bento-label">TOTAL COMMITTED</div>
+                            <div class="bento-label">Đã cam kết (giá trị HĐ)</div>
                             <div class="bento-value text-cyan-600" id="ow2-budget-committed">0</div>
                             <div class="bento-progress">
                                 <div class="bento-progress-bg"><div class="bento-progress-fill bg-cyan-500" id="ow2-commit-bar" style="width: 0%;"></div></div>
@@ -19,7 +19,7 @@
                         </div>
                         <div class="bento-card interactive-widget card-expended" id="widget-expended">
                             <div class="bento-icon bg-emerald-100 text-emerald-600"><i class="fa-solid fa-money-bill-wave"></i></div>
-                            <div class="bento-label">TOTAL EXPENDED</div>
+                            <div class="bento-label">Đã thực hiện</div>
                             <div class="bento-value text-emerald-600" id="ow2-pay-paid">0</div>
                             <div class="bento-progress">
                                 <div class="bento-progress-bg"><div class="bento-progress-fill bg-emerald-500" id="ow2-pay-bar" style="width: 0%;"></div></div>
@@ -28,11 +28,11 @@
                         </div>
                         <div class="bento-card interactive-widget card-uncommitted" id="widget-uncommitted">
                             <div class="bento-icon bg-purple-100 text-purple-600"><i class="fa-solid fa-coins"></i></div>
-                            <div class="bento-label">UNCOMMITTED BUDGET</div>
+                            <div class="bento-label">Ngân sách chưa cam kết</div>
                             <div class="bento-value text-purple-600" id="ow2-budget-uncommitted">0</div>
                             <div class="bento-progress">
                                 <div class="bento-progress-bg"><div class="bento-progress-fill bg-purple-500" id="ow2-uncommit-bar" style="width: 0%;"></div></div>
-                                <div class="bento-progress-text"><span id="ow2-uncommit-pct">0%</span> Available</div>
+                                <div class="bento-progress-text"><span id="ow2-uncommit-pct">0%</span> còn lại</div>
                             </div>
                         </div>
                     </div>
@@ -46,17 +46,17 @@
                             <!-- TENDER PIPELINE -->
                             <div class="bento-widget interactive-widget" id="widget-tender">
                                 <div class="bento-widget-header">
-                                    <span><i class="fa-solid fa-file-signature text-purple-500"></i> Tender Pipeline</span>
+                                    <span><i class="fa-solid fa-file-signature text-purple-500"></i> Tiến độ đấu thầu</span>
                                 </div>
                                 <div class="bento-widget-body" style="display: flex; gap: 1rem; align-items: center;">
                                     <div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                                        <div class="pill-badge pill-purple">
+                                        <div class="pill-badge pill-blue">
                                             <span class="pill-val" id="ow2-tender-awarded">0</span> <span class="pill-lbl">Đã trao thầu</span>
                                         </div>
                                         <div class="pill-badge pill-amber">
                                             <span class="pill-val" id="ow2-tender-eval">0</span> <span class="pill-lbl">Đang xét thầu</span>
                                         </div>
-                                        <div class="pill-badge pill-blue">
+                                        <div class="pill-badge pill-plan">
                                             <span class="pill-val" id="ow2-tender-bidding">0</span> <span class="pill-lbl">Đang mời thầu</span>
                                         </div>
                                         <div class="pill-badge pill-slate">
@@ -70,23 +70,23 @@
                             <!-- CONTRACT & VO -->
                             <div class="bento-widget interactive-widget" id="widget-contract">
                                 <div class="bento-widget-header">
-                                    <span><i class="fa-solid fa-file-contract text-indigo-500"></i> Contract &amp; Variations</span>
+                                    <span><i class="fa-solid fa-file-contract text-indigo-500"></i> Hợp đồng &amp; phát sinh</span>
                                 </div>
                                 <div class="bento-widget-body">
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                        <div class="text-sm text-slate-500">Original Total</div>
+                                        <div class="text-sm text-slate-500">Giá trị HĐ gốc</div>
                                         <div class="font-semibold" id="ow2-contract-original">0 VNĐ</div>
                                     </div>
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
-                                        <div class="text-sm text-slate-500">Approved VOs</div>
+                                        <div class="text-sm text-slate-500">VO đã duyệt</div>
                                         <div class="font-semibold text-red-500" id="ow2-contract-vo">0 VNĐ</div>
                                     </div>
                                     <div class="bento-progress" style="margin-bottom: 1rem;">
-                                        <div class="bento-progress-text text-red-500 text-xs font-semibold" style="margin-bottom: 4px;">VO Ratio: <span id="ow2-contract-vo-pct">0%</span></div>
+                                        <div class="bento-progress-text text-red-500 text-xs font-semibold" style="margin-bottom: 4px;">Tỷ lệ VO: <span id="ow2-contract-vo-pct">0%</span></div>
                                         <div class="bento-progress-bg"><div class="bento-progress-fill bg-red-500" id="ow2-contract-vo-bar" style="width: 0%;"></div></div>
                                     </div>
                                     <div style="display: flex; justify-content: space-between; padding-top: 0.75rem; border-top: 1px dashed var(--border-color);">
-                                        <div class="text-sm font-semibold">Revised Total</div>
+                                        <div class="text-sm font-semibold">Giá trị quyết toán dự kiến</div>
                                         <div class="font-bold text-lg text-indigo-600" id="ow2-contract-revised">0 VNĐ</div>
                                     </div>
                                 </div>
@@ -99,22 +99,22 @@
                             <!-- CASHFLOW S-CURVE -->
                             <div class="bento-widget interactive-widget" id="widget-cashflow" style="height: 100%; display: flex; flex-direction: column;">
                                 <div class="bento-widget-header">
-                                    <span><i class="fa-solid fa-chart-line text-rose-500"></i> Cashflow S-Curve</span>
+                                    <span><i class="fa-solid fa-chart-line"></i> Đường S dòng tiền (lũy kế, tỷ VNĐ)</span>
                                 </div>
                                 <div class="bento-widget-body" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
                                     <div id="ow2-cashflow-chart" style="width: 100%; height: 320px; max-height: 320px;"></div>
                                     
                                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
                                         <div class="text-center">
-                                            <div class="text-xs text-slate-500 uppercase tracking-wider mb-1">Total Paid</div>
+                                            <div class="text-xs text-slate-500 uppercase tracking-wider mb-1">Đã trả</div>
                                             <div class="font-bold text-emerald-600 text-sm" id="ow2-pay-paid-bottom">0 VNĐ</div>
                                         </div>
                                         <div class="text-center" style="border-left: 1px solid var(--border-color); border-right: 1px solid var(--border-color);">
-                                            <div class="text-xs text-slate-500 uppercase tracking-wider mb-1">Unrecouped Adv.</div>
+                                            <div class="text-xs text-slate-500 uppercase tracking-wider mb-1">Tạm ứng chưa thu hồi</div>
                                             <div class="font-bold text-orange-500 text-sm" id="ow2-pay-advance">0 VNĐ</div>
                                         </div>
                                         <div class="text-center">
-                                            <div class="text-xs text-slate-500 uppercase tracking-wider mb-1">Retention Held</div>
+                                            <div class="text-xs text-slate-500 uppercase tracking-wider mb-1">Giữ lại bảo hành</div>
                                             <div class="font-bold text-slate-700 text-sm" id="ow2-pay-retention">0 VNĐ</div>
                                         </div>
                                     </div>
@@ -129,8 +129,8 @@
 
                     <!-- Metrics -->
                     <div class="section-title" style="display: flex; justify-content: space-between; width: 100%;">
-                        Budget Executive Dashboard
-                        <button class="btn btn-primary" id="btn-open-budget-list" style="background-color: var(--primary-blue); font-weight: bold;"><i class="fa-solid fa-table-list"></i> Bảng Chi Tiết Phân Bổ Ngân Sách</button>
+                        Ngân sách
+                        <button class="btn btn-primary" id="btn-open-budget-list" style="background-color: var(--brand); font-weight: bold;"><i class="fa-solid fa-table-list"></i> Bảng Chi Tiết Phân Bổ Ngân Sách</button>
                     </div>
 
                     <!-- LAYER 1: KPI Grid -->
@@ -138,7 +138,7 @@
                         <!-- Card 1 -->
                         <div class="kpi-card kpi-card-slate interactive-kpi" id="kpi-card-budget" title="Bấm để xem chi tiết Bảng phân bổ (Reset Filter)">
                             <div class="kpi-header">
-                                <span class="kpi-title">APPROVED BUDGET BASELINE</span>
+                                <span class="kpi-title">Ngân sách duyệt</span>
                             </div>
                             <div class="kpi-value" id="metric-total-budget">0 <span>VNĐ</span></div>
                         </div>
@@ -146,7 +146,7 @@
                         <!-- Card 2 -->
                         <div class="kpi-card kpi-card-blue interactive-kpi" id="kpi-card-committed" title="Bấm để xem chi tiết các hạng mục đã Cam kết chi phí (Committed > 0)">
                             <div class="kpi-header">
-                                <span class="kpi-title">COMMITTED COST</span>
+                                <span class="kpi-title">Đã cam kết</span>
                                 <span class="kpi-count" id="metric-allocated-pct">0%</span>
                             </div>
                             <div class="kpi-value" id="metric-allocated">0 <span>VNĐ</span></div>
@@ -155,7 +155,7 @@
                         <!-- Card 3 -->
                         <div class="kpi-card kpi-card-slate interactive-kpi" id="kpi-card-projected" title="Bấm để xem chi tiết các hạng mục VƯỢT NGÂN SÁCH (Projected > Baseline)">
                             <div class="kpi-header">
-                                <span class="kpi-title">PROJECTED FINAL COST</span>
+                                <span class="kpi-title">Chi phí cuối dự kiến</span>
                             </div>
                             <div class="kpi-value" id="metric-projected">0 <span>VNĐ</span></div>
                         </div>
@@ -163,7 +163,7 @@
                         <!-- Card 4 -->
                         <div class="kpi-card kpi-card-orange interactive-kpi" id="kpi-card-contingency" title="Bấm để tìm và highlight dòng Ngân sách Dự phòng (Contingency)">
                             <div class="kpi-header">
-                                <span class="kpi-title">REMAINING CONTINGENCY</span>
+                                <span class="kpi-title">Dự phòng còn lại</span>
                             </div>
                             <div class="kpi-value" id="metric-contingency">0 <span>VNĐ</span></div>
                         </div>
@@ -172,7 +172,7 @@
                     <!-- LAYER 1: Charts Area -->
                     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1rem;">
                         <div style="background: var(--card-bg); padding: 14px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                            <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 14px; font-weight: 600;">Budget vs Committed vs Expended</h3>
+                            <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 14px; font-weight: 600;">Ngân sách / Cam kết / Đã thực hiện</h3>
                             <div id="budget-chart-bar" style="height: 350px;"></div>
                         </div>
                         <div style="background: var(--card-bg); padding: 14px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
@@ -181,40 +181,13 @@
                         </div>
                     </div>
 
-                    <!-- Bottom Section Layout -->
-                    <div class="bottom-grid">
-                        <div class="documents-section">
-                            <div class="section-title">Key Project Documents <span class="add-icon manager-hide">+</span></div>
-                            <div class="documents-grid" id="documents-grid">
-                                <!-- JS injected -->
-                                <div class="document-upload manager-hide">
-                                    <i class="fa-solid fa-arrow-up-from-bracket"></i> Uploader
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="quick-actions-section">
-                            <div class="section-title">Quick Actions Sidebar</div>
-                            <div class="quick-actions-list manager-hide">
-                                <button id="btn-initiate-payment"><i class="fa-regular fa-file-lines"></i> Initiate Payment Claim</button>
-                                <button><i class="fa-regular fa-pen-to-square"></i> Log VO Request</button>
-                                <button><i class="fa-solid fa-list-check"></i> Log VO Request</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Recent Financial Activities -->
-                    <div class="section-title" style="margin-top: 2rem;">Recent Financial Activities <span class="add-icon">+</span></div>
-                    <div class="activities-timeline" id="activities-timeline">
-                        <!-- JS injected -->
-                    </div>
                 </div>
 
                 <!-- Tender Module -->
                 <div id="module-tender" class="hidden">
                     <div id="tender-list-view">
                         <div class="section-title" style="display: flex; justify-content: space-between; width: 100%;">
-                            Tender Executive Dashboard
+                            Đấu thầu
                             <div style="display: flex; gap: 1rem;">
                                 <button class="btn bg-amber-700 hover:bg-amber-800 text-white font-semibold px-4 py-2 rounded-lg shadow" id="btn-open-tender-list"><i class="fa-solid fa-table-list"></i> Bảng Chi Tiết Tiến Độ Đấu Thầu</button>
                                 <button class="btn btn-primary manager-hide" id="btn-new-tender">+ Tạo Gói thầu mới</button>
@@ -226,7 +199,7 @@
                             <!-- Card 1 -->
                             <div class="kpi-card kpi-card-slate">
                                 <div class="kpi-header">
-                                    <span class="kpi-title">TOTAL TENDER BUDGET</span>
+                                    <span class="kpi-title">Tổng dự toán gói thầu</span>
                                 </div>
                                 <div class="kpi-value" id="tender-kpi-total-val">0 <span>VNĐ</span></div>
                             </div>
@@ -234,7 +207,7 @@
                             <!-- Card 2 -->
                             <div class="kpi-card kpi-card-amber">
                                 <div class="kpi-header">
-                                    <span class="kpi-title">FLOATING (PHÁT HÀNH)</span>
+                                    <span class="kpi-title">Đang phát hành</span>
                                     <span class="kpi-count"><span id="tender-kpi-floating-count">0</span> gói</span>
                                 </div>
                                 <div class="kpi-value" id="tender-kpi-floating-val">0 <span>VNĐ</span></div>
@@ -243,7 +216,7 @@
                             <!-- Card 3 -->
                             <div class="kpi-card kpi-card-blue">
                                 <div class="kpi-header">
-                                    <span class="kpi-title">EVALUATING (CHẤM THẦU)</span>
+                                    <span class="kpi-title">Đang chấm thầu</span>
                                     <span class="kpi-count"><span id="tender-kpi-evaluating-count">0</span> gói</span>
                                 </div>
                                 <div class="kpi-value" id="tender-kpi-evaluating-val">0 <span>VNĐ</span></div>
@@ -252,7 +225,7 @@
                             <!-- Card 4 -->
                             <div class="kpi-card kpi-card-emerald">
                                 <div class="kpi-header">
-                                    <span class="kpi-title">AWARDED (ĐÃ TRAO THẦU)</span>
+                                    <span class="kpi-title">Đã trao thầu</span>
                                     <span class="kpi-count"><span id="tender-kpi-awarded-count">0</span> gói</span>
                                 </div>
                                 <div class="kpi-value" id="tender-kpi-awarded-val">0 <span>VNĐ</span></div>
@@ -279,7 +252,7 @@
                 <!-- Contract Module -->
                 <div id="contract-view" class="hidden">
                     <div class="section-title" style="display: flex; justify-content: space-between; width: 100%;">
-                        Contract Executive Dashboard
+                        Hợp đồng
                         <div style="display: flex; gap: 1rem;">
                             <!-- Top action button for Layer 2 -->
                             <button class="btn bg-amber-700 hover:bg-amber-800 text-white font-semibold px-4 py-2 rounded-lg shadow" id="btn-open-contract-list"><i class="fa-solid fa-table-list"></i> Bảng Chi Tiết Hợp Đồng</button>
@@ -297,7 +270,7 @@
                         <!-- Card 1 -->
                         <div class="kpi-card kpi-card-slate">
                             <div class="kpi-header">
-                                <span class="kpi-title">TOTAL APPROVED BUDGET</span>
+                                <span class="kpi-title">Ngân sách duyệt</span>
                             </div>
                             <div class="kpi-value" id="contract-kpi-budget">0 <span>VNĐ</span></div>
                         </div>
@@ -305,7 +278,7 @@
                         <!-- Card 2 -->
                         <div class="kpi-card kpi-card-emerald">
                             <div class="kpi-header">
-                                <span class="kpi-title">TOTAL CONTRACT VALUE</span>
+                                <span class="kpi-title">Tổng giá trị HĐ</span>
                             </div>
                             <div class="kpi-value" id="contract-kpi-committed">0 <span>VNĐ</span></div>
                         </div>
@@ -313,7 +286,7 @@
                         <!-- Card 3 -->
                         <div class="kpi-card kpi-card-blue">
                             <div class="kpi-header">
-                                <span class="kpi-title">BUDGET VARIANCE (SAVINGS)</span>
+                                <span class="kpi-title">Chênh lệch ngân sách (tiết kiệm)</span>
                             </div>
                             <div class="kpi-value" id="contract-kpi-variance">0 <span>VNĐ</span></div>
                         </div>
@@ -321,7 +294,7 @@
                         <!-- Card 4 -->
                         <div class="kpi-card kpi-card-orange">
                             <div class="kpi-header">
-                                <span class="kpi-title">AWARDED RATE</span>
+                                <span class="kpi-title">Tỷ lệ đã ký HĐ</span>
                             </div>
                             <div class="kpi-value" id="contract-kpi-awarded-rate">0%</div>
                         </div>
@@ -330,11 +303,11 @@
                     <!-- LAYER 1: Charts Area -->
                     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
                         <div style="background: var(--card-bg); padding: 14px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                            <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 14px; font-weight: 600;">Budget vs Actual by Category</h3>
+                            <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 14px; font-weight: 600;">Ngân sách vs giá trị HĐ theo nhóm</h3>
                             <div id="contract-chart-bar" style="height: 350px;"></div>
                         </div>
                         <div style="background: var(--card-bg); padding: 14px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                            <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 14px; font-weight: 600;">Contract Value Breakdown</h3>
+                            <h3 style="margin-bottom: 1rem; color: var(--text-dark); font-size: 14px; font-weight: 600;">Cơ cấu giá trị HĐ</h3>
                             <div id="contract-chart-pie" style="height: 350px;"></div>
                         </div>
                     </div>

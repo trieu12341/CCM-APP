@@ -74,7 +74,7 @@ function renderTrendChart(payments) {
     // If no data, show empty state
     if (trend.categories.length === 0) {
         chartEl.innerHTML = `
-            <div style="height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#94a3b8;gap:8px;">
+            <div style="height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-muted);gap:8px;">
                 <i class="fa-regular fa-chart-bar" style="font-size:2rem;"></i>
                 <span style="font-size:13px;">Chưa có dữ liệu IPC để hiển thị biểu đồ</span>
             </div>`;
@@ -91,9 +91,9 @@ function renderTrendChart(payments) {
             background: 'transparent',
         },
         series: [
-            { name: 'Giá trị Trình (Submitted)', data: trend.submitted },
-            { name: 'Đã Phê duyệt (Certified)', data: trend.certified },
-            { name: 'Đã Thanh toán (Paid)', data: trend.paid },
+            { name: 'NT đề nghị', data: trend.submitted },
+            { name: 'Đã duyệt', data: trend.certified },
+            { name: 'Đã trả', data: trend.paid },
         ],
         xaxis: {
             categories: trend.categories,
@@ -105,13 +105,13 @@ function renderTrendChart(payments) {
                 style: { fontSize: '10px' },
             },
         },
-        colors: ['#3b82f6', '#10b981', '#8b5cf6'],
+        colors: ['submitted', 'approved', 'paid'],
         plotOptions: {
             bar: { borderRadius: 4, columnWidth: '65%' },
         },
         dataLabels: { enabled: false },
         legend: { position: 'top', fontSize: '12px' },
-        grid: { borderColor: '#f1f5f9', strokeDashArray: 3 },
+        grid: { strokeDashArray: 3 },
         tooltip: {
             y: { formatter: v => `${formatCurrencyVND(v)} VNĐ` },
         },
@@ -134,7 +134,7 @@ function renderPendingTable(payments) {
     if (pending.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="6" style="text-align:center;padding:24px 0;color:#94a3b8;">
+                <td colspan="6" style="text-align:center;padding:24px 0;color:var(--text-muted);">
                     <i class="fa-regular fa-circle-check" style="margin-right:6px;"></i>
                     Không có hồ sơ nào đang chờ xử lý
                 </td>
@@ -157,7 +157,7 @@ function renderPendingTable(payments) {
                 <td><span class="ipc-code">${ipcCode(p)}</span></td>
                 <td>
                     <div style="font-weight:600;font-size:13px;">${escapeHtml(p.contract_name) || '—'}</div>
-                    <div style="font-size:11px;color:#64748b;">${escapeHtml(p.contractor_name) || ''}</div>
+                    <div style="font-size:11px;color:var(--text-muted);">${escapeHtml(p.contractor_name) || ''}</div>
                 </td>
                 <td style="text-align:center;">${periodLabel(p)}</td>
                 <td style="text-align:right">${formatCurrencyVND(p.net_payable || p.gross_work_done)}</td>

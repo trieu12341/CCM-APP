@@ -17,7 +17,8 @@
   --radius-sm: 6px; --radius: 8px;
   --control-h: 32px;
 
-  /* Bảng màu sáng — trung tính, đỏ thương hiệu VCRE làm điểm nhấn */
+  /* Bảng màu sáng — trung tính, chàm (indigo) thương hiệu CCM làm điểm nhấn.
+     Đỏ chỉ dành cho cảnh báo / xóa / vượt ngân sách. */
   --main-bg: #f4f6f9;
   --card-bg: #ffffff;
   --sidebar-bg: #ffffff;
@@ -36,11 +37,12 @@
   --border-color: #e4e8ee;
   --border-strong: #d3d9e2;
 
-  --brand: #c63a25;
-  --brand-hover: #a93020;
-  --brand-soft: #fbeceA;
+  --brand: #4148d6;
+  --brand-hover: #333ab8;
+  --brand-soft: #eceefd;
+  --brand-ink: #3a41c8;      /* chữ màu thương hiệu trên nền sáng */
   --primary-brand: var(--brand);
-  --primary-blue: var(--brand);     /* biến cũ: giữ màu logo */
+  --primary-blue: var(--brand-ink); /* biến cũ: dùng cho chữ nhấn (mã HĐ, mã VO…) */
 
   --accent-blue: #2563eb;  --accent-blue-soft: #e8effd;
   --accent-teal: #0e9f8e;  --accent-teal-soft: #e3f5f2;
@@ -56,6 +58,16 @@
   --status-orange-bg: var(--accent-amber-soft);
   --status-orange-text: #8a5a12;
 
+  /* Màu biểu đồ ngữ nghĩa (đọc bởi js/theme-toggle.js) */
+  --chart-plan: #94a3b8;
+  --chart-submitted: #d4912a;
+  --chart-approved: #2f6fdf;
+  --chart-paid: #0e9f8e;
+  --chart-negative: #d14343;
+  --chart-track: #dfe4ec;
+  --chart-soft: #8b5cf6;
+  --chart-hard: #2f6fdf;
+  --chart-contingency: #d4912a;
   --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04);
   --shadow-pop: 0 8px 24px rgba(16, 24, 40, 0.12);
 }
@@ -80,11 +92,12 @@
   --border-color: #243045;
   --border-strong: #2f3c55;
 
-  --brand: #e2533c;
-  --brand-hover: #ec6a55;
-  --brand-soft: rgba(226, 83, 60, 0.14);
+  --brand: #6a70f4;
+  --brand-hover: #7f85ff;
+  --brand-soft: rgba(106, 112, 244, 0.16);
+  --brand-ink: #a5a9ff;      /* chữ màu thương hiệu trên nền tối */
   --primary-brand: var(--brand);
-  --primary-blue: var(--brand);
+  --primary-blue: var(--brand-ink);
 
   --accent-blue: #6b9cff;  --accent-blue-soft: rgba(107, 156, 255, 0.14);
   --accent-teal: #34c3ae;  --accent-teal-soft: rgba(52, 195, 174, 0.14);
@@ -100,6 +113,15 @@
   --status-orange-bg: var(--accent-amber-soft);
   --status-orange-text: #f2c27a;
 
+  --chart-plan: #8190a8;
+  --chart-submitted: #e3a545;
+  --chart-approved: #6b9cff;
+  --chart-paid: #34c3ae;
+  --chart-negative: #f07171;
+  --chart-track: #2a3550;
+  --chart-soft: #a98bf0;
+  --chart-hard: #6b9cff;
+  --chart-contingency: #e3a545;
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-pop: 0 12px 32px rgba(0, 0, 0, 0.5);
 }

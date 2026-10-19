@@ -8,6 +8,8 @@
 import { state, formatCurrency, getDynamicContractValue } from '../app.js';
 import { paymentTotals, paymentsByMonth, cumulativeSeries, isApprovedIPC } from '../modules/payment/payment-metrics.js';
 import { getContractName } from '../core/contract-fields.js';
+import { getLocalCashflow } from './cashflow-state.js';
+import { calculateForecastEngine } from './cashflow-calc.js';
 
 const B = 1e9;
 const toB = (v) => (v === null ? null : Math.round(v / B * 1000) / 1000);
@@ -25,15 +27,32 @@ const lineChart = (series, colors, categories) => ({
 });
 
 /**
- * @param {Object} planByMonth { 'YYYY-MM': số tiền kế hoạch trong tháng }
- * @returns {Array} các ApexCharts chưa render
+ * Kế hoạch dòng tiền theo tháng của dự án đang chọn (cùng cách tính tab Cashflow):
+ * gói xây dựng lấy netPayable sau khi chạy forecast, gói khác lấy value.
  */
-export function buildProgressCharts(planByMonth = {}) {
+export function projectPlanByMonth() {
+    const pid = state.currentProjectId;
+    const cashflows = getLocalCashflow();
+    (state.appData.Contracts || []).filter(c => c.project_id === pid && c.type === 'Construction').forEach(contract => {
+        const rows = cashflows.filter(c => c.package_name === contract.package_name && c.project_id === pid);
+        if (rows.length) calculateForecastEngine(rows, contract);
+    });
+    const out = {};
+    cashflows.filter(c => c.project_id === pid && c.date).forEach(c => {
+        const [y, m] = String(c.date).split('-');
+        if (!y || !m) return;
+        const val = c.is_construction ? (Number(c.netPayable) || Number(c.total_cert) || 0) : (Number(c.value) || 0);
+        out[`${y}-${m}`] = (out[`${y}-${m}`] || 0) + val;
+    });
+    return out;
+}
+
+/** Chuỗi lũy kế (tỷ VNĐ) trên trục tháng chung: kế hoạch, đã duyệt, đã trả. */
+export function progressSeries(planByMonth = {}) {
     const pid = state.currentProjectId;
     const payments = state.appData.Payments || [];
     const cert = paymentsByMonth(payments, 'certified', pid);
     const paid = paymentsByMonth(payments, 'paid', pid);
-
     const keys = [...new Set([...Object.keys(planByMonth), ...Object.keys(cert), ...Object.keys(paid)])].sort();
     // Lũy kế xuất phát từ 0: thêm tháng liền trước tháng đầu tiên → đường thực tế luôn
     // thành một đoạn nhìn thấy được, kể cả khi mới có một đợt thanh toán.
@@ -42,24 +61,36 @@ export function buildProgressCharts(planByMonth = {}) {
         const d = new Date(y, m - 2, 1);
         keys.unshift(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
     }
-    const cats = keys.length ? keys.map(label) : ['(Chưa có dữ liệu)'];
     const now = nowKey();
-    const plan = keys.length ? cumulativeSeries(keys, planByMonth).map(toB) : [0];
-    const certS = keys.length ? cumulativeSeries(keys, cert, now).map(toB) : [0];
-    const paidS = keys.length ? cumulativeSeries(keys, paid, now).map(toB) : [0];
+    return {
+        cats: keys.length ? keys.map(label) : ['(Chưa có dữ liệu)'],
+        plan: keys.length ? cumulativeSeries(keys, planByMonth).map(toB) : [0],
+        certS: keys.length ? cumulativeSeries(keys, cert, now).map(toB) : [0],
+        paidS: keys.length ? cumulativeSeries(keys, paid, now).map(toB) : [0],
+    };
+}
+
+/**
+ * @param {Object} planByMonth { 'YYYY-MM': số tiền kế hoạch trong tháng }
+ * @returns {Array} các ApexCharts chưa render
+ */
+export function buildProgressCharts(planByMonth = {}) {
+    const pid = state.currentProjectId;
+    const payments = state.appData.Payments || [];
+    const { cats, plan, certS, paidS } = progressSeries(planByMonth);
 
     const charts = [];
     const el3 = document.querySelector('#cf-chart-3');
     if (el3) charts.push(new ApexCharts(el3, lineChart([
         { name: 'Kế hoạch (lũy kế)', data: plan },
         { name: 'Đã duyệt thực tế (lũy kế)', data: certS },
-    ], ['#94a3b8', '#10b981'], cats)));
+    ], ['plan', 'approved'], cats)));
     const el4 = document.querySelector('#cf-chart-4');
     if (el4) charts.push(new ApexCharts(el4, lineChart([
         { name: 'Kế hoạch (lũy kế)', data: plan },
         { name: 'Đã duyệt', data: certS },
         { name: 'Đã trả', data: paidS },
-    ], ['#94a3b8', '#10b981', '#f97316'], cats)));
+    ], ['plan', 'approved', 'paid'], cats)));
 
     // Phần đã duyệt / còn lại theo hợp đồng (giá trị HĐ gồm VO đã duyệt)
     const contracts = (state.appData.Contracts || []).filter(c => c.project_id === pid && c.status !== 'Closed');
@@ -75,7 +106,7 @@ export function buildProgressCharts(planByMonth = {}) {
             : [{ name: 'Chưa có hợp đồng', data: [0] }],
         chart: { type: 'bar', height: 250, stacked: true, toolbar: { show: false } },
         plotOptions: { bar: { horizontal: true, barHeight: '60%' } },
-        colors: ['#10b981', '#cbd5e1'],
+        colors: ['approved', 'track'],
         dataLabels: { enabled: false },
         xaxis: { categories: rows.length ? rows.map(r => r.name.length > 28 ? r.name.slice(0, 27) + '…' : r.name) : ['-'],
             labels: { formatter: (v) => (Number(v) || 0).toFixed(1) + ' Tỷ' } },

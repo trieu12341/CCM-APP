@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cost & Contract Management</title>
+    <title>CCM — Cost & Contract Management</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234148d6'/%3E%3Crect x='7' y='18' width='4' height='7' rx='1' fill='%23fff' opacity='.38'/%3E%3Crect x='14' y='14' width='4' height='11' rx='1' fill='%23fff' opacity='.38'/%3E%3Crect x='21' y='10' width='4' height='15' rx='1' fill='%23fff' opacity='.38'/%3E%3Cpath d='M6 24.5C11 24.5 12 13.5 17 12.5S22.5 7.5 26 7' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round'/%3E%3Ccircle cx='26' cy='7' r='2.2' fill='%23fff'/%3E%3C/svg%3E">
+    <meta name="theme-color" content="#4148d6">
     <link rel="stylesheet" href="style.css">
     <!-- Module Styles -->
 
@@ -28,14 +30,19 @@
     <div id="login-modal" class="modal-overlay hidden" style="z-index: 9999; background-color: var(--main-bg); position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;">
         <div class="modal-content" style="max-width: 400px; width: 90%; padding: 2rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 12px; text-align: center;">
             <div style="margin-bottom: 2rem;">
-                <div style="display: flex; justify-content: center; gap: 4px; margin-bottom: 1rem;">
-                    <div style="background-color: var(--primary-blue); color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem; border-radius: 4px;">V</div>
-                    <div style="background-color: var(--primary-blue); color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem; border-radius: 4px;">C</div>
-                    <div style="background-color: var(--primary-blue); color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem; border-radius: 4px;">R</div>
-                    <div style="background-color: var(--primary-blue); color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem; border-radius: 4px;">E</div>
+                <div class="ccm-brand ccm-brand-login">
+                    <svg class="ccm-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+                <rect width="32" height="32" rx="8" fill="var(--brand)"/>
+                <rect x="7" y="18" width="4" height="7" rx="1" fill="#fff" opacity=".38"/>
+                <rect x="14" y="14" width="4" height="11" rx="1" fill="#fff" opacity=".38"/>
+                <rect x="21" y="10" width="4" height="15" rx="1" fill="#fff" opacity=".38"/>
+                <path d="M6 24.5C11 24.5 12 13.5 17 12.5S22.5 7.5 26 7" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+                <circle cx="26" cy="7" r="2.2" fill="#fff"/>
+            </svg>
+                    <div class="ccm-wordmark"><span class="ccm-name">CCM</span><span class="ccm-tag">Cost &amp; Contract Management</span></div>
                 </div>
-                <h2 style="color: var(--primary-blue); margin-bottom: 0.5rem;">Đăng nhập Hệ thống</h2>
-                <p style="color: var(--text-muted); font-size: 0.9rem;">Cost & Contract Management</p>
+                <h2 style="color: var(--text-dark); margin-bottom: 0.25rem; font-size: 1.15rem;">Đăng nhập hệ thống</h2>
+                <p style="color: var(--text-muted); font-size: 0.85rem;">Quản lý chi phí &amp; hợp đồng dự án</p>
             </div>
             
             <form id="login-form" style="text-align: left;">
@@ -55,7 +62,7 @@
                 <a href="#" id="btn-clear-session" style="color: var(--text-muted); text-decoration: underline;">Xóa session cũ &amp; đăng nhập lại</a>
             </div>
             <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted);">
-                &copy; 2024 Viet Capital Real Estate
+                &copy; CCM — Cost &amp; Contract Management
             </div>
         </div>
     </div>

@@ -76,13 +76,13 @@ export async function initApp() {
     // ─────────────────────────────────────────────────────
     // Logout handler
     // ─────────────────────────────────────────────────────
-    bindEvent('btn-logout', 'click', () => {
-        apiLogout().then(() => {
-            state.user = null;
-            hideApp();
-            document.body.classList.remove('is-manager', 'is-admin');
-        });
+    const doLogout = () => apiLogout().then(() => {
+        state.user = null;
+        hideApp();
+        document.body.classList.remove('is-manager', 'is-admin');
     });
+    bindEvent('btn-logout', 'click', doLogout);
+    bindEvent('btn-logout-side', 'click', doLogout);
 
     // ─────────────────────────────────────────────────────
     // Firebase onAuthStateChanged - Single source of auth truth

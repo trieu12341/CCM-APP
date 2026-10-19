@@ -1,4 +1,5 @@
 import { getContractValue, getContractName, getContractorName } from '../core/contract-fields.js';
+import { setTone } from '../utils/formatters.js';
 import { escapeHtml } from '../utils/formatters.js';
 import { state, formatCurrency, formatCurrencyVND, getContractBudgetValue, getDynamicContractValue } from '../app.js';
 import { getLocalContracts } from './contract-state.js';
@@ -83,12 +84,8 @@ export function renderContracts() {
         
         if (varianceEl) {
             varianceEl.innerHTML = `${formatCurrencyVND(Math.abs(variance))} <span>VNĐ</span>`;
-            if (variance < 0) {
-                varianceEl.style.color = '#ef4444'; // Red for negative savings
-                varianceEl.innerHTML = `-${formatCurrencyVND(Math.abs(variance))} <span>VNĐ</span>`;
-            } else {
-                varianceEl.style.color = '#3b82f6'; // Blue for positive savings
-            }
+            if (variance < 0) varianceEl.innerHTML = `-${formatCurrencyVND(Math.abs(variance))} <span>VNĐ</span>`;
+            setTone(varianceEl, variance, { positive: true });
         }
         
         if (elAwardedRate) elAwardedRate.textContent = `${awardedRate}%`;
@@ -104,14 +101,14 @@ export function renderContracts() {
         if (barEl) {
             const barOptions = {
                 series: [{
-                    name: 'Budget',
+                    name: 'Ngân sách',
                     data: [consultancyBudget / 1e9, constructionBudget / 1e9]
                 }, {
-                    name: 'Actual Contract',
+                    name: 'Giá trị HĐ',
                     data: [consultancyCommitted / 1e9, constructionCommitted / 1e9]
                 }],
                 chart: { type: 'bar', height: 350, toolbar: { show: false } },
-                colors: ['#cbd5e1', '#3b82f6'],
+                colors: ['plan', 'approved'],
                 plotOptions: { bar: { horizontal: false, columnWidth: '50%', endingShape: 'rounded' } },
                 dataLabels: { enabled: false },
                 stroke: { show: true, width: 2, colors: ['transparent'] },
@@ -131,8 +128,8 @@ export function renderContracts() {
             const pieOptions = {
                 series: [consultancyCommitted, constructionCommitted],
                 chart: { type: 'donut', height: 350 },
-                labels: ['Tư vấn (Consultancy)', 'Thi công (Construction)'],
-                colors: ['#a855f7', '#3b82f6'],
+                labels: ['Tư vấn', 'Thi công'],
+                colors: ['soft', 'hard'],
                 dataLabels: { enabled: true, formatter: function (val, opts) { return opts.w.globals.seriesTotals[opts.seriesIndex] > 0 ? val.toFixed(1) + "%" : "" } },
                 legend: { position: 'bottom' },
                 tooltip: {
@@ -223,7 +220,7 @@ export function renderContractTableModal() {
         tr.innerHTML = `
             <td style="font-weight: 500;">${escapeHtml(contract.budget_code || '-')}</td>
             <td style="font-weight: 500; color: var(--primary-blue);">${escapeHtml(contract.contract_code || '-')}</td>
-            <td><span class="badge ${contract.type === 'Consultancy' ? 'bg-purple' : 'bg-blue'}" style="padding:4px 8px; border-radius:4px; font-size:0.8rem; background:${contract.type === 'Consultancy' ? '#e9d5ff; color:#6b21a8;' : '#dbeafe; color:#1e40af;'}">${typeStr}</span></td>
+            <td><span class="badge ${contract.type === 'Consultancy' ? 'bg-purple' : 'bg-blue'}" style="padding:4px 8px; border-radius:4px; font-size:0.8rem; background:${contract.type === 'Consultancy' ? 'var(--accent-violet-soft); color:var(--accent-violet);' : 'var(--accent-blue-soft); color:var(--accent-blue);'}">${typeStr}</span></td>
             <td>${escapeHtml(contract.package_name || '-')}</td>
             <td>${escapeHtml(contract.contractor || '-')}</td>
             <td style="font-weight: 600;">${budget ? formatCurrency(budget) : '<span style="color: var(--text-muted);">—</span>'}</td>

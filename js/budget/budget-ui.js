@@ -1,3 +1,4 @@
+import { setTone } from '../utils/formatters.js';
 import { paymentTotals, isApprovedIPC } from '../modules/payment/payment-metrics.js';
 import { escapeHtml } from '../utils/formatters.js';
 import { state, formatCurrency, formatCurrencyVND, formatDate, mockActivities, getDynamicContractValue } from '../app.js';
@@ -126,6 +127,7 @@ export function renderDashboard() {
     const contingencyPct = totalBudgetFallback > 0 ? ((contingencyRemaining / totalBudgetFallback) * 100).toFixed(1) : 0;
     
     document.getElementById('metric-contingency').innerHTML = `${formatCurrencyVND(contingencyRemaining)} <span>VNĐ</span>`;
+    setTone(document.getElementById('metric-contingency'), contingencyRemaining);
     const contingencyPctEl = document.getElementById('metric-contingency-pct');
     if (contingencyPctEl) contingencyPctEl.textContent = `${contingencyPct}%`;
     
@@ -143,21 +145,21 @@ export function renderDashboard() {
     // Chart 1: Grouped Bar Chart
     const barOptions = {
         series: [{
-            name: 'Budget Duyệt',
+            name: 'Ngân sách duyệt',
             data: [consultancyBudget / 1e9, constructionBudget / 1e9, contingencyBudget / 1e9]
         }, {
-            name: 'Thực tế Cam kết',
+            name: 'Đã cam kết',
             data: [consultancyCommitted / 1e9, constructionCommitted / 1e9, 0] // 0 for contingency committed
         }, {
-            name: 'Đã Chi',
+            name: 'Đã thực hiện',
             data: [consultancyExpended / 1e9, constructionExpended / 1e9, 0] // 0 for contingency expended
         }],
         chart: { type: 'bar', height: 350, toolbar: { show: false } },
-        colors: ['#cbd5e1', '#3b82f6', '#10b981'],
+        colors: ['plan', 'approved', 'paid'],
         plotOptions: { bar: { horizontal: false, columnWidth: '50%', endingShape: 'rounded' } },
         dataLabels: { enabled: false },
         stroke: { show: true, width: 2, colors: ['transparent'] },
-        xaxis: { categories: ['Tư vấn (Soft Cost)', 'Xây dựng / M&E (Hard Cost)', 'Dự phòng (Contingency)'] },
+        xaxis: { categories: ['Tư vấn', 'Xây dựng / M&E', 'Dự phòng'] },
         yaxis: { labels: { formatter: (val) => val.toFixed(1) + ' Tỷ' } },
         fill: { opacity: 1 },
         tooltip: {
@@ -173,8 +175,8 @@ export function renderDashboard() {
     const pieOptions = {
         series: [consultancyBudget, constructionBudget, contingencyBudget],
         chart: { type: 'donut', height: 350 },
-        labels: ['Tư vấn (Soft Cost)', 'Xây dựng / M&E (Hard Cost)', 'Dự phòng (Contingency)'],
-        colors: ['#a855f7', '#3b82f6', '#f97316'],
+        labels: ['Tư vấn', 'Xây dựng / M&E', 'Dự phòng'],
+        colors: ['soft', 'hard', 'contingency'],
         dataLabels: { enabled: true, formatter: function (val, opts) { return opts.w.globals.seriesTotals[opts.seriesIndex] > 0 ? val.toFixed(1) + "%" : "" } },
         legend: { position: 'bottom' },
         tooltip: {

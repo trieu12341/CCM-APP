@@ -120,7 +120,7 @@ export function renderTenders() {
                 data: tenderBudgets
             }],
             chart: { type: 'bar', height: 350, toolbar: { show: false } },
-            colors: ['#3b82f6'],
+            colors: ['plan'],
             plotOptions: { bar: { horizontal: false, columnWidth: '50%', distributed: true } },
             dataLabels: { enabled: false },
             legend: { show: false },
@@ -314,7 +314,7 @@ export function renderCBATable() {
     let theadHtml = `
         <th style="width: 50px;">STT</th>
         <th style="width: 250px;">DIỄN GIẢI</th>
-        <th style="width: 150px; text-align: right; background: #e0f2fe; color: #0284c7;">PTE (Giá TV)</th>
+        <th style="width: 150px; text-align: right; background: var(--accent-blue-soft); color: var(--accent-blue);">PTE (Giá TV)</th>
     `;
     bidders.forEach((bidder, idx) => {
         theadHtml += `<th style="width: 150px; text-align: right; position: relative; padding-right: 25px;">

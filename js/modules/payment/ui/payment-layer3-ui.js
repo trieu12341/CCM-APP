@@ -55,8 +55,8 @@ export function renderIPCDetail(ipcId) {
     if (typeEl) {
         const isConsultancy = ipc.contract_type === 'Consultancy';
         typeEl.innerHTML = isConsultancy
-            ? `<span style="font-size:11px;padding:2px 10px;border-radius:10px;background:#fef3c7;color:#d97706;font-weight:700;margin-left:8px;">Tư vấn</span>`
-            : `<span style="font-size:11px;padding:2px 10px;border-radius:10px;background:#e0f2fe;color:#0369a1;font-weight:700;margin-left:8px;">Xây dựng</span>`;
+            ? `<span style="font-size:11px;padding:2px 10px;border-radius:10px;background:var(--accent-violet-soft);color:var(--accent-violet);font-weight:700;margin-left:8px;">Tư vấn</span>`
+            : `<span style="font-size:11px;padding:2px 10px;border-radius:10px;background:var(--accent-blue-soft);color:var(--accent-blue);font-weight:700;margin-left:8px;">Xây dựng</span>`;
     }
 
     // ── Financial Breakdown ──────────────────────────────────
@@ -153,14 +153,14 @@ function renderFinancialBreakdown(ipc) {
 
     container.innerHTML = rows.map(r => `
         <tr class="${r.highlight ? 'breakdown-total-row' : ''}">
-            <td style="text-align:center;font-weight:600;color:#64748b;width:40px;">${r.no}</td>
+            <td style="text-align:center;font-weight:600;color:var(--text-muted);width:40px;">${r.no}</td>
             <td>
                 <div style="font-weight:${r.highlight ? '700' : '500'};font-size:${r.highlight ? '14px' : '13px'};">${escapeHtml(r.label)}</div>
-                <div style="font-size:11px;color:#94a3b8;font-style:italic;">${r.sublabel}</div>
+                <div style="font-size:11px;color:var(--text-muted);font-style:italic;">${r.sublabel}</div>
             </td>
             <td style="text-align:right;font-weight:${r.highlight ? '700' : '500'};
                 font-size:${r.highlight ? '15px' : '13px'};
-                color:${r.highlight ? 'var(--primary-blue)' : r.isPositive ? 'inherit' : '#ef4444'};">
+                color:${r.highlight ? 'var(--primary-blue)' : r.isPositive ? 'inherit' : 'var(--accent-red)'};">
                 ${r.value}
             </td>
         </tr>`).join('');

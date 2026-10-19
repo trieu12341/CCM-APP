@@ -1,63 +1,67 @@
 <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header" style="flex-direction: column; align-items: flex-start; padding-top: 1.5rem; gap: 8px;">
-        <div style="display: flex; gap: 4px;">
-            <div style="background-color: var(--primary-blue); color: white; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.25rem;">V</div>
-            <div class="sidebar-text" style="background-color: var(--primary-blue); color: white; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.25rem;">C</div>
-            <div class="sidebar-text" style="background-color: var(--primary-blue); color: white; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.25rem;">R</div>
-            <div class="sidebar-text" style="background-color: var(--primary-blue); color: white; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.25rem;">E</div>
+    <div class="sidebar-header ccm-brand">
+        <svg class="ccm-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+                <rect width="32" height="32" rx="8" fill="var(--brand)"/>
+                <rect x="7" y="18" width="4" height="7" rx="1" fill="#fff" opacity=".38"/>
+                <rect x="14" y="14" width="4" height="11" rx="1" fill="#fff" opacity=".38"/>
+                <rect x="21" y="10" width="4" height="15" rx="1" fill="#fff" opacity=".38"/>
+                <path d="M6 24.5C11 24.5 12 13.5 17 12.5S22.5 7.5 26 7" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+                <circle cx="26" cy="7" r="2.2" fill="#fff"/>
+            </svg>
+        <div class="ccm-wordmark sidebar-text">
+            <span class="ccm-name">CCM</span>
+            <span class="ccm-tag">Cost &amp; Contract Management</span>
         </div>
-        <div class="sidebar-text" style="font-size: 0.8rem; font-weight: 700; color: var(--primary-blue); letter-spacing: 0.5px;">VIET CAPITAL REAL ESTATE</div>
-        <div class="sidebar-text" style="font-size: 0.7rem; color: #94a3b8; margin-top: -2px;">COST & CONTRACT MANAGEMENT</div>
     </div>
     
     <div class="sidebar-menu">
         <div class="menu-section">
-            <h4 class="sidebar-text">DASHBOARD</h4>
-            <a href="#" class="menu-item active" id="menu-overview" title="Overview">
+            <h4 class="sidebar-text">TỔNG QUAN</h4>
+            <a href="#" class="menu-item active" id="menu-overview" title="Tổng quan">
                 <i class="fa-solid fa-chart-pie"></i>
-                <span class="sidebar-text">Overview</span>
+                <span class="sidebar-text">Tổng quan</span>
             </a>
         </div>
 
         <div class="menu-section">
-            <h4 class="sidebar-text">PLANNING & CONTRACTS</h4>
-            <a href="#" class="menu-item" id="menu-budget" title="Budget">
+            <h4 class="sidebar-text">KẾ HOẠCH & HỢP ĐỒNG</h4>
+            <a href="#" class="menu-item" id="menu-budget" title="Ngân sách">
                 <i class="fa-solid fa-wallet"></i>
-                <span class="sidebar-text">Budget</span>
+                <span class="sidebar-text">Ngân sách</span>
             </a>
-            <a href="#" class="menu-item" id="menu-tender" title="Tender">
+            <a href="#" class="menu-item" id="menu-tender" title="Đấu thầu">
                 <i class="fa-solid fa-file-contract"></i>
-                <span class="sidebar-text">Tender</span>
+                <span class="sidebar-text">Đấu thầu</span>
             </a>
-            <a href="#" class="menu-item" id="menu-contract" title="Contract">
+            <a href="#" class="menu-item" id="menu-contract" title="Hợp đồng">
                 <i class="fa-solid fa-file-signature"></i>
-                <span class="sidebar-text">Contract</span>
+                <span class="sidebar-text">Hợp đồng</span>
             </a>
         </div>
 
         <div class="menu-section">
-            <h4 class="sidebar-text">EXECUTION & SETTLEMENT</h4>
-            <a href="#" class="menu-item" id="menu-cashflow" title="Cashflow">
+            <h4 class="sidebar-text">THỰC HIỆN & QUYẾT TOÁN</h4>
+            <a href="#" class="menu-item" id="menu-cashflow" title="Dòng tiền">
                 <i class="fa-solid fa-money-bill-trend-up"></i>
-                <span class="sidebar-text">Cashflow</span>
+                <span class="sidebar-text">Dòng tiền</span>
             </a>
-            <a href="#" class="menu-item" id="menu-payment" title="Payment">
+            <a href="#" class="menu-item" id="menu-payment" title="Thanh toán (IPC)">
                 <i class="fa-solid fa-money-bill-transfer"></i>
-                <span class="sidebar-text">Payment</span>
+                <span class="sidebar-text">Thanh toán (IPC)</span>
             </a>
-            <a href="#" class="menu-item" id="menu-vo" title="Variation Order">
+            <a href="#" class="menu-item" id="menu-vo" title="Phát sinh (VO)">
                 <i class="fa-solid fa-code-branch"></i>
-                <span class="sidebar-text">Variation Order</span>
+                <span class="sidebar-text">Phát sinh (VO)</span>
             </a>
-            <a href="#" class="menu-item" id="menu-final" title="Final Statement">
+            <a href="#" class="menu-item" id="menu-final" title="Quyết toán">
                 <i class="fa-solid fa-file-invoice-dollar"></i>
-                <span class="sidebar-text">Final Statement</span>
+                <span class="sidebar-text">Quyết toán</span>
             </a>
         </div>
         
         <div class="menu-section admin-only block-display">
-            <h4 class="sidebar-text">ADMINISTRATION</h4>
-            <a href="#" class="menu-item" id="menu-admin" title="User Management">
+            <h4 class="sidebar-text">QUẢN TRỊ</h4>
+            <a href="#" class="menu-item" id="menu-admin" title="Quản lý tài khoản">
                 <i class="fa-solid fa-users-gear"></i>
                 <span class="sidebar-text">Quản lý Tài khoản</span>
             </a>
@@ -65,17 +69,13 @@
     </div>
     
     <div class="sidebar-footer">
-        <div class="savings-card sidebar-text">
-            <span>PROJECTED SAVINGS</span>
-            <span class="savings-value">+2%</span>
-        </div>
         <div class="user-info">
             <div class="avatar-initials" aria-hidden="true">QS</div>
             <div class="user-details sidebar-text">
                 <strong id="user-name">Triều</strong>
                 <span id="user-role">Quantity Surveyor</span>
             </div>
-            <i class="fa-solid fa-ellipsis sidebar-text" id="btn-logout" style="cursor:pointer;" title="Logout"></i>
+            <i class="fa-solid fa-ellipsis sidebar-text" id="btn-logout-side" style="cursor:pointer;" title="Đăng xuất" role="button" tabindex="0"></i>
         </div>
     </div>
 </aside>

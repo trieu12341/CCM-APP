@@ -54,3 +54,12 @@ export const escapeHtml = (value) => {
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
 };
+
+/** Tô màu theo NGHĨA cho số KPI: âm/vượt → đỏ, dương (khi có nghĩa tốt) → xanh. */
+export function setTone(el, value, { positive = false } = {}) {
+    if (!el) return;
+    el.classList.toggle('tone-neg', value < 0);
+    el.classList.toggle('tone-pos', positive && value > 0);
+    const card = el.closest && el.closest('.kpi-card');
+    if (card) card.classList.toggle('has-alert', value < 0);
+}

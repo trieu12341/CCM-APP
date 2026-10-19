@@ -179,7 +179,7 @@
                 <h2 style="color: #ef4444; margin: 0; display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-triangle-exclamation"></i> CẢNH BÁO: XÓA DỮ LIỆU HỆ THỐNG</h2>
                 <button id="close-reset-modal" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div style="background-color: #fef2f2; padding: 15px; border-radius: 6px; margin-bottom: 20px; font-size: 0.9rem; color: #991b1b;">
+            <div style="background-color: var(--accent-red-soft); padding: 15px; border-radius: 6px; margin-bottom: 20px; font-size: 0.9rem; color: var(--accent-red);">
                 Hành động này sẽ xóa sạch dữ liệu thực thi đã chọn để phục vụ kiểm thử workflow. <b>Hệ thống sẽ tự động xuất một bản Backup JSON trước khi xóa.</b>
             </div>
             <form id="system-reset-form">
@@ -199,7 +199,7 @@
                             <input type="checkbox" id="reset-scope-contracts" value="contracts"> 
                             Xóa Hợp đồng & Gói thầu (Clear Contracts & Tenders)
                         </label>
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 4px; color: #ef4444; font-weight: bold;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: var(--accent-red-soft); border: 1px solid var(--accent-red); border-radius: 4px; color: #ef4444; font-weight: bold;">
                             <input type="checkbox" id="reset-scope-full" value="full"> 
                             FULL SYSTEM RESET (Clear All Data)
                         </label>

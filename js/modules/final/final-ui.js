@@ -77,8 +77,8 @@ function renderCharts(doughnutData, barCategories, originalValues, finalValues) 
     const dOptions = {
         series: [doughnutData.reviewing, doughnutData.closed],
         chart: { type: 'donut', height: 300, toolbar: { show: false } },
-        labels: ['In Progress', 'Closed'],
-        colors: ['#3b82f6', '#10b981'],
+        labels: ['Đang thực hiện', 'Đã quyết toán'],
+        colors: ['submitted', 'paid'],
         dataLabels: { enabled: true }
     };
     charts.doughnut = new ApexCharts(document.querySelector('#final-doughnut-chart'), dOptions);
@@ -97,7 +97,7 @@ function renderCharts(doughnutData, barCategories, originalValues, finalValues) 
         yaxis: { title: { text: 'Tỷ VNĐ' }, labels: { formatter: (v) => (Number(v) || 0).toLocaleString('vi-VN', { maximumFractionDigits: 1 }) } },
         tooltip: { y: { formatter: (v) => `${(Number(v) || 0).toLocaleString('vi-VN', { maximumFractionDigits: 3 })} tỷ` } },
         fill: { opacity: 1 },
-        colors: ['#94a3b8', '#0ea5e9']
+        colors: ['plan', 'paid']
     };
     charts.bar = new ApexCharts(document.querySelector('#final-bar-chart'), bOptions);
     charts.bar.render();
@@ -176,7 +176,7 @@ export function renderFinalBreakdown(contractId) {
         submitBtn.disabled = true;
         submitBtn.innerHTML = `<i class="fa-solid fa-check"></i> ĐÃ QUYẾT TOÁN`;
         submitBtn.className = 'btn text-white font-bold py-3 px-6 rounded-xl shadow-lg';
-        submitBtn.style.backgroundColor = '#10b981'; // Success green
+        submitBtn.style.backgroundColor = 'var(--accent-teal)';
     } else {
         submitBtn.disabled = false;
         submitBtn.innerHTML = `<i class="fa-solid fa-lock"></i> CHỐT QUYẾT TOÁN & ĐÓNG HỢP ĐỒNG`;

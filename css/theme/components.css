@@ -32,20 +32,13 @@
   background: var(--bg-subtle) !important; color: var(--text-muted) !important; border-radius: var(--radius-sm) !important; }
 .bento-card i:not(.bento-icon i) { font-size: 14px; }
 
-/* màu nhấn theo loại thẻ: chỉ tô vạch trên + số */
-.kpi-card-blue, .bento-card.card-budget      { --kpi-accent: var(--accent-blue); }
-.kpi-card-emerald, .bento-card.card-expended { --kpi-accent: var(--accent-teal); }
-.kpi-card-amber, .kpi-card-orange            { --kpi-accent: var(--accent-amber); }
-.bento-card.card-committed                   { --kpi-accent: var(--accent-blue); }
-.bento-card.card-uncommitted                 { --kpi-accent: var(--accent-violet); }
-.kpi-card-red                                { --kpi-accent: var(--accent-red); }
-.kpi-card-slate                              { --kpi-accent: var(--accent-slate); }
-.kpi-card-blue .kpi-value, .kpi-card-blue .kpi-count { color: var(--accent-blue) !important; }
-.kpi-card-emerald .kpi-value, .kpi-card-emerald .kpi-count { color: var(--accent-teal) !important; }
-.kpi-card-amber .kpi-value, .kpi-card-amber .kpi-count,
-.kpi-card-orange .kpi-value, .kpi-card-orange .kpi-count { color: var(--accent-amber) !important; }
-.kpi-card-red .kpi-value, .kpi-card-red .kpi-count { color: var(--accent-red) !important; }
-.bento-card.card-budget .bento-value { color: var(--accent-blue) !important; }
+/* Số KPI màu TRUNG TÍNH. Màu chỉ dùng khi có nghĩa (gắn qua JS):
+   .tone-neg = vượt ngân sách / âm (đỏ), .tone-pos = tiết kiệm / còn dư (xanh ngọc). */
+.kpi-value, .kpi-count, .bento-value,
+.kpi-value.text-success, .kpi-value.text-warning, .kpi-value.text-danger { color: var(--text-dark) !important; }
+.kpi-value.tone-neg, .bento-value.tone-neg { color: var(--accent-red) !important; }
+.kpi-value.tone-pos, .bento-value.tone-pos { color: var(--accent-teal) !important; }
+.kpi-card.has-alert { --kpi-accent: var(--accent-red); }
 .bento-card .bento-progress-bg { height: 4px !important; }
 .bento-progress-text { font-size: var(--fs-xs) !important; color: var(--text-muted) !important; }
 .text-success { color: var(--accent-teal) !important; }
@@ -78,6 +71,7 @@
 .pill-amber  { background: var(--accent-amber-soft) !important;  color: var(--accent-amber) !important; }
 .pill-blue   { background: var(--accent-blue-soft) !important;   color: var(--accent-blue) !important; }
 .pill-slate  { background: var(--accent-slate-soft) !important;  color: var(--text-muted) !important; }
+.pill-plan   { background: var(--accent-slate-soft) !important;  color: var(--text-body) !important; }
 
 /* ---------- 9. BẢNG ---------- */
 table { font-size: var(--fs-base); border-color: var(--border-color); }
@@ -167,3 +161,28 @@ button.w-8.h-8 { border: 0; background: transparent; cursor: pointer; }
 .apexcharts-datalabels-group .apexcharts-datalabel-label { fill: var(--text-muted) !important; }
 .apexcharts-datalabels-group .apexcharts-datalabel-value { fill: var(--text-dark) !important; font-weight: 600 !important; }
 .apexcharts-pie-area { stroke: var(--card-bg) !important; }
+
+/* ---------- 17. LOGO CCM ---------- */
+.ccm-brand { display: flex !important; flex-direction: row !important; align-items: center !important; gap: 9px !important; padding: 18px 14px 14px !important; }
+.ccm-mark { width: 32px; height: 32px; flex: 0 0 32px; display: block; }
+.ccm-wordmark { display: flex !important; flex-direction: column; line-height: 1.15; min-width: 0; }
+.ccm-name { font-size: 17px; font-weight: 800; letter-spacing: 0.06em; color: var(--text-dark); }
+.ccm-tag { font-size: 9.75px; font-weight: 500; color: var(--text-muted); letter-spacing: 0.01em; white-space: nowrap; }
+#sidebar.sidebar-collapsed .ccm-brand { justify-content: center !important; padding: 18px 0 14px !important; }
+#sidebar.sidebar-collapsed .ccm-mark { margin: 0 auto; }
+.ccm-brand-login { justify-content: center; padding: 0 0 18px !important; }
+.ccm-brand-login .ccm-mark { width: 44px; height: 44px; flex-basis: 44px; }
+.ccm-brand-login .ccm-wordmark { text-align: left; }
+.ccm-brand-login .ccm-name { font-size: 20px; }
+
+/* ---------- 18. BÀN PHÍM & CHUYỂN ĐỘNG ---------- */
+/* Viền focus rõ khi điều hướng bằng phím Tab (không hiện khi bấm chuột) */
+:where(a, button, input, select, textarea, [tabindex], .menu-item, summary):focus-visible {
+  outline: 2px solid var(--brand) !important; outline-offset: 2px !important; border-radius: var(--radius-sm);
+}
+input:focus-visible, select:focus-visible, textarea:focus-visible { outline-offset: 0 !important; }
+button, .btn, .menu-item, [role="button"], .btn-icon, tr[data-id], .vo-row { cursor: pointer; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}

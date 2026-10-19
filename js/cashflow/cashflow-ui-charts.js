@@ -3,7 +3,7 @@ import { state, formatCurrency, formatCurrencyVND, getContractBudgetValue, getDy
 import { getLocalCashflow } from './cashflow-state.js';
 import { calculateForecastEngine, calculatePackageTotalPlanned } from './cashflow-calc.js';
 import { buildProgressCharts } from './cashflow-ui-progress.js';
-import { parseCurrencyInput } from '../utils/formatters.js';
+import { parseCurrencyInput, setTone } from '../utils/formatters.js';
 
 let chartInstances = [];
 
@@ -97,6 +97,7 @@ export function renderCashflow() {
     setKPIHtml('cf-kpi-planned', `${formatCurrencyVND(totalPlan)} <span>VNĐ</span>`);
     setKPIHtml('cf-kpi-certified', `${formatCurrencyVND(kpiData.certified)} <span>VNĐ</span>`);
     setKPIHtml('cf-kpi-balance', `${formatCurrencyVND(kpiData.balance)} <span>VNĐ</span>`);
+    setTone(document.getElementById('cf-kpi-balance'), kpiData.balance);
     setKPIHtml('cf-kpi-paid', `${formatCurrencyVND(kpiData.paid)} <span>VNĐ</span>`);
     setKPIText('cf-kpi-pct-paid', kpiData.pctPaid + '%');
     setKPIText('cf-kpi-pct-certified', kpiData.pctCertified + '%');
@@ -105,12 +106,12 @@ export function renderCashflow() {
     const revisedB = revised > 0 ? revised / 1000000000 : 0;
 
     var options1 = {
-        series: [{ name: 'Project Budget', data: [budgetB] }, { name: 'Revised Total Contract', data: [revisedB] }],
+        series: [{ name: 'Ngân sách dự án', data: [budgetB] }, { name: 'Tổng giá trị HĐ', data: [revisedB] }],
         chart: { type: 'bar', height: 250, toolbar: { show: false } },
-        colors: ['#3b82f6', '#f97316'],
+        colors: ['plan', 'approved'],
         plotOptions: { bar: { horizontal: false, columnWidth: '40%' } },
         dataLabels: { enabled: false },
-        xaxis: { categories: ['Total Value (Tỷ VNĐ)'] },
+        xaxis: { categories: ['Tổng giá trị (tỷ VNĐ)'] },
         yaxis: { labels: { formatter: (val) => val.toFixed(1) + ' Tỷ' } },
         tooltip: {
             y: { formatter: function (val) { return formatCurrency(val * 1000000000); } }

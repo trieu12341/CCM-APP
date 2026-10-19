@@ -24,13 +24,13 @@ export function recalculateCBA() {
     let tfootSumHtml = `
         <tr>
             <td colspan="2">TỔNG CỘNG (TOTAL)</td>
-            <td style="text-align: right; background: #e0f2fe; color: #0284c7;">${formatCurrencyVND(sumPTE)}</td>
+            <td style="text-align: right; background: var(--accent-blue-soft); color: var(--accent-blue);">${formatCurrencyVND(sumPTE)}</td>
     `;
     
     let tfootVarHtml = `
         <tr>
             <td colspan="2">Chênh lệch so với PTE</td>
-            <td style="text-align: right; background: #e0f2fe; color: #0284c7;">-</td>
+            <td style="text-align: right; background: var(--accent-blue-soft); color: var(--accent-blue);">-</td>
     `;
 
     bidders.forEach((bidder, bIdx) => {

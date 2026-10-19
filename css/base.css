@@ -19,8 +19,8 @@
   --border-color: #e2e8f0;
 
   /* Brand & Status Accents */
-  --primary-brand: #c63a25;
-  --primary-blue: #c63a25; /* Keep logo color fixed */
+  --primary-brand: #4148d6;
+  --primary-blue: #4148d6; /* Keep logo color fixed */
   --primary-green: #10b981;
   --primary-orange: #f59e0b;
   --status-green-bg: #dcfce7;
@@ -51,7 +51,7 @@
 
   /* Dark Status Accents */
   --primary-brand: #ef4444;
-  --primary-blue: #c63a25; /* Keep logo color fixed */
+  --primary-blue: #4148d6; /* Keep logo color fixed */
   --primary-green: #10b981;
   --primary-orange: #f59e0b;
   --status-green-bg: #064e3b;
