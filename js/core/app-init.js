@@ -3,7 +3,7 @@ import { apiLogin, apiLogout, onAuthStateChanged } from '../api.js';
 import { loadAllProjectsFromCloud, subscribeToProject, saveProjectsToCloud, getUserProfile } from '../db-service.js';
 
 import { setupBudgetEvents, renderProjectTabs, renderDashboard } from '../budget.js';
-import { setupTenderEvents } from '../tender.js';
+import { setupTenderEvents, renderTenders } from '../tender.js';
 import { setupContractEvents } from '../contract.js';
 import { setupCashflowEvents, renderCashflow } from '../cashflow.js';
 import { setupProjectSummaryEvents } from '../project.js';
@@ -312,14 +312,16 @@ async function loadAppData() {
                         state.appData.Cashflow = mergeProjectData(state.appData.Cashflow, docData.cashflows, projectId);
                         state.appData.Payments = mergeProjectData(state.appData.Payments, docData.payments, projectId);
                         state.appData.Variations = mergeProjectData(state.appData.Variations, docData.variations, projectId);
+                        state.appData.Final_Statements = mergeProjectData(state.appData.Final_Statements, docData.final_statements, projectId);
 
                         // Persist to local storage as backup
                         localStorage.setItem('ccm_budgets', JSON.stringify(state.appData.Budgets));
                         localStorage.setItem('ccm_tenders', JSON.stringify(state.appData.Tenders));
                         localStorage.setItem('ccm_contracts', JSON.stringify(state.appData.Contracts));
-                        localStorage.setItem('ccm_cashflows', JSON.stringify(state.appData.Cashflow));
+                        localStorage.setItem('ccm_cashflow', JSON.stringify(state.appData.Cashflow));
                         localStorage.setItem('ccm_payments', JSON.stringify(state.appData.Payments));
                         localStorage.setItem('ccm_variations', JSON.stringify(state.appData.Variations));
+                        localStorage.setItem('ccm_final', JSON.stringify(state.appData.Final_Statements));
 
                         console.log(`⚡ Realtime Update received for project ${projectId}, triggering UI re-render...`);
                         
@@ -331,25 +333,25 @@ async function loadAppData() {
                         document.dispatchEvent(new Event('cashflowChanged'));
                         document.dispatchEvent(new Event('paymentsChanged'));
                         document.dispatchEvent(new Event('variationsChanged'));
-                        
-                        // Force active tab to re-render
-                        try {
-                            const activeTab = document.querySelector('.menu-item.active');
-                            if (activeTab) activeTab.click();
-                        } catch(e) {}
+                        document.dispatchEvent(new Event('finalChanged'));
+
+                        // Vẽ lại tab đang mở — KHÔNG "bấm lại" menu vì thao tác đó
+                        // đóng mọi màn hình con / form người dùng đang làm dở.
+                        refreshActiveView();
                         
                         try { renderProjectTabs(); } catch(e){}
                         try { renderDashboard(); } catch(e){}
                     } else {
                         // Project document doesn't exist on cloud yet. Initialize it.
                         console.log(`Initial Setup: Initializing new project document ${projectId}`);
-                        const { saveBudgetsToCloud, saveTendersToCloud, saveContractsToCloud, saveCashflowToCloud, savePaymentsToCloud, saveVariationsToCloud } = await import('../db-service.js');
+                        const { saveBudgetsToCloud, saveTendersToCloud, saveContractsToCloud, saveCashflowToCloud, savePaymentsToCloud, saveVariationsToCloud, saveFinalStatementsToCloud } = await import('../db-service.js');
                         saveBudgetsToCloud(state.appData.Budgets);
                         saveTendersToCloud(state.appData.Tenders);
                         saveContractsToCloud(state.appData.Contracts);
                         saveCashflowToCloud(state.appData.Cashflow);
                         savePaymentsToCloud(state.appData.Payments);
                         saveVariationsToCloud(state.appData.Variations);
+                        saveFinalStatementsToCloud(state.appData.Final_Statements || []);
                     }
                 });
             };
@@ -357,7 +359,9 @@ async function loadAppData() {
             // Setup Realtime Listener for Current Project initially
             setupSubscription(state.currentProjectId);
 
-            // Listen for project switch to resubscribe
+            // Listen for project switch to resubscribe (chỉ gắn 1 lần dù đăng nhập lại)
+            if (projectSwitchBound) return;
+            projectSwitchBound = true;
             document.addEventListener('projectSwitched', (e) => {
                 const newProjectId = e.detail;
                 if (newProjectId) {
@@ -370,6 +374,24 @@ async function loadAppData() {
     } catch (error) {
         console.error('[loadAppData] Fatal error loading app data:', error);
     }
+}
+
+let projectSwitchBound = false;
+
+/** Vẽ lại nội dung tab đang mở mà không đóng màn hình con/form đang mở. */
+function refreshActiveView() {
+    const active = document.querySelector('.menu-item.active');
+    if (!active) return;
+    const renderers = {
+        'menu-overview': renderOverviewDashboard,
+        'menu-tender': renderTenders,
+        'menu-budget': renderDashboard,
+        'menu-cashflow': renderCashflow,
+        'menu-payment': renderPaymentDashboard,
+        'menu-vo': renderVODashboard,
+        'menu-final': renderFinalDashboard,
+    };
+    try { (renderers[active.id] || (() => {}))(); } catch (e) { console.error('refreshActiveView:', e); }
 }
 
 // ─────────────────────────────────────────────────────────────

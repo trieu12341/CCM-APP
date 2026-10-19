@@ -85,6 +85,15 @@ export function setupFinalEvents() {
             
             const workspace = document.getElementById('final-breakdown-workspace');
             const contractId = workspace.dataset.contractId;
+
+            // Chống quyết toán 1 hợp đồng 2 lần (cộng dự phòng 2 lần)
+            const alreadyClosed = (state.appData.Final_Statements || []).some(fs =>
+                fs.contract_id === contractId && fs.project_id === state.currentProjectId && fs.status === 'Closed');
+            if (alreadyClosed) {
+                alert('Hợp đồng này đã được quyết toán trước đó. Không thể quyết toán lần nữa.');
+                return;
+            }
+
             const finalAcc = calculateFinalAccount(contractId);
             if (!finalAcc) return;
 
@@ -96,9 +105,11 @@ export function setupFinalEvents() {
             }
 
             // 2. Add Final Statement Record
-            const fsCount = (state.appData.Final_Statements || []).length + 1;
+            // Mã quyết toán: số kế tiếp trong dự án + hậu tố thời gian → không trùng giữa các máy
+            const projectFS = (state.appData.Final_Statements || []).filter(fs => fs.project_id === state.currentProjectId);
+            const nextNo = projectFS.reduce((mx, fs) => Math.max(mx, parseInt(String(fs.id).split('-')[1], 10) || 0), 0) + 1;
             const record = {
-                id: 'FS-' + String(fsCount).padStart(2, '0'),
+                id: `FS-${String(nextNo).padStart(2, '0')}-${Date.now().toString(36)}`,
                 contract_id: contractId,
                 contract_name: contract.package_name || contract.contract_name || contract.contract_id,
                 project_id: state.currentProjectId,
@@ -131,13 +142,15 @@ export function setupFinalEvents() {
 
             // Add delta to Contingency
             if (delta !== 0) {
-                let contingencyBudget = state.appData.Budgets.find(b => b.id === 'BG-CONT' && b.project_id === state.currentProjectId);
+                const contId = `BG-CONT-${state.currentProjectId}`;
+                let contingencyBudget = state.appData.Budgets.find(b =>
+                    (b.id === contId || b.id === 'BG-CONT') && b.project_id === state.currentProjectId);
                 if (contingencyBudget) {
                     contingencyBudget.budgeted = (contingencyBudget.budgeted || 0) + delta;
                     contingencyBudget.notes = (contingencyBudget.notes || '') + `\n+ Quyết toán ${contract.contract_id}: ${formatCurrencyVND(delta)}`;
                 } else {
                     state.appData.Budgets.push({
-                        id: 'BG-CONT',
+                        id: contId,
                         project_id: state.currentProjectId,
                         category: 'Contingency',
                         packageName: 'Dự phòng chung & Quyết toán',

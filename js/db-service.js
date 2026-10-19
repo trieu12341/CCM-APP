@@ -68,6 +68,9 @@ export function subscribeToProject(projectId, callback) {
     if (!projectId) return;
 
     unsubscribeProject = PROJECTS_COLLECTION.doc(projectId).onSnapshot((doc) => {
+        // Bỏ qua "tiếng vọng" từ chính lần lưu cục bộ (chưa lên server) —
+        // tránh vẽ lại màn hình ngay khi người dùng vừa bấm Lưu.
+        if (doc.metadata && doc.metadata.hasPendingWrites) return;
         if (doc.exists) {
             callback(doc.data());
         } else {
@@ -87,11 +90,18 @@ export async function loadAllProjectsFromCloud() {
         snapshot.forEach(doc => {
             const data = doc.data();
             if (data.projectId) {
+                // Dữ liệu cũ lưu nhầm tên vào projectName=undefined → lấy từ các trường còn lại
+                const projectName = data.projectName || data.project_name || data.name || data.projectId;
                 projects.push({
                     id: data.projectId,
                     project_id: data.projectId,
-                    name: data.projectName,
+                    project_name: projectName,
+                    name: projectName,
                     location: data.location || '',
+                    start_date: data.start_date || '',
+                    end_date: data.end_date || '',
+                    total_budget: data.total_budget || 0,
+                    contingency_budget: data.contingency_budget || 0,
                     status: data.status || 'Active'
                 });
             } else if (data.projects) {
@@ -111,10 +121,16 @@ export async function saveProjectsToCloud(projectsData) {
         const batch = db.batch();
         projectsData.forEach(p => {
             const docRef = PROJECTS_COLLECTION.doc(p.project_id);
+            const projectName = p.project_name || p.name || p.project_id;
             batch.set(docRef, {
                 projectId: p.project_id,
-                projectName: p.name,
+                projectName,
+                project_name: projectName,
                 location: p.location || '',
+                start_date: p.start_date || '',
+                end_date: p.end_date || '',
+                total_budget: Number(p.total_budget) || 0,
+                contingency_budget: Number(p.contingency_budget) || 0,
                 status: p.status || 'Active',
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
@@ -175,6 +191,11 @@ export async function savePaymentsToCloud(paymentsData) {
 // === VARIATIONS ===
 export async function saveVariationsToCloud(variationsData) {
     await saveGranularField('variations', variationsData);
+}
+
+// === FINAL STATEMENTS (Quyết toán) ===
+export async function saveFinalStatementsToCloud(finalData) {
+    await saveGranularField('final_statements', finalData);
 }
 
 // Legacy stubs (kept for import compatibility)

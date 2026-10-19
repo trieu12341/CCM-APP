@@ -9,7 +9,7 @@
  * Đã loại bỏ hoàn toàn dual-save sang Express API.
  */
 import { state } from '../app.js';
-import { saveBudgetsToCloud, saveTendersToCloud, saveProjectsToCloud, saveContractsToCloud, saveCashflowToCloud, savePaymentsToCloud, saveVariationsToCloud } from '../db-service.js';
+import { saveBudgetsToCloud, saveTendersToCloud, saveProjectsToCloud, saveContractsToCloud, saveCashflowToCloud, savePaymentsToCloud, saveVariationsToCloud, saveFinalStatementsToCloud } from '../db-service.js';
 
 // Centralize all localStorage keys
 export const STORAGE_KEYS = {
@@ -128,6 +128,7 @@ export function persistFinalStatements(data) {
     clearResetFlag();
     state.appData.Final_Statements = data;
     localStorage.setItem(STORAGE_KEYS.FINAL, JSON.stringify(data));
+    saveFinalStatementsToCloud(data);
     document.dispatchEvent(new Event('finalChanged'));
 }
 
