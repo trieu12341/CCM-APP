@@ -23,4 +23,6 @@ if (!firebase.apps.length) {
 
 // Export các Firebase services
 export const db = firebase.firestore();
+// Lớp an toàn thứ hai: bỏ qua trường undefined thay vì từ chối cả bản ghi
+try { db.settings({ ignoreUndefinedProperties: true, merge: true }); } catch (e) { console.warn('Firestore settings:', e); }
 export const auth = firebase.auth();

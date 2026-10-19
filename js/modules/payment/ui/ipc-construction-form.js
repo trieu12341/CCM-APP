@@ -126,7 +126,7 @@ export function readConstructionInput() {
         advance_this_period: isAdv ? parseMoney($('ipc-c-advance')?.value) : 0,
         lines: isAdv ? [] : ctx.lines.map(({ code, description, contract_amount, to_date_amount }) =>
             ({ code, description, contract_amount: Number(contract_amount) || 0, to_date_amount: Number(to_date_amount) || 0 })),
-        work_done_to_date: isAdv ? (ctx.previous.at(-1)?.computed?.workDoneToDate || 0) : undefined,
+        work_done_to_date: isAdv ? (ctx.previous.at(-1)?.computed?.workDoneToDate || 0) : 0, // có dòng Bill thì bộ máy tính dùng tổng các dòng
         variations_to_date: isAdv ? (ctx.previous.at(-1)?.computed?.variationsToDate || 0) : parseMoney($('ipc-c-vo')?.value),
         penalty_this_period: isAdv ? 0 : parseMoney($('ipc-c-penalty')?.value),
         withhold_this_period: isAdv ? 0 : parseMoney($('ipc-c-withhold')?.value),

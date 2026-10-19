@@ -67,7 +67,7 @@ export function renderIPCList(filterState = { search: '', status: 'All', contrac
         const code = ipcCode(p);
         // Số đầy đủ đến đồng; cột "Khấu trừ" = KL trình − xác nhận (giữ lại, thu hồi TƯ, phạt…)
         const s = summarizeIPC(p);
-        const gross = p.is_advance ? s.advance : s.grossThisPeriod;
+        const gross = p.is_advance ? 0 : s.grossThisPeriod;   // tạm ứng không phải khối lượng thực hiện
         const certified = p.is_advance ? 0 : s.certifiedExVat;
         const qsDed = p.is_advance ? 0 : Math.max(0, gross - certified);
         const netPay = s.payment;
@@ -88,7 +88,7 @@ export function renderIPCList(filterState = { search: '', status: 'All', contrac
                 </td>
                 <td style="text-align:center;font-weight:600;">${periodLabel(p)}</td>
                 <td style="text-align:center;color:#64748b;font-size:12px;">${formatDateShort(p.submission_date)}</td>
-                <td style="text-align:right;font-size:13px;">${formatCurrencyVND(gross)}</td>
+                <td style="text-align:right;font-size:13px;">${p.is_advance ? '—' : formatCurrencyVND(gross)}</td>
                 <td style="text-align:right;font-size:13px;color:#ef4444;">${qsDed > 0 ? '- ' + formatCurrencyVND(qsDed) : '—'}</td>
                 <td style="text-align:right;font-size:13px;font-weight:600;color:#10b981;">${p.is_advance ? '—' : formatCurrencyVND(certified)}</td>
                 <td style="text-align:right;font-size:13px;font-weight:700;color:var(--primary-blue);">${formatCurrencyVND(netPay)}</td>

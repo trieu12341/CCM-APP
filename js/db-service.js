@@ -1,4 +1,6 @@
 import { db } from './firebase-config.js';
+import { cleanForFirestore } from './utils/firestore-clean.js';
+import { notifyCloudError } from './utils/notify.js';
 import { state } from './app.js';
 
 /**
@@ -139,6 +141,7 @@ export async function saveProjectsToCloud(projectsData) {
         console.log('Projects saved to Cloud successfully.');
     } catch (err) {
         console.error('Failed to save Projects to Cloud:', err);
+        notifyCloudError('Không lưu được danh sách dự án lên cloud. ' + (err && err.message ? err.message.slice(0, 160) : ''));
     }
 }
 
@@ -149,7 +152,8 @@ async function saveGranularField(fieldName, arrayData) {
         if (!projectId) return;
 
         // Only save data for the current active project
-        const projectData = arrayData.filter(item => item.project_id === projectId);
+        // Làm sạch (undefined/NaN) — Firestore từ chối CẢ bản ghi nếu có một trường lỗi
+        const projectData = cleanForFirestore(arrayData.filter(item => item && item.project_id === projectId));
 
         const docRef = PROJECTS_COLLECTION.doc(projectId);
         await docRef.set({ 
@@ -160,6 +164,7 @@ async function saveGranularField(fieldName, arrayData) {
         console.log(`${fieldName} saved to Cloud for project ${projectId}.`);
     } catch (err) {
         console.error(`Failed to save ${fieldName} to Cloud:`, err);
+        notifyCloudError(`Không lưu được "${fieldName}" lên cloud — dữ liệu mới chỉ nằm trong máy này. ${err && err.code === 'permission-denied' ? 'Tài khoản chưa có quyền sửa (cần role user/admin).' : (err && err.message ? err.message.slice(0, 160) : '')}`);
     }
 }
 
