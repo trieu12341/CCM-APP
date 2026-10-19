@@ -90,3 +90,14 @@ test('Dashboard với chuỗi đầy đủ: Đã trả = tạm ứng + Σ(14) c�
     const paid = paymentTotals(ps, { filter: isPaidIPC });
     assert.equal(k.totalPaid, 1_500_000_000 + paid.certifiedExVat);
 });
+
+test('cùng cơ sở tiền thanh toán (gồm TƯ): đã trả không bao giờ vượt đã duyệt', () => {
+    const ps = chain();
+    const approved = paymentTotals(ps, { filter: isApprovedIPC }).paymentExVat;
+    const paid = paymentTotals(ps, { filter: isPaidIPC }).paymentExVat;
+    assert.ok(paid <= approved);
+    // chỉ có tạm ứng đã duyệt chưa trả → đã duyệt = tạm ứng, đã trả = 0
+    const only = [{ ...ps[0], status: 'Approved' }];
+    assert.equal(paymentTotals(only, { filter: isApprovedIPC }).paymentExVat, 1_500_000_000);
+    assert.equal(paymentTotals(only, { filter: isPaidIPC }).paymentExVat, 0);
+});

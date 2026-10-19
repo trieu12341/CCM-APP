@@ -46,8 +46,10 @@ export function renderCashflow() {
     // Single Source of Truth for Payments
     if (state.appData.Payments) {
         const pid = state.currentProjectId;
-        totalCertified = paymentTotals(state.appData.Payments, { projectId: pid, filter: isApprovedIPC }).certifiedExVat;
-        totalPaid = paymentTotals(state.appData.Payments, { projectId: pid, filter: isPaidIPC }).paymentExVat; // gồm tạm ứng đã chi
+        // Tab dòng tiền: Duyệt và Đã trả CÙNG một cơ sở — tiền thanh toán trước thuế, gồm tạm ứng
+        // (= tạm ứng + Σ(14)), khớp đường kế hoạch netPayable (cũng gồm tạm ứng). Nhờ vậy Đã trả ≤ Đã duyệt.
+        totalCertified = paymentTotals(state.appData.Payments, { projectId: pid, filter: isApprovedIPC }).paymentExVat;
+        totalPaid = paymentTotals(state.appData.Payments, { projectId: pid, filter: isPaidIPC }).paymentExVat;
     }
 
     let monthlyData = {}; 
