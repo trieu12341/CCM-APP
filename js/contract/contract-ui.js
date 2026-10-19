@@ -305,6 +305,10 @@ export function openContractModal(contract = null) {
         document.getElementById('contract-ap-recovery-input').value = contract.ap_recovery_percent || '';
         document.getElementById('contract-retention-percent-input').value = contract.retention_percent || '';
         document.getElementById('contract-max-retention-input').value = contract.max_retention_percent || '';
+        const setSel = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+        setSel('contract-ap-basis-input', contract.ap_recovery_basis || 'work_done');
+        setSel('contract-retention-basis-input', contract.retention_basis || 'gross');
+        setSel('contract-vat-input', contract.vat_percent ?? 8);
         document.getElementById('contract-ld-input').value = contract.liquidated_damages || '';
         document.getElementById('contract-scope-input').value = contract.scope_of_work || '';
         

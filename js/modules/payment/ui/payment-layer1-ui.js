@@ -1,3 +1,4 @@
+import { periodLabel } from '../ipc-chain.js';
 import { escapeHtml } from '../../../utils/formatters.js';
 /**
  * payment-layer1-ui.js
@@ -158,7 +159,7 @@ function renderPendingTable(payments) {
                     <div style="font-weight:600;font-size:13px;">${escapeHtml(p.contract_name) || '—'}</div>
                     <div style="font-size:11px;color:#64748b;">${escapeHtml(p.contractor_name) || ''}</div>
                 </td>
-                <td style="text-align:center;">Đợt ${p.payment_number || '—'}</td>
+                <td style="text-align:center;">${periodLabel(p)}</td>
                 <td>${formatCurrencyShort(p.gross_work_done)}</td>
                 <td style="text-align:center;">${daysLabel}</td>
                 <td style="text-align:center;">${getStatusBadge(p.status)}</td>

@@ -111,3 +111,8 @@ body {
 #btn-admin-reset { color: var(--accent-red) !important; }
 #btn-admin-restore { color: var(--accent-blue) !important; }
 .topbar .btn-secondary:hover { background: var(--sidebar-hover) !important; color: var(--text-dark) !important; }
+
+/* ---------- 15. MÀN HÌNH CHI TIẾT KHÔNG BỊ TOPBAR CHE ----------
+   Topbar dính (sticky, cao 56px, z-index 1000) đè lên phần đầu các màn hình chi tiết. */
+#payment-detail-workspace { top: 56px !important; height: calc(100vh - 56px) !important; }
+#cashflow-detail-modal > .modal-content { height: 100% !important; max-height: 100% !important; }

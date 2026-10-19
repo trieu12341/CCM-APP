@@ -1,0 +1,55 @@
+/* ipc.css — IPC gói xây dựng theo mẫu CERT (form nhập + màn hình chi tiết) */
+
+/* Tham số hợp đồng dạng chip */
+.ipc-c-params { display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 10px 12px; margin: 4px 0 12px;
+  background: var(--bg-subtle, var(--main-bg)); border: 1px solid var(--border-color); border-radius: 8px;
+  font-size: 12px; color: var(--text-muted); }
+.ipc-c-params b { color: var(--text-dark); font-weight: 600; }
+
+.ipc-c-check { display: flex; align-items: center; gap: 8px; margin: 4px 0 12px; font-size: 13px; color: var(--text-dark); cursor: pointer; }
+.ipc-c-check input { width: 16px; height: 16px; min-height: 0; }
+
+.ipc-c-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin: 8px 0; font-size: 13px; }
+.ipc-c-toolbar span { display: flex; gap: 8px; }
+
+.ipc-c-msg { font-size: 12px; padding: 8px 10px; border-radius: 6px; margin-bottom: 8px; line-height: 1.5; }
+.ipc-c-msg.ok { background: var(--accent-teal-soft, #e3f5f2); color: var(--status-green-text, #0b7366); }
+.ipc-c-msg.warn { background: var(--accent-amber-soft, #fbf3e2); color: var(--status-orange-text, #8a5a12); }
+
+.ipc-c-table-wrap { overflow-x: auto; margin-bottom: 12px; border: 1px solid var(--border-color); border-radius: 8px; }
+.ipc-c-lines input { width: 100%; min-height: 28px !important; height: 28px; padding: 0 6px !important; font-size: 12.5px; }
+.ipc-c-lines td { padding: 4px 6px !important; vertical-align: middle; }
+.ipc-c-lines td:nth-child(1) { width: 90px; }
+.ipc-c-lines td:nth-child(3), .ipc-c-lines td:nth-child(5) { width: 150px; }
+.ipc-c-lines input.strong { font-weight: 600; }
+.ipc-c-del { border: 0; background: transparent; color: var(--text-muted); font-size: 18px; cursor: pointer; line-height: 1; }
+.ipc-c-del:hover { color: var(--accent-red, #d14343); }
+
+/* Bảng chứng chỉ 16 dòng */
+.ipc-cert-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 16px; }
+.ipc-cert-table td { padding: 6px 10px !important; border-bottom: 1px solid var(--border-color) !important; background: transparent !important; }
+.ipc-cert-table td.no { width: 46px; color: var(--text-muted); font-weight: 600; }
+.ipc-cert-table td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; width: 180px; }
+.ipc-cert-table tr.is-sub td { font-weight: 600; background: var(--bg-subtle, var(--main-bg)) !important; }
+.ipc-cert-table tr.is-total td { font-weight: 700; font-size: 14px; color: var(--brand, var(--primary-blue));
+  border-top: 2px solid var(--border-strong, var(--border-color)) !important; }
+
+/* Bảng dòng Bill, tổng hợp thanh toán, thu hồi tạm ứng */
+.ipc-lines-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-bottom: 16px; }
+.ipc-lines-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ipc-lines-table .muted { color: var(--text-muted); }
+.ipc-lines-table tr.is-current td { font-weight: 600; background: var(--brand-soft, #fbecea) !important; }
+.ipc-lines-table tfoot td { font-weight: 700; }
+
+#pay-v2-breakdown .breakdown-section-title { margin-top: 8px; }
+.hidden { display: none !important; }
+
+/* Drawer IPC rộng hơn để bảng Bill không bị bóp */
+#payment-detail-workspace { width: min(1080px, 94vw) !important; max-width: 94vw !important; }
+/* Ô "Đây là hồ sơ tạm ứng": không theo kiểu nhãn in hoa của form */
+.ipc-c-check { text-transform: none !important; letter-spacing: 0 !important; font-weight: 400 !important; font-size: 13px !important; color: var(--text-dark) !important; }
+.ipc-c-check input[type="checkbox"] { width: 16px !important; flex: 0 0 auto; margin: 0; }
+/* Thẻ "Thanh toán đợt này": bỏ nền xanh gradient cứng, theo màu thương hiệu */
+.net-payable-card { background: var(--brand-soft, #fbecea) !important; color: var(--text-dark) !important; border: 1px solid var(--border-color); }
+.net-payable-card .net-payable-label { color: var(--text-muted) !important; }
+.net-payable-card .net-payable-amount { color: var(--brand, #c63a25) !important; }

@@ -270,7 +270,16 @@ export function setupBudgetEvents() {
     // --- Payment Modal ---
     const paymentModal = document.getElementById('payment-modal');
     if (paymentModal) {
+        // "Initiate Payment" → mở form IPC đầy đủ ở tab Payment (không tạo IPC
+        // "đã duyệt" tắt với số tiền gõ tay như trước — số đó không qua bộ máy tính IPC)
         bindEvent('btn-initiate-payment', 'click', () => {
+            document.getElementById('menu-payment')?.click();
+            setTimeout(() => {
+                document.getElementById('btn-open-payment-list')?.click();
+                setTimeout(() => document.getElementById('btn-new-ipc')?.click(), 120);
+            }, 120);
+        });
+        bindEvent('btn-initiate-payment-legacy', 'click', () => {
             const select = document.getElementById('contract-select');
             if (!select) return;
             select.innerHTML = '';

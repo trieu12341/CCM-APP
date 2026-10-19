@@ -38,6 +38,9 @@ export function saveContract() {
         ap_recovery_percent: parseFloat(document.getElementById('contract-ap-recovery-input').value) || 0,
         retention_percent: parseFloat(document.getElementById('contract-retention-percent-input').value) || 0,
         max_retention_percent: parseFloat(document.getElementById('contract-max-retention-input').value) || 0,
+        ap_recovery_basis: document.getElementById('contract-ap-basis-input')?.value || 'work_done',
+        retention_basis: document.getElementById('contract-retention-basis-input')?.value || 'gross',
+        vat_percent: (() => { const v = document.getElementById('contract-vat-input')?.value; return v === '' || v === undefined ? 8 : parseFloat(v); })(),
         liquidated_damages: document.getElementById('contract-ld-input').value.trim(),
         scope_of_work: document.getElementById('contract-scope-input').value.trim()
     };

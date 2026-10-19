@@ -6,6 +6,7 @@
 
 import { state } from '../../app.js';
 import { persistPayments, loadPaymentsFromLS } from '../../core/data-store.js';
+import { newIPCId } from './ipc-chain.js';
 
 // ─────────────────────────────────────────────────────────────
 // READ
@@ -46,7 +47,7 @@ export function createIPC(ipcData) {
     const now = new Date().toISOString().split('T')[0];
 
     const newIPC = {
-        ipc_id: `IPC-${(payments.length + 1).toString().padStart(2, '0')}`,
+        ipc_id: newIPCId(payments),   // không trùng kể cả sau khi xóa / giữa nhiều máy
         project_id: state.currentProjectId || '',
         contract_id: '',
         contract_name: '',
@@ -58,7 +59,7 @@ export function createIPC(ipcData) {
         // Financial fields
         gross_work_done: 0,
         ap_recovery_pct: 0,
-        retention_pct: 5,
+        retention_pct: 0,
         vat_pct: 10,
 
         // Computed / stored
@@ -84,6 +85,7 @@ export function createIPC(ipcData) {
         // Override with provided data
         ...ipcData,
     };
+    if (ipcData.ipc_id) newIPC.ipc_id = ipcData.ipc_id;
 
     payments.push(newIPC);
     persistPayments(payments);

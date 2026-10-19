@@ -78,7 +78,7 @@
                 <!-- Các trường động cho Thi công -->
                 <div id="contract-dynamic-fields" style="display: contents;">
                     <div class="form-group">
-                        <label>% Khấu trừ tạm ứng (AP Recovery)</label>
+                        <label>% Thu hồi tạm ứng (AP Recovery rate)</label>
                         <div style="position: relative;">
                             <input type="number" id="contract-ap-recovery-input" step="0.01" min="0" max="100"
                                 style="padding-right: 2rem;">
@@ -94,12 +94,35 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Giới hạn bảo hành (Max Retention)</label>
+                        <label>Trần giữ lại (% giá trị HĐ, để trống = không giới hạn)</label>
                         <div style="position: relative;">
                             <input type="number" id="contract-max-retention-input" step="0.01" min="0" max="100"
                                 style="padding-right: 2rem;">
                             <span style="position: absolute; right: 10px; top: 10px;">%</span>
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Thu hồi tạm ứng tính trên</label>
+                        <select id="contract-ap-basis-input">
+                            <option value="work_done">(5) Giá trị công việc — không gồm phát sinh</option>
+                            <option value="gross">(7) Tổng giá trị thực hiện — gồm phát sinh</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Giữ lại tính trên</label>
+                        <select id="contract-retention-basis-input">
+                            <option value="gross">(7) Tổng giá trị thực hiện — gồm phát sinh</option>
+                            <option value="work_done">(5) Giá trị công việc — không gồm phát sinh</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>% Thuế GTGT mặc định (VAT)</label>
+                        <div style="position: relative;">
+                            <input type="number" id="contract-vat-input" step="0.01" min="0" max="100"
+                                style="padding-right: 2rem;">
+                            <span style="position: absolute; right: 10px; top: 10px;">%</span>
+                        </div>
+                        <small class="text-muted">Tính trên giá trị KL gộp kỳ này; sửa được ở từng IPC.</small>
                     </div>
                     <div class="form-group" style="grid-column: span 2;">
                         <label>Phạt chậm tiến độ (LD)</label>
@@ -640,6 +663,9 @@
             </div>
             <div class="detail-workspace-header-right">
                 <span id="pay-detail-status-badge"></span>
+                <button id="btn-edit-ipc" class="btn btn-secondary" title="Sửa IPC (chỉ khi chưa duyệt)">
+                    <i class="fa-solid fa-pen"></i> Sửa
+                </button>
                 <button id="btn-delete-ipc" class="btn btn-secondary" style="font-size:12px;padding:5px 10px;color:#ef4444;border-color:#fecaca;"
                     title="Xóa IPC này">
                     <i class="fa-solid fa-trash"></i>
@@ -698,6 +724,8 @@
                     <!-- Dynamically rendered by payment-layer3-ui.js -->
                 </tbody>
             </table>
+            <!-- IPC xây dựng (mẫu CERT): bảng 16 dòng + Bill + thu hồi TƯ + tổng hợp -->
+            <div id="pay-v2-breakdown"></div>
 
             <!-- Notes -->
             <div style="margin-bottom:16px;">
@@ -741,7 +769,7 @@
         <!-- Form Header -->
         <div class="detail-workspace-header">
             <div class="detail-workspace-header-left">
-                <div style="font-size:15px;font-weight:700;color:var(--text-dark);">
+                <div style="font-size:15px;font-weight:700;color:var(--text-dark);" id="ipc-form-title">
                     Tạo Hồ sơ Thanh toán Mới (IPC)
                 </div>
             </div>
@@ -775,10 +803,15 @@
                     </div>
                 </div>
 
+                <!-- Gói XÂY DỰNG: nhập theo mẫu CERT (render bởi ipc-construction-form.js) -->
+                <div id="ipc-construction-section"></div>
+
+                <!-- Gói TƯ VẤN: công thức đơn giản -->
+                <div id="ipc-simple-section">
                 <!-- Gross Work Done -->
                 <div class="form-group">
                     <label>Giá trị Khối lượng Đợt này (Gross Work Done) <span style="color:#ef4444;">*</span></label>
-                    <input type="number" id="ipc-form-gross" min="0" step="1000000" placeholder="0" required>
+                    <input type="number" id="ipc-form-gross" min="0" step="any" placeholder="0" required>
                 </div>
 
                 <!-- Deduction Rates (AP & Retention hidden for Consultancy contracts) -->
@@ -800,7 +833,7 @@
                 <!-- QS Deduction (optional) -->
                 <div class="form-group">
                     <label>Khấu trừ điều chỉnh QS (nếu có)</label>
-                    <input type="number" id="ipc-form-qs-deduction" min="0" step="1000000" placeholder="0" value="0">
+                    <input type="number" id="ipc-form-qs-deduction" min="0" step="any" placeholder="0" value="0">
                 </div>
 
                 <!-- Live Calculation Preview -->
@@ -822,6 +855,8 @@
                         <span class="calc-preview-label" id="form-preview-net-label">✅ NET PAYABLE ĐỢT NÀY</span>
                         <span class="calc-preview-value" id="form-preview-net" style="color:var(--primary-blue);font-size:14px;">0 VNĐ</span>
                     </div>
+                </div>
+
                 </div>
 
                 <!-- Notes -->

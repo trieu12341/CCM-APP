@@ -1,3 +1,4 @@
+import { shortIPCCode, periodLabel } from '../ipc-chain.js';
 import { escapeHtml } from '../../../utils/formatters.js';
 /**
  * payment-layer2-ui.js
@@ -62,7 +63,7 @@ export function renderIPCList(filterState = { search: '', status: 'All', contrac
     }
 
     tbody.innerHTML = payments.map((p, idx) => {
-        const ipcCode = p.ipc_id.replace('ipc-', 'IPC-');
+        const ipcCode = shortIPCCode(p.ipc_id);
         const gross    = Number(p.gross_work_done) || 0;
         const qsDed    = Number(p.qs_deduction) || 0;
         const certifiedGross = Number(p.certified_value) || Number(p.net_payable) || 0;
@@ -84,7 +85,7 @@ export function renderIPCList(filterState = { search: '', status: 'All', contrac
                     <div style="font-weight:600;font-size:13px;line-height:1.4;">${escapeHtml(p.contract_name) || '<span style="color:#94a3b8;">—</span>'}</div>
                     <div style="font-size:11px;color:#64748b;margin-top:2px;">${escapeHtml(p.contractor_name) || ''} ${ctBadge}</div>
                 </td>
-                <td style="text-align:center;font-weight:600;">Đợt ${p.payment_number || '—'}</td>
+                <td style="text-align:center;font-weight:600;">${periodLabel(p)}</td>
                 <td style="text-align:center;color:#64748b;font-size:12px;">${formatDateShort(p.submission_date)}</td>
                 <td style="text-align:right;font-size:13px;">${formatCurrencyShort(gross)}</td>
                 <td style="text-align:right;font-size:13px;color:#ef4444;">${qsDed > 0 ? '- ' + formatCurrencyShort(qsDed) : '—'}</td>
