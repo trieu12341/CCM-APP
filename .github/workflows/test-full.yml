@@ -1,0 +1,33 @@
+# Bộ kiểm thử ĐẦY ĐỦ, dùng chung cho CI (PR/develop) và trước khi deploy (master).
+name: Test đầy đủ
+
+on:
+  workflow_call:
+
+jobs:
+  full:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci
+
+      - name: Unit test
+        run: npm test
+
+      - name: Cài Chromium cho E2E
+        run: npx playwright install --with-deps chromium
+
+      - name: E2E (luồng đầy đủ, đăng nhập, dữ liệu bản cũ)
+        run: npm run test:e2e
+        env: { CI: 'true' }
+
+      - name: Lưu báo cáo E2E (ảnh chụp, trace khi lỗi)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14

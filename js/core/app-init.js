@@ -46,8 +46,11 @@ export async function initApp() {
                 // chạy hiệu ứng thành công / báo lỗi "chờ cấp quyền".
                 await apiLogin(email, password);
             } catch (err) {
-                console.error('[Login Error]', err);
                 let msg = 'Đăng nhập thất bại. Vui lòng thử lại.';
+                const known = ['auth/user-not-found', 'auth/wrong-password', 'auth/invalid-credential', 'auth/invalid-email',
+                    'auth/too-many-requests', 'auth/network-request-failed'];
+                // Gõ sai mật khẩu là tình huống bình thường, không phải lỗi của app
+                if (known.includes(err.code)) console.warn('[Login]', err.code); else console.error('[Login Error]', err);
                 if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
                     msg = 'Email hoặc mật khẩu không đúng.';
                 } else if (err.code === 'auth/invalid-email') {
