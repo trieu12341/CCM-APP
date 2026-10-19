@@ -2,8 +2,9 @@
 # Cần secret FIREBASE_SERVICE_ACCOUNT (JSON khóa service account) trong
 # GitHub → Settings → Secrets and variables → Actions.
 #   1. test   : chạy unit test công thức (npm test). Test hỏng → KHÔNG deploy.
-#   2. deploy : Hosting (giao diện) rồi Firestore rules (phân quyền).
-name: Deploy Firebase
+#   2. deploy : Hosting (giao diện).
+# Firestore rules deploy ở workflow riêng: firestore-rules.yml
+name: Deploy Firebase Hosting
 
 on:
   push:
@@ -43,13 +44,3 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           projectId: cost-contract-management
           channelId: live
-
-      - name: Deploy Firestore rules
-        env:
-          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        run: |
-          printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
-          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
-          npx --yes firebase-tools@13 deploy --only firestore:rules \
-            --project cost-contract-management --non-interactive
-          rm -f "$RUNNER_TEMP/sa.json"
