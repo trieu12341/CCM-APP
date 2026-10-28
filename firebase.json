@@ -19,7 +19,9 @@
       "CLAUDE.md",
       "playwright.config.js",
       "test-results/**",
-      "playwright-report/**"
+      "playwright-report/**",
+      "GEMINI.md",
+      "scripts/**"
     ],
     "rewrites": [
       {

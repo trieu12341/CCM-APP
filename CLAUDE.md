@@ -69,3 +69,15 @@ Bộ hồi quy: unit x/x · IPC mẫu 4/4 · E2E x/x · đăng nhập x/x · l�
 Cần bạn kiểm tay trên staging: <kịch bản + các bước bấm>
 Rủi ro / chưa làm: <nếu có>
 ```
+
+## 9. Giao việc cho Gemini (thợ phụ, chỉ chạy trên máy có cài Gemini CLI)
+Claude là quản đốc; Gemini làm việc trong **worktree riêng**, không commit/push. Subagent sẵn: `gemini-tho` (`.claude/agents/`).
+```bash
+node scripts/gemini/run.mjs check                    # Gemini có chạy không
+node scripts/gemini/run.mjs review develop "<trọng tâm>"   # ý kiến soát thứ hai, chỉ đọc
+node scripts/gemini/run.mjs task <file-nhiệm-vụ.md>  # dòng "# tiêu đề" + "Được sửa: a, b" + mô tả
+```
+- **Nên giao:** viết test theo kịch bản T…, code lặp/khung giao diện, soát diff lần hai, đọc file rất dài để tóm tắt.
+- **Không giao:** mục 4 (định nghĩa số liệu), `ipc-engine.js`, `payment-metrics.js`, `firestore.rules`, công cụ chuyển đổi dữ liệu.
+- Mã thoát 2 = Gemini sửa ngoài phạm vi → từ chối. Kết quả Gemini chỉ được gộp sau khi Claude đọc diff và chạy đủ bộ hồi quy.
+- Nhật ký từng lần giao nằm ở `.gemini-logs/` (không đưa lên git). Không gửi dữ liệu thật (`tests/fixtures/private/`) cho Gemini.
