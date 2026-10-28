@@ -18,11 +18,13 @@ const LOG_DIR = join(ROOT, '.gemini-logs');
 const TIMEOUT = Number(process.env.GEMINI_TIMEOUT_MIN || 20) * 60_000;
 const WIN = process.platform === 'win32';
 
-/** Lệnh dạng shim .cmd (gemini, npm) cần shell trên Windows → phải tự bọc nháy tham số có dấu cách. */
+/** Lệnh dạng shim .cmd (gemini, npm) cần shell trên Windows. Node 22+ cảnh báo khi vừa shell vừa mảng tham số
+ *  (DEP0190), nên tự bọc nháy rồi ghép thành MỘT chuỗi lệnh. git chạy thẳng, không qua shell. */
 function sh(cmd, args, opts = {}) {
     const shell = WIN && cmd !== 'git';
-    const a = shell ? args.map(x => (/[\s"&|<>^]/.test(x) ? `"${x.replace(/"/g, '\\"')}"` : x)) : args;
-    const r = spawnSync(cmd, a, { encoding: 'utf8', shell, maxBuffer: 64 * 1024 * 1024, ...opts });
+    const q = x => (/[\s"&|<>^]/.test(x) ? `"${x.replace(/"/g, '\\"')}"` : x);
+    const base = { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, ...opts };
+    const r = shell ? spawnSync([cmd, ...args.map(q)].join(' '), { ...base, shell: true }) : spawnSync(cmd, args, base);
     if (r.error?.code === 'ENOENT') throw new Error(`Không tìm thấy lệnh \`${cmd}\` trên máy này.` + (cmd === 'gemini' ? ' Cài: npm install -g @google/gemini-cli rồi chạy `gemini` một lần để đăng nhập.' : ''));
     if (r.error) throw r.error;
     return r;
@@ -39,6 +41,9 @@ function gemini(input, { cwd = ROOT, edit = false } = {}) {
     if (edit) args.push('--yolo');               // chỉ dùng trong worktree riêng
     if (process.env.GEMINI_MODEL) args.push('-m', process.env.GEMINI_MODEL);
     const r = sh('gemini', args, { cwd, input, timeout: TIMEOUT });
+    if (r.status === 41 || /Auth method/i.test(r.stderr)) {
+        throw new Error('Gemini chưa đăng nhập. Gõ `gemini` (chế độ tương tác) → chọn "Login with Google" → đăng nhập → /quit, rồi chạy lại.');
+    }
     if (r.status !== 0) throw new Error(`gemini lỗi (mã ${r.status}): ${r.stderr.slice(-800)}`);
     return r.stdout;
 }
