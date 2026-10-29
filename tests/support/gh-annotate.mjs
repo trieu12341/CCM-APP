@@ -18,10 +18,18 @@ export function toAnnotation(ev) {
     return `::error${file ? ` file=${esc(file, true)},` : ' '}title=${esc(d.name, true)}::${esc(msg)}\n`;
 }
 
+/** Dòng tổng kết (::notice::) — để thấy test thật sự CHẠY, không phải bị bỏ qua hết. */
+export function toSummary({ pass, fail, skip }) {
+    return `::notice title=Tổng kết test::đạt ${pass} · đỏ ${fail} · bỏ qua ${skip}\n`;
+}
+
 export default async function* ghAnnotate(source) {
-    if (!process.env.GITHUB_ACTIONS) { for await (const _ of source) { /* bỏ qua */ } return; }
+    const n = { pass: 0, fail: 0, skip: 0 };
     for await (const ev of source) {
-        const line = toAnnotation(ev);
+        if (ev.type === 'test:pass') ev.data.skip !== undefined ? n.skip++ : n.pass++;
+        if (ev.type === 'test:fail') n.fail++;
+        const line = process.env.GITHUB_ACTIONS ? toAnnotation(ev) : '';
         if (line) yield line;
     }
+    if (process.env.GITHUB_ACTIONS) yield toSummary(n);
 }
