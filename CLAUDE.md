@@ -51,11 +51,12 @@ nằm ở tài liệu kế hoạch của chủ repo; mỗi bước có mã (1.1,
 npm test              # unit test (node --test), nhanh, chạy mọi lúc
 npm run test:data     # lớp dữ liệu js/data/ trên Firestore giả trong bộ nhớ
 npm run test:data:emulator  # cùng bộ đó trên Firestore Emulator thật (cần Java; CI chạy)
+npm run test:rules:emulator  # firestore.rules: ma trận vai trò, chống ghi đè _v, nhật ký chỉ thêm (cần Java; CI chạy)
 npm run test:e2e      # E2E Playwright toàn luồng + đăng nhập + dữ liệu bản cũ (cần Chromium)
 npm run test:all      # cả ba
 ```
 CI (`.github/workflows/ci.yml`): đẩy lên nhánh bất kỳ → unit + lớp dữ liệu; PR/merge vào `develop` hoặc `master`
-→ toàn bộ, kể cả lớp dữ liệu trên Firestore Emulator thật. `master` chỉ deploy khi toàn bộ test đạt.
+→ toàn bộ, kể cả lớp dữ liệu và rules trên Firestore Emulator thật. `master` chỉ deploy khi toàn bộ test đạt.
 
 ## 7. Quy tắc làm việc
 - Làm trên nhánh `gdX/bYY-ten-ngan` tách từ `develop`; mở PR vào `develop`. Không đẩy thẳng `master`.

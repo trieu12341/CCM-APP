@@ -6,6 +6,11 @@ rules_version = '2';
 //   manager : chỉ xem
 //   pending : tài khoản mới, chờ admin cấp quyền → không thấy dữ liệu
 // Không ai tự sửa được trường `role` của chính mình.
+//
+// Cấu trúc dữ liệu mới (Giai đoạn 1, bước 1.4):
+//   projects/{pid}/{budgets|tenders|contracts|payments|variations|cashflows|finals}/{id}
+//   projects/{pid}/audit/{autoId}      — nhật ký, chỉ được THÊM
+// Bản ghi dự án cũ projects/{pid} (chứa các mảng) giữ nguyên quy tắc trong lúc chuyển đổi.
 // ─────────────────────────────────────────────────────────────
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -39,11 +44,73 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    // ── Dữ liệu dự án ──
+    // ── Dữ liệu dự án (bản ghi cũ: cả dự án một bản ghi) ──
     match /projects/{projectId} {
       allow read: if canRead();
       allow create, update: if canEdit();
       allow delete: if isAdmin();
+    }
+
+    // ── Hồ sơ của dự án (bản ghi mới: mỗi hồ sơ một bản ghi) ──
+    function entityOk(e) {
+      return e in ['budgets', 'tenders', 'contracts', 'payments', 'variations', 'cashflows', 'finals'];
+    }
+    function nv() { return request.resource.data; }
+    // Mọi lần ghi phải mang đúng người ghi và đúng giờ máy chủ (không giả mạo được)
+    function stamped() {
+      return nv().updatedBy == request.auth.uid && nv().updatedAt == request.time;
+    }
+
+    match /projects/{projectId}/{entity}/{docId} {
+      allow read: if entityOk(entity) && canRead();
+
+      // Tạo mới: phiên bản 1, chưa xóa, người tạo là chính mình
+      allow create: if entityOk(entity) && canEdit()
+                    && nv()._v == 1
+                    && nv().deleted == false
+                    && nv().createdBy == request.auth.uid
+                    && nv().createdAt == request.time
+                    && stamped();
+
+      // Sửa: _v mới = _v cũ + 1 (chống ghi đè người khác); không đổi người/giờ tạo.
+      // Xóa mềm (deleted: false → true) phải ghi rõ ai xóa và khi nào; khôi phục thì không cần.
+      allow update: if entityOk(entity) && canEdit()
+                    && nv()._v is int && nv()._v == resource.data._v + 1
+                    && stamped()
+                    && nv().createdBy == resource.data.createdBy
+                    && nv().createdAt == resource.data.createdAt
+                    && nv().deleted is bool
+                    && (nv().deleted == resource.data.deleted
+                        || nv().deleted == false
+                        || (nv().deletedBy == request.auth.uid && nv().deletedAt == request.time));
+
+      // Xóa thật: chỉ admin (người dùng thường chỉ xóa mềm)
+      allow delete: if entityOk(entity) && isAdmin();
+    }
+
+    // ── Nhật ký thay đổi: chỉ thêm, không ai sửa hay xóa ──
+    function auditShape() {
+      return nv().keys().hasOnly(['at', 'uid', 'name', 'entity', 'entityId', 'action', 'changes', 'reason'])
+          && nv().keys().hasAll(['at', 'uid', 'entity', 'entityId', 'action'])
+          && nv().uid == request.auth.uid
+          && nv().at == request.time
+          && nv().changes is list;
+    }
+    // Dòng nhật ký phải đi kèm một lần ghi hồ sơ CÙNG giao dịch (cùng giờ máy chủ, cùng người)
+    function auditPairedWithWrite(projectId) {
+      return entityOk(nv().entity)
+          && nv().action in ['create', 'update', 'delete', 'restore']
+          && getAfter(/databases/$(database)/documents/projects/$(projectId)/$(nv().entity)/$(nv().entityId)).data.updatedAt == request.time
+          && getAfter(/databases/$(database)/documents/projects/$(projectId)/$(nv().entity)/$(nv().entityId)).data.updatedBy == request.auth.uid;
+    }
+
+    match /projects/{projectId}/audit/{auditId} {
+      allow read: if canRead();
+      allow create: if canEdit() && auditShape()
+                    && (auditPairedWithWrite(projectId)
+                        // Chuyển dữ liệu (bước 1.5): admin ghi một dòng tổng kết, không gắn với một hồ sơ
+                        || (isAdmin() && nv().action == 'migrate'));
+      allow update, delete: if false;
     }
 
     // ── Mặc định: từ chối mọi thứ khác ──
