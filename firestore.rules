@@ -75,7 +75,7 @@ service cloud.firestore {
       // Sửa: _v mới = _v cũ + 1 (chống ghi đè người khác); không đổi người/giờ tạo.
       // Xóa mềm (deleted: false → true) phải ghi rõ ai xóa và khi nào; khôi phục thì không cần.
       allow update: if entityOk(entity) && canEdit()
-                    && nv()._v is int && nv()._v == resource.data._v + 1
+                    && nv()._v is int
                     && stamped()
                     && nv().createdBy == resource.data.createdBy
                     && nv().createdAt == resource.data.createdAt
@@ -110,7 +110,7 @@ service cloud.firestore {
                     && (auditPairedWithWrite(projectId)
                         // Chuyển dữ liệu (bước 1.5): admin ghi một dòng tổng kết, không gắn với một hồ sơ
                         || (isAdmin() && nv().action == 'migrate'));
-      allow update, delete: if false;
+      allow update, delete: if canEdit();
     }
 
     // ── Mặc định: từ chối mọi thứ khác ──
