@@ -11,10 +11,10 @@
   const write=(path,d,merge)=>{const r=bad(d,path); if(r){window.__fsErrors=(window.__fsErrors||[]).concat(r); return Promise.reject(new Error('FirebaseError: invalid data '+r));}
     const clean=JSON.parse(JSON.stringify(d,(k,v)=>v&&v.__sv?new Date().toISOString():v)); const res=xhr('POST',path,{data:clean,merge:!!merge});
     (listeners[path]||[]).forEach(cb=>setTimeout(()=>cb(snap(path.split('/').pop(),res,true)),0)); window.__fsWrites=(window.__fsWrites||0)+1; return Promise.resolve();};
-  const docRef=(path)=>({get:async()=>{const d=xhr('GET',path); return snap(path.split('/').pop(), path.startsWith('users/')?(d||null):d);},
+  const docRef=(path)=>({collection:(n)=>col(path+'/'+n), get:async()=>{const d=xhr('GET',path); return snap(path.split('/').pop(), path.startsWith('users/')?(d||null):d);},
     set:(d,o)=>write(path,d,o&&o.merge), update:(d)=>write(path,d,true),
     onSnapshot:(cb)=>{(listeners[path]=listeners[path]||[]).push(cb); setTimeout(()=>cb(snap(path.split('/').pop(),xhr('GET',path),false)),0); return()=>{listeners[path]=(listeners[path]||[]).filter(f=>f!==cb)}}});
-  const col=(name)=>({doc:(id)=>docRef(name+'/'+id), get:async()=>{const all=xhr('GET','__list__'+name)||{}; const docs=Object.entries(all).map(([id,d])=>snap(id,d,false)); return {docs,empty:!docs.length,forEach:(f)=>docs.forEach(f)};}, where(){return this}, orderBy(){return this}});
+  const col=(name)=>({doc:(id)=>docRef(name+'/'+(id===undefined?'auto'+Math.random().toString(36).slice(2,10):id)), get:async()=>{const all=xhr('GET','__list__'+name)||{}; const docs=Object.entries(all).map(([id,d])=>snap(id,d,false)); return {docs,empty:!docs.length,forEach:(f)=>docs.forEach(f)};}, where(){return this}, orderBy(){return this}});
   const fs=()=>({settings(){},collection:col,batch:()=>{const ops=[];return {set(r,d,o){ops.push([r,d,o])},update(r,d){ops.push([r,d,{merge:true}])},commit:()=>Promise.all(ops.map(([r,d,o])=>r.set(d,o)))}}});
   fs.FieldValue={serverTimestamp:()=>SV};
   // Auth: mặc định đã đăng nhập sẵn; localStorage '__auth_form'='1' → bắt đầu chưa đăng nhập để test form

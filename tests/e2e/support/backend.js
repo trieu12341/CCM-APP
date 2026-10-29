@@ -44,7 +44,7 @@ export class Backend {
             }
             if (path.startsWith('__list__')) {
                 const pre = path.slice(8) + '/';
-                const out = Object.fromEntries(Object.entries(this.DB).filter(([k]) => k.startsWith(pre)).map(([k, v]) => [k.slice(pre.length), v]));
+                const out = Object.fromEntries(Object.entries(this.DB).filter(([k]) => k.startsWith(pre) && !k.slice(pre.length).includes('/')).map(([k, v]) => [k.slice(pre.length), v]));
                 return route.fulfill({ body: JSON.stringify(out), contentType: 'application/json' });
             }
             return route.fulfill({ body: JSON.stringify(this.DB[path] ?? null), contentType: 'application/json' });
