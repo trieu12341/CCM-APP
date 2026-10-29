@@ -13,6 +13,9 @@ nằm ở tài liệu kế hoạch của chủ repo; mỗi bước có mã (1.1,
 - Firebase compat v10 (Auth email/mật khẩu + Firestore), nạp từ CDN gstatic. Cấu hình ở `js/firebase-config.js`.
 - ApexCharts (biểu đồ), SheetJS 0.20.3 (đọc Excel).
 - Deploy: Firebase Hosting qua GitHub Actions (`.github/workflows/`). Rules: `firestore.rules`, deploy bằng workflow riêng.
+- Hai môi trường: **bản thật** `cost-contract-management` (mặc định) và **staging** `ccm-staging-15ddd`. Cấu hình ở `js/firebase-env.js`;
+  app chỉ dùng staging khi chạy trên tên miền staging hoặc mở với `?env=staging` (có dải cảnh báo STAGING). Đưa nhánh lên staging:
+  Actions → "Deploy STAGING" (chạy tay, cần secret `FIREBASE_SERVICE_ACCOUNT_STAGING`). Thử chuyển đổi dữ liệu/rules trên staging trước, không thử trên bản thật.
 
 ## 3. Bản đồ thư mục
 | Thư mục | Vai trò |

@@ -1,0 +1,56 @@
+# Đưa MỘT NHÁNH BẤT KỲ lên môi trường STAGING (project ccm-staging-15ddd) để thử trước khi lên bản thật.
+# Chạy tay: tab Actions → "Deploy STAGING" → Run workflow → chọn nhánh.
+# Không đụng bản thật (project cost-contract-management). Cần secret FIREBASE_SERVICE_ACCOUNT_STAGING
+# (khóa JSON của service account project staging, vai trò: Firebase Rules Admin, Firebase Hosting Admin,
+#  Service Usage Consumer) trong GitHub → Settings → Secrets and variables → Actions.
+name: Deploy STAGING
+
+on:
+  workflow_dispatch:
+    inputs:
+      what:
+        description: 'Đưa gì lên staging'
+        type: choice
+        options: [rules + hosting, chỉ rules, chỉ hosting]
+        default: rules + hosting
+
+concurrency:
+  group: staging-deploy
+  cancel-in-progress: false
+
+jobs:
+  staging:
+    runs-on: ubuntu-latest
+    env:
+      PROJECT: ccm-staging-15ddd
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Kiểm tra secret
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STAGING }}
+        run: |
+          if [ -z "$SA" ]; then echo "::error::Chưa có secret FIREBASE_SERVICE_ACCOUNT_STAGING"; exit 1; fi
+          printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
+
+      - name: Unit test (không deploy khi test đỏ)
+        run: npm ci && npm test
+
+      - name: Deploy rules lên staging
+        if: inputs.what != 'chỉ hosting'
+        run: |
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
+          npx --yes firebase-tools@13 deploy --only firestore:rules --project "$PROJECT" --non-interactive
+
+      - name: Deploy hosting lên staging
+        if: inputs.what != 'chỉ rules'
+        run: |
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
+          npx --yes firebase-tools@13 deploy --only hosting --project "$PROJECT" --non-interactive
+
+      - name: Xóa khóa
+        if: always()
+        run: rm -f "$RUNNER_TEMP/sa.json"
