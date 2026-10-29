@@ -141,3 +141,14 @@
 /* ---------- Vào app ---------- */
 .app-container.is-entering { animation: app-in .5s var(--ease-out) backwards; }
 @keyframes app-in { from { opacity: 0; transform: translateY(6px); } }
+
+/* Môi trường staging: dải cảnh báo mảnh trên cùng để không nhầm với bản thật */
+html.env-staging body::before {
+    content: 'STAGING — dữ liệu thử, không phải bản thật';
+    position: fixed; top: 0; left: 0; right: 0; z-index: 10000;
+    height: 20px; line-height: 20px; text-align: center;
+    font-size: var(--fs-xs); font-weight: 600; letter-spacing: .02em;
+    background: var(--accent-amber-soft); color: var(--accent-amber);
+    border-bottom: 1px solid var(--accent-amber);
+    pointer-events: none;
+}
