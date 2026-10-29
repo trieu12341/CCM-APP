@@ -1,11 +1,16 @@
 # Đưa MỘT NHÁNH BẤT KỲ lên môi trường STAGING (project ccm-staging-15ddd) để thử trước khi lên bản thật.
-# Chạy tay: tab Actions → "Deploy STAGING" → Run workflow → chọn nhánh.
+# Cách 1 (luôn dùng được): đẩy nhánh cần thử vào nhánh `staging`:  git push origin <nhánh>:staging --force
+#   → tự deploy rules + hosting lên staging.
+# Cách 2: tab Actions → "Deploy STAGING" → Run workflow. CHỈ hiện sau khi file này có trên nhánh mặc định (master),
+#   vì GitHub chỉ liệt kê workflow chạy tay từ nhánh mặc định.
 # Không đụng bản thật (project cost-contract-management). Cần secret FIREBASE_SERVICE_ACCOUNT_STAGING
 # (khóa JSON của service account project staging, vai trò: Firebase Rules Admin, Firebase Hosting Admin,
 #  Service Usage Consumer) trong GitHub → Settings → Secrets and variables → Actions.
 name: Deploy STAGING
 
 on:
+  push:
+    branches: [staging]
   workflow_dispatch:
     inputs:
       what:
