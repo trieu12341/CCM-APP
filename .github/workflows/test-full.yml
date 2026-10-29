@@ -26,6 +26,9 @@ jobs:
       - name: Lớp dữ liệu — Firestore Emulator thật
         run: npm run test:data:emulator
 
+      - name: Firestore rules — Emulator thật (ma trận quyền, chống ghi đè, nhật ký chỉ thêm)
+        run: npm run test:rules:emulator
+
       - name: Cài Chromium cho E2E
         run: npx playwright install --with-deps chromium
 
