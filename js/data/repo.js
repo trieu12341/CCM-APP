@@ -13,7 +13,7 @@
 import { cleanForFirestore } from '../utils/firestore-clean.js';
 
 export const ENTITIES = ['budgets', 'tenders', 'contracts', 'payments', 'variations', 'cashflows', 'finals'];
-const META = ['_v', 'createdAt', 'createdBy', 'updatedAt', 'updatedBy', 'deleted', 'deletedAt', 'deletedBy'];
+export const META = ['_v', 'createdAt', 'createdBy', 'updatedAt', 'updatedBy', 'deleted', 'deletedAt', 'deletedBy'];
 
 export class ConflictError extends Error {
     constructor(message, current = null) {
@@ -23,7 +23,7 @@ export class ConflictError extends Error {
     }
 }
 
-const stripMeta = (rec) => Object.fromEntries(Object.entries(rec || {}).filter(([k]) => !META.includes(k) && k !== 'id'));
+export const stripMeta = (rec) => Object.fromEntries(Object.entries(rec || {}).filter(([k]) => !META.includes(k) && k !== 'id'));
 const metaOf = (d) => (d ? { _v: d._v, updatedBy: d.updatedBy, updatedAt: d.updatedAt } : null);
 
 /**

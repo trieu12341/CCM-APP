@@ -1,6 +1,6 @@
 /**
  * Firestore giả trong bộ nhớ, đủ phần API compat mà js/data/ dùng:
- * collection/doc/get/set/update/onSnapshot/runTransaction + FieldValue.serverTimestamp.
+ * collection/doc/get/set/update/onSnapshot/runTransaction/batch + FieldValue.serverTimestamp.
  * Transaction mô phỏng Firestore: ghi dồn tới lúc commit; nếu bản ghi đã đọc bị người khác ghi
  * trong lúc đó → chạy lại hàm transaction (tối đa 5 lần) như SDK thật.
  */
@@ -69,8 +69,26 @@ export function createFakeFirestore() {
         throw Object.assign(new Error('aborted: quá nhiều lần thử lại'), { code: 'aborted' });
     }
 
+    /** Lô ghi: giữ lại tới commit; quá 500 thao tác → lỗi như Firestore thật. */
+    function batch() {
+        const writes = [];
+        const b = {
+            set: (ref, d, o) => { writes.push(() => setDoc(ref.path, d, o)); return b; },
+            update: (ref, p) => { writes.push(() => updateDoc(ref.path, p)); return b; },
+            commit: async () => {
+                await tick();
+                if (writes.length > 500) throw Object.assign(new Error('invalid-argument: tối đa 500 thao tác mỗi lô'), { code: 'invalid-argument' });
+                writes.forEach(w => w());
+                batch.commits.push(writes.length);
+            },
+        };
+        return b;
+    }
+    batch.commits = [];   // số thao tác của từng lô đã commit — để test kiểm cỡ lô
+
     return {
-        db: { collection: (name) => colRef(name), runTransaction },
+        db: { collection: (name) => colRef(name), runTransaction, batch },
+        batchCommits: batch.commits,
         fieldValue: { serverTimestamp: () => TS },
         dump: () => Object.fromEntries([...docs].map(([k, v]) => [k, clone(v)])),
     };

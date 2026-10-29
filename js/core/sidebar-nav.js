@@ -39,7 +39,8 @@ export function setupSidebarEvents() {
         { menu: 'menu-payment', mod: 'module-payment' },
         { menu: 'menu-vo', mod: 'module-vo' },
         { menu: 'menu-final', mod: 'module-final' },
-        { menu: 'menu-admin', mod: 'module-admin' }
+        { menu: 'menu-admin', mod: 'module-admin' },
+        { menu: 'menu-migrate', mod: 'module-migrate' }
     ];
 
     modules.forEach(m => {
@@ -113,6 +114,11 @@ export function setupSidebarEvents() {
                 // Final dashboard re-render on tab switch
                 if (m.mod === 'module-final') {
                     setTimeout(() => { try { renderFinalDashboard(); } catch (e) { console.error(e); } }, 50);
+                }
+
+                // Trang chuyển dữ liệu (admin)
+                if (m.mod === 'module-migrate') {
+                    import('../modules/migrate/migrate-events.js').then(mod => mod.initMigratePage()).catch(err => console.error(err));
                 }
 
                 // Admin dashboard render
