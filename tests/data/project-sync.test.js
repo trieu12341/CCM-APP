@@ -19,11 +19,16 @@ async function seed() {
     await runMigration({ db: env.db, fieldValue: env.fieldValue, user: { uid: 'admin', name: 'Admin' }, pid });
     return pid;
 }
+/** Chờ tới khi điều kiện đúng (Emulator thật trả snapshot đầu chậm hơn bản giả). */
+async function ready(cond, ms = 8000) {
+    const end = Date.now() + ms;
+    while (!cond()) { if (Date.now() > end) throw new Error('Hết giờ chờ dữ liệu đầu tiên'); await new Promise(r => setTimeout(r, 20)); }
+}
 async function open(pid, user, errors = []) {
     const lists = {};
     const s = createProjectSync({ repo: mk(user), pid, onChange: (e, l) => { lists[e] = l; }, onError: (e, i) => errors.push({ e, ...i }) });
     s.start();
-    await new Promise(r => setTimeout(r, 30));
+    await ready(() => lists.payments && lists.variations);
     return { s, lists, errors, repo: mk(user) };
 }
 const edit = (list, id, patch) => list.map(x => (x.ipc_id === id ? { ...x, ...patch } : x));
@@ -111,7 +116,7 @@ test('T1.06 (phần dữ liệu) lưu thất bại giữa chừng (lỗi mạng/
     const pid = await seed(); const a = await open(pid, A);
     const real = a.s; const errors = [];
     const broken = createProjectSync({ repo: { ...mk(A), saveMany: async () => { throw Object.assign(new Error('unavailable'), { code: 'unavailable' }); } }, pid, onError: (e) => errors.push(e) });
-    broken.start(); await new Promise(r => setTimeout(r, 30));
+    broken.start(); await ready(() => broken.baseline('payments').length === 4);
     const r = await broken.commit('payments', edit(broken.baseline('payments'), 'IPC-001', { notes: 'x' }));
     assert.equal(r.ok, false); assert.equal(errors.length, 1);
     assert.equal((await a.repo.get('payments', pid, 'IPC-001'))._v, 1);
