@@ -15,7 +15,10 @@ import { normalizeContracts } from './contract-fields.js';
 export const STATE_KEY = { budgets: 'Budgets', tenders: 'Tenders', contracts: 'Contracts', payments: 'Payments', variations: 'Variations', cashflows: 'Cashflow', finals: 'Final_Statements' };
 const EVENTS = { budgets: ['budgetsChanged'], tenders: ['tendersChanged'], contracts: ['contractsChanged'], payments: ['paymentsChanged'],
     variations: ['variationsChanged'], cashflows: ['cashflowsChanged', 'cashflowChanged'], finals: ['finalChanged'] };
-let sync = null, syncPid = null, netBound = false;
+let sync = null, syncPid = null, netBound = false, curRepo = null;
+
+/** Repo đang dùng cho dự án v2 (Thùng rác, Reset an toàn cần gọi trực tiếp). */
+export const getRepo = () => curRepo;
 
 export const isV2 = (pid) => !!sync && syncPid === pid && !!pid;
 
@@ -56,6 +59,7 @@ export function ensureV2(pid) {
     if (!user.uid) return;
     const fieldValue = firebase.firestore.FieldValue;
     const repo = createRepo({ db, fieldValue, user, onWrite: createAuditWriter({ db, fieldValue, user }) });
+    curRepo = repo;
     sync = createProjectSync({ repo, pid, isOnline: () => navigator.onLine !== false, onChange: (e, l) => onChange(pid, e, l), onError, onStatus: setBadge });
     setBadge('saved');
     if (!netBound) { netBound = true; ['online', 'offline'].forEach(ev => window.addEventListener(ev, () => sync && setBadge(sync.status()))); }
@@ -66,7 +70,7 @@ export function ensureV2(pid) {
 /** Gọi khi người dùng MỞ form sửa một hồ sơ: ghi nhớ _v lúc mở để phát hiện người khác lưu trong lúc form đang mở. */
 export function markOpened(entity, idValue) { if (sync) sync.markOpened(entity, idValue); }
 
-export function stopV2() { if (sync) sync.stop(); sync = null; syncPid = null; setBadge(null); }
+export function stopV2() { if (sync) sync.stop(); sync = null; syncPid = null; curRepo = null; setBadge(null); }
 
 /** Lưu mảng đầy đủ (mọi dự án) của một loại; chỉ phần của dự án hiện tại được ghi. */
 export function commitV2(entity, fullList) {

@@ -27,6 +27,7 @@ nằm ở tài liệu kế hoạch của chủ repo; mỗi bước có mã (1.1,
 | `js/budget/`, `js/tender/`, `js/contract/`, `js/cashflow/`, `js/project/` | từng tab |
 | `js/modules/payment/` | IPC: `ipc-engine.js` (16 dòng CERT), `ipc-chain.js` (chuỗi đợt), `ipc-fs-parser.js` (import sheet FS), `payment-metrics.js` (mọi con số tổng hợp) |
 | `js/modules/vo/`, `js/modules/final/`, `js/modules/overview/` | VO, Quyết toán, Tổng quan |
+| `js/modules/trash/`, `js/core/reset-safe.js`, `js/data/backup.js`, `scripts/` | Thùng rác (xóa mềm, khôi phục); Reset an toàn (admin + gõ tên dự án + tự tải sao lưu); xuất/nhập trọn dự án; `scripts/backup.mjs` (workflow `backup.yml` 19:00 UTC hằng ngày, artifact 90 ngày) và `scripts/restore.mjs <file> <mã-gốc> <mã-mới> [--yes]` (khôi phục vào dự án MỚI, không ghi đè) |
 | `js/utils/` | định dạng số, làm sạch dữ liệu trước khi ghi Firestore, thông báo lỗi |
 | `css/theme/` | biến màu (`tokens.css`), bố cục, thành phần — lớp theme nạp sau cùng |
 | `tests/` | unit test (`*.test.js`), E2E (`tests/e2e/`), test lớp dữ liệu (`tests/data/`) |

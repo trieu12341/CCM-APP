@@ -40,7 +40,8 @@ export function setupSidebarEvents() {
         { menu: 'menu-vo', mod: 'module-vo' },
         { menu: 'menu-final', mod: 'module-final' },
         { menu: 'menu-admin', mod: 'module-admin' },
-        { menu: 'menu-migrate', mod: 'module-migrate' }
+        { menu: 'menu-migrate', mod: 'module-migrate' },
+        { menu: 'menu-trash', mod: 'module-trash' }
     ];
 
     modules.forEach(m => {
@@ -119,6 +120,10 @@ export function setupSidebarEvents() {
                 // Trang chuyển dữ liệu (admin)
                 if (m.mod === 'module-migrate') {
                     import('../modules/migrate/migrate-events.js').then(mod => mod.initMigratePage()).catch(err => console.error(err));
+                }
+
+                if (m.mod === 'module-trash') {
+                    import('../modules/trash/trash-events.js').then(mod => mod.initTrashPage()).catch(err => console.error(err));
                 }
 
                 // Admin dashboard render
