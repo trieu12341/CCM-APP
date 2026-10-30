@@ -13,7 +13,7 @@
 import { cleanForFirestore } from '../utils/firestore-clean.js';
 
 export const ENTITIES = ['budgets', 'tenders', 'contracts', 'payments', 'variations', 'cashflows', 'finals'];
-export const META = ['_v', 'createdAt', 'createdBy', 'updatedAt', 'updatedBy', 'deleted', 'deletedAt', 'deletedBy'];
+export const META = ['_v', 'createdAt', 'createdBy', 'updatedAt', 'updatedBy', 'updatedByName', 'deleted', 'deletedAt', 'deletedBy'];
 
 export class ConflictError extends Error {
     constructor(message, current = null) {
@@ -37,6 +37,7 @@ const metaOf = (d) => (d ? { _v: d._v, updatedBy: d.updatedBy, updatedAt: d.upda
 export function createRepo({ db, fieldValue, user, onWrite = () => {} }) {
     if (!db || !fieldValue || !user?.uid) throw new Error('createRepo cần db, fieldValue và user.uid');
     const ts = () => fieldValue.serverTimestamp();
+    const who = user.name || user.email || user.uid;   // tên hiện trong hộp thoại xung đột ("vừa được <tên> sửa")
 
     const col = (entity, pid) => {
         if (!ENTITIES.includes(entity)) throw new Error(`Loại hồ sơ không hợp lệ: ${entity}`);
@@ -67,7 +68,7 @@ export function createRepo({ db, fieldValue, user, onWrite = () => {} }) {
             const snap = await tx.get(ref);
             if (snap.exists) throw new ConflictError(`Đã có ${entity}/${ref.id}`, metaOf(snap.data()));
             const data = { ...cleanForFirestore(stripMeta(record)), _v: 1, deleted: false,
-                createdAt: ts(), createdBy: user.uid, updatedAt: ts(), updatedBy: user.uid };
+                createdAt: ts(), createdBy: user.uid, updatedAt: ts(), updatedBy: user.uid, updatedByName: who };
             tx.set(ref, data);
             onWrite(tx, { entity, pid, id: ref.id, action: 'create', before: null, after: data });
             return { id: ref.id, _v: 1 };
@@ -84,7 +85,7 @@ export function createRepo({ db, fieldValue, user, onWrite = () => {} }) {
             const cur = snap.data();
             if (cur._v !== expectedV) throw new ConflictError(`${entity}/${ref.id} vừa được người khác lưu`, metaOf(cur));
             const data = { ...cleanForFirestore(stripMeta(record)), _v: expectedV + 1, deleted: !!cur.deleted,
-                createdAt: cur.createdAt ?? null, createdBy: cur.createdBy ?? null, updatedAt: ts(), updatedBy: user.uid };
+                createdAt: cur.createdAt ?? null, createdBy: cur.createdBy ?? null, updatedAt: ts(), updatedBy: user.uid, updatedByName: who };
             tx.set(ref, data);
             onWrite(tx, { entity, pid, id: ref.id, action: 'update', before: cur, after: data, reason });
             return { id: ref.id, _v: data._v };
@@ -98,7 +99,7 @@ export function createRepo({ db, fieldValue, user, onWrite = () => {} }) {
             if (!snap.exists) throw new ConflictError(`${entity}/${id} không còn tồn tại`, null);
             const cur = snap.data();
             if (cur._v !== expectedV) throw new ConflictError(`${entity}/${id} vừa được người khác lưu`, metaOf(cur));
-            const patch = { _v: expectedV + 1, deleted, updatedAt: ts(), updatedBy: user.uid,
+            const patch = { _v: expectedV + 1, deleted, updatedAt: ts(), updatedBy: user.uid, updatedByName: who,
                 deletedAt: deleted ? ts() : null, deletedBy: deleted ? user.uid : null };
             tx.update(ref, patch);
             onWrite(tx, { entity, pid, id, action: deleted ? 'delete' : 'restore', before: cur, after: { ...cur, ...patch }, reason });
@@ -128,25 +129,56 @@ export function createRepo({ db, fieldValue, user, onWrite = () => {} }) {
                 const cur = snaps[i].exists ? snaps[i].data() : null;
                 const base = { entity: o.entity, pid, id: refs[i].id, reason };
                 if (o.kind === 'create') {
-                    const data = { ...cleanForFirestore(stripMeta(o.record)), _v: 1, deleted: false, createdAt: ts(), createdBy: user.uid, updatedAt: ts(), updatedBy: user.uid };
+                    const data = { ...cleanForFirestore(stripMeta(o.record)), _v: 1, deleted: false, createdAt: ts(), createdBy: user.uid, updatedAt: ts(), updatedBy: user.uid, updatedByName: who };
                     tx.set(refs[i], data); onWrite(tx, { ...base, action: 'create', before: null, after: data });
                     return { entity: o.entity, id: refs[i].id, kind: o.kind, _v: 1 };
                 }
                 if (o.kind === 'save') {
                     const data = { ...cleanForFirestore(stripMeta(o.record)), _v: o.expectedV + 1, deleted: !!cur.deleted,
-                        createdAt: cur.createdAt ?? null, createdBy: cur.createdBy ?? null, updatedAt: ts(), updatedBy: user.uid };
+                        createdAt: cur.createdAt ?? null, createdBy: cur.createdBy ?? null, updatedAt: ts(), updatedBy: user.uid, updatedByName: who };
                     tx.set(refs[i], data); onWrite(tx, { ...base, action: 'update', before: cur, after: data });
                     return { entity: o.entity, id: refs[i].id, kind: o.kind, _v: data._v };
                 }
-                const patch = { _v: o.expectedV + 1, deleted: true, updatedAt: ts(), updatedBy: user.uid, deletedAt: ts(), deletedBy: user.uid };
+                const patch = { _v: o.expectedV + 1, deleted: true, updatedAt: ts(), updatedBy: user.uid, updatedByName: who, deletedAt: ts(), deletedBy: user.uid };
                 tx.update(refs[i], patch); onWrite(tx, { ...base, action: 'delete', before: cur, after: { ...cur, ...patch } });
                 return { entity: o.entity, id: refs[i].id, kind: o.kind, _v: patch._v };
             });
         });
     }
 
+    /**
+     * Ghi nhiều hồ sơ bằng BATCH (không đọc trước) — dùng được khi MẤT MẠNG: Firestore xếp hàng và tự gửi khi có mạng.
+     * Chống ghi đè do rules chịu trách nhiệm (_v mới phải = _v cũ + 1): bản cũ bị server từ chối khi đồng bộ.
+     * ops như saveMany, nhưng save/delete phải kèm `before` (bản đã đọc, để giữ createdAt/By và ghi nhật ký).
+     * @returns {{ results, committed: Promise }} results áp dụng ngay trong máy; committed xong khi server nhận (hoặc từ chối).
+     */
+    function writeBatch(pid, ops, { reason } = {}) {
+        if (ops.length > 200) throw new Error('Một lần lưu tối đa 200 hồ sơ');
+        const batch = db.batch();
+        const results = ops.map((o) => {
+            const ref = col(o.entity, pid).doc(String(o.id));
+            const base = { entity: o.entity, pid, id: ref.id, reason };
+            if (o.kind === 'create') {
+                const data = { ...cleanForFirestore(stripMeta(o.record)), _v: 1, deleted: false, createdAt: ts(), createdBy: user.uid, updatedAt: ts(), updatedBy: user.uid, updatedByName: who };
+                batch.set(ref, data); onWrite(batch, { ...base, action: 'create', before: null, after: data });
+                return { entity: o.entity, id: ref.id, kind: o.kind, _v: 1 };
+            }
+            const cur = o.before || {};
+            if (o.kind === 'save') {
+                const data = { ...cleanForFirestore(stripMeta(o.record)), _v: o.expectedV + 1, deleted: !!cur.deleted,
+                    createdAt: cur.createdAt ?? null, createdBy: cur.createdBy ?? null, updatedAt: ts(), updatedBy: user.uid, updatedByName: who };
+                batch.set(ref, data); onWrite(batch, { ...base, action: 'update', before: cur, after: data });
+                return { entity: o.entity, id: ref.id, kind: o.kind, _v: data._v };
+            }
+            const patch = { _v: o.expectedV + 1, deleted: true, updatedAt: ts(), updatedBy: user.uid, updatedByName: who, deletedAt: ts(), deletedBy: user.uid };
+            batch.update(ref, patch); onWrite(batch, { ...base, action: 'delete', before: cur, after: { ...cur, ...patch } });
+            return { entity: o.entity, id: ref.id, kind: o.kind, _v: patch._v };
+        });
+        return { results, committed: ops.length ? batch.commit() : Promise.resolve() };
+    }
+
     return {
-        list, get, subscribe, create, save, saveMany,
+        list, get, subscribe, create, save, saveMany, writeBatch,
         /** Xóa mềm: vào thùng rác, khôi phục được. Không xóa thật. */
         softDelete: (entity, pid, id, expectedV, { reason } = {}) => setDeleted(entity, pid, id, expectedV, true, reason),
         restore: (entity, pid, id, expectedV, { reason } = {}) => setDeleted(entity, pid, id, expectedV, false, reason),

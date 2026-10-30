@@ -194,3 +194,19 @@ button, .btn, .menu-item, [role="button"], .btn-icon, tr[data-id], .vo-row { cur
     background: var(--accent-amber-soft); color: var(--accent-amber); border-top: 1px solid var(--accent-amber);
 }
 .legacy-banner[hidden] { display: none; }
+
+/* Huy hiệu trạng thái lưu (bước 1.8) */
+.sync-badge { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-xs); font-weight: 600; padding: 3px 10px; border-radius: 999px;
+    background: var(--accent-teal-soft); color: var(--accent-teal); }
+.sync-badge[hidden] { display: none; }
+.sync-badge[data-state="saving"], .sync-badge[data-state="pending"] { background: var(--accent-amber-soft); color: var(--accent-amber); }
+.sync-badge[data-state="error"] { background: var(--accent-red-soft); color: var(--accent-red); }
+
+/* Hộp thoại xung đột (bước 1.8) */
+.conflict-overlay { position: fixed; inset: 0; z-index: 10001; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, .45); }
+.conflict-box { width: min(640px, 92vw); max-height: 86vh; overflow: auto; padding: 20px 22px; border-radius: 12px; background: var(--card-bg); color: var(--text-dark); border: 1px solid var(--border-color); }
+.conflict-box h3 { margin: 0 0 8px; }
+.conflict-note, .conflict-copied { color: var(--text-muted); font-size: var(--fs-sm, 13px); }
+.conflict-table { width: 100%; border-collapse: collapse; margin: 6px 0 12px; font-size: 13px; }
+.conflict-table th, .conflict-table td { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--border-color); word-break: break-word; }
+.conflict-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }

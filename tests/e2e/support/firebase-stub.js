@@ -1,5 +1,7 @@
 (function(){
   // Firestore giả có "máy chủ" thật (do Playwright giữ) → dữ liệu sống qua các phiên trình duyệt
+  // Giả lập mất mạng: window.__fsOffline = true (kèm sự kiện 'offline'). Ghi theo lô chờ tới khi có mạng.
+  try{Object.defineProperty(navigator,'onLine',{get:()=>!window.__fsOffline,configurable:true})}catch(e){}
   const user={uid:'demo',email:'qs@demo.vn',displayName:'QS Demo'};
   const SV={__sv:1};
   function bad(v,p){ if(v===undefined) return p+'=undefined'; if(typeof v==='number'&&!Number.isFinite(v)) return p+'=NaN';
@@ -16,7 +18,7 @@
     set:(d,o)=>write(path,d,o&&o.merge), update:(d)=>write(path,d,true),
     onSnapshot:(cb)=>{(listeners[path]=listeners[path]||[]).push(cb); setTimeout(()=>cb(snap(path.split('/').pop(),xhr('GET',path),false)),0); return()=>{listeners[path]=(listeners[path]||[]).filter(f=>f!==cb)}}});
   const col=(name)=>({doc:(id)=>docRef(name+'/'+(id===undefined?'auto'+Math.random().toString(36).slice(2,10):id)), get:async()=>colSnap(name), onSnapshot:(cb)=>{(colL[name]=colL[name]||[]).push(cb); setTimeout(()=>cb(colSnap(name)),0); return()=>{colL[name]=(colL[name]||[]).filter(f=>f!==cb)}}, where(){return this}, orderBy(){return this}});
-  const fs=()=>({settings(){},enablePersistence:()=>Promise.resolve(),collection:col,runTransaction:async(fn)=>{const w=[]; const tx={get:(r)=>r.get(), set:(r,d)=>{w.push(()=>r.set(d))}, update:(r,d)=>{w.push(()=>r.update(d))}}; const out=await fn(tx); await Promise.all(w.map(f=>f())); return out;},batch:()=>{const ops=[];return {set(r,d,o){ops.push([r,d,o])},update(r,d){ops.push([r,d,{merge:true}])},commit:()=>Promise.all(ops.map(([r,d,o])=>r.set(d,o)))}}});
+  const fs=()=>({settings(){},enablePersistence:()=>Promise.resolve(),collection:col,runTransaction:async(fn)=>{const w=[]; const tx={get:(r)=>r.get(), set:(r,d)=>{w.push(()=>r.set(d))}, update:(r,d)=>{w.push(()=>r.update(d))}}; const out=await fn(tx); await Promise.all(w.map(f=>f())); return out;},batch:()=>{const ops=[];return {set(r,d,o){ops.push([r,d,o])},update(r,d){ops.push([r,d,{merge:true}])},commit:()=>new Promise((res,rej)=>{const go=()=>window.__fsOffline?setTimeout(go,50):Promise.all(ops.map(([r,d,o])=>r.set(d,o))).then(res,rej); go();})}}});
   fs.FieldValue={serverTimestamp:()=>SV};
   // Auth: mặc định đã đăng nhập sẵn; localStorage '__auth_form'='1' → bắt đầu chưa đăng nhập để test form
   const A={user:(function(){try{return localStorage.getItem('__auth_form')==='1'?null:user}catch(e){return user}})(),cbs:[]};

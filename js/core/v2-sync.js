@@ -7,6 +7,7 @@ import { db, FIREBASE_ENV } from '../firebase-config.js';
 import { createRepo } from '../data/repo.js';
 import { createAuditWriter } from '../data/audit.js';
 import { createProjectSync, SYNCED } from '../data/project-sync.js';
+import { showConflictDialog } from './conflict-dialog.js';
 import { notifyCloudError } from '../utils/notify.js';
 import { ID_KEY } from '../data/migrate-plan.js';
 import { normalizeContracts } from './contract-fields.js';
@@ -14,7 +15,7 @@ import { normalizeContracts } from './contract-fields.js';
 export const STATE_KEY = { budgets: 'Budgets', tenders: 'Tenders', contracts: 'Contracts', payments: 'Payments', variations: 'Variations', cashflows: 'Cashflow', finals: 'Final_Statements' };
 const EVENTS = { budgets: ['budgetsChanged'], tenders: ['tendersChanged'], contracts: ['contractsChanged'], payments: ['paymentsChanged'],
     variations: ['variationsChanged'], cashflows: ['cashflowsChanged', 'cashflowChanged'], finals: ['finalChanged'] };
-let sync = null, syncPid = null;
+let sync = null, syncPid = null, netBound = false;
 
 export const isV2 = (pid) => !!sync && syncPid === pid && !!pid;
 
@@ -30,7 +31,18 @@ function onChange(pid, entity, list) {
     import('../budget.js').then(m => { try { m.renderDashboard(); } catch (_) {} });
 }
 
-function onError(error, { conflict }) {
+const BADGE = { saved: ['Đã lưu', 'fa-circle-check'], saving: ['Đang lưu…', 'fa-spinner fa-spin'], pending: ['Chờ đồng bộ', 'fa-cloud-arrow-up'], error: ['Lỗi lưu', 'fa-triangle-exclamation'] };
+function setBadge(status) {
+    const el = document.getElementById('sync-badge');
+    if (!el) return;
+    el.hidden = !status;
+    if (!status) return;
+    el.dataset.state = status;
+    el.innerHTML = `<i class="fa-solid ${BADGE[status][1]}"></i> ${BADGE[status][0]}`;
+}
+
+function onError(error, { conflict, conflicts }) {
+    if (conflict && conflicts?.length) { showConflictDialog(conflicts, { onClose: () => sync && sync.clearError() }); return; }
     (conflict ? console.warn : console.error)('Lưu hồ sơ thất bại:', error);
     notifyCloudError(conflict
         ? 'Hồ sơ vừa được người khác sửa — đã tải lại bản mới nhất, thay đổi của bạn chưa được lưu. Hãy kiểm tra rồi nhập lại.'
@@ -44,12 +56,17 @@ export function ensureV2(pid) {
     if (!user.uid) return;
     const fieldValue = firebase.firestore.FieldValue;
     const repo = createRepo({ db, fieldValue, user, onWrite: createAuditWriter({ db, fieldValue, user }) });
-    sync = createProjectSync({ repo, pid, onChange: (e, l) => onChange(pid, e, l), onError });
+    sync = createProjectSync({ repo, pid, isOnline: () => navigator.onLine !== false, onChange: (e, l) => onChange(pid, e, l), onError, onStatus: setBadge });
+    setBadge('saved');
+    if (!netBound) { netBound = true; ['online', 'offline'].forEach(ev => window.addEventListener(ev, () => sync && setBadge(sync.status()))); }
     syncPid = pid;
     sync.start();
 }
 
-export function stopV2() { if (sync) sync.stop(); sync = null; syncPid = null; }
+/** Gọi khi người dùng MỞ form sửa một hồ sơ: ghi nhớ _v lúc mở để phát hiện người khác lưu trong lúc form đang mở. */
+export function markOpened(entity, idValue) { if (sync) sync.markOpened(entity, idValue); }
+
+export function stopV2() { if (sync) sync.stop(); sync = null; syncPid = null; setBadge(null); }
 
 /** Lưu mảng đầy đủ (mọi dự án) của một loại; chỉ phần của dự án hiện tại được ghi. */
 export function commitV2(entity, fullList) {

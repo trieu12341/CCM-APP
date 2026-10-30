@@ -24,9 +24,9 @@ export function planOps(entity, idKey, baseline = [], next = []) {
         seen.add(key);
         const cur = base.get(key);
         if (!cur) ops.push({ entity, kind: 'create', id: safeId(key), record: item });
-        else if (body(item) !== body(cur)) ops.push({ entity, kind: 'save', id: cur.id, expectedV: cur._v, record: item });
+        else if (body(item) !== body(cur)) ops.push({ entity, kind: 'save', id: cur.id, expectedV: cur._v, record: item, before: cur });
     }
-    for (const [key, cur] of base) if (!seen.has(key)) ops.push({ entity, kind: 'delete', id: cur.id, expectedV: cur._v });
+    for (const [key, cur] of base) if (!seen.has(key)) ops.push({ entity, kind: 'delete', id: cur.id, expectedV: cur._v, before: cur });
     return { ops, skipped };
 }
 

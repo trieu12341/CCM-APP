@@ -61,7 +61,7 @@ test('T1.01 trên giao diện: máy B lưu trước, máy A lưu sau → A bị 
         await mod(A.page, '/js/modules/payment/payment-state.js', 'updateIPC', 'IPC-003', { notes: 'A' }); await A.page.waitForTimeout(1200);
         expect(be.DB['projects/P001/payments/IPC-003'].notes).toBe('B');
         expect(be.DB['projects/P001/payments/IPC-003']._v).toBe(2);
-        expect(txt(await A.page.innerText('body'))).toContain('vừa được người khác sửa');
+        expect(txt(await A.page.innerText('#conflict-dialog'))).toContain('IPC IPC-003 vừa được QS Demo sửa');
         const mine = await A.page.evaluate(async () => (await import('/js/modules/payment/payment-state.js')).getIPCById('IPC-003').notes);
         expect(mine).toBe('B');
     });
@@ -72,4 +72,49 @@ test('T1.01 trên giao diện: máy B lưu trước, máy A lưu sau → A bị 
         expect(be.DB['projects/P001/variations/VO-001'].notes).toBe('B2');
     });
     await A.context.close(); await B.context.close();
+});
+
+test('T1.01 hộp thoại: B lưu trước, A mở form rồi lưu sau → A thấy hộp nêu TÊN B và trường khác nhau; có nút Chép / Tải bản mới', async ({ browser }) => {
+    const be = seedV2(new Backend('admin'));
+    const A = await open(browser, be); const B = await open(browser, be);
+    await step(test, A.s, 'C1. A mở form IPC-003; B lưu IPC-003; A bấm Lưu → hộp xung đột', async () => {
+        await mod(A.page, '/js/core/v2-sync.js', 'markOpened', 'payments', 'IPC-003');
+        await mod(B.page, '/js/modules/payment/payment-state.js', 'updateIPC', 'IPC-003', { notes: 'B sửa' }); await B.page.waitForTimeout(800);
+        await A.page.waitForTimeout(600);   // thay đổi của B về máy A
+        await mod(A.page, '/js/modules/payment/payment-state.js', 'updateIPC', 'IPC-003', { notes: 'A sửa' }); await A.page.waitForTimeout(1000);
+        const dlg = txt(await A.page.innerText('#conflict-dialog'));
+        expect(dlg).toContain('IPC IPC-003 vừa được QS Demo sửa'); expect(dlg).toContain('notes'); expect(dlg).toContain('B sửa'); expect(dlg).toContain('A sửa');
+        expect(be.DB['projects/P001/payments/IPC-003'].notes).toBe('B sửa');
+    });
+    await step(test, A.s, 'C2. Chép thay đổi → hiện xác nhận; Tải bản mới → đóng hộp, số liệu là của B', async () => {
+        await A.page.evaluate(() => { navigator.clipboard.writeText = async () => {}; });
+        await A.page.click('#conflict-dialog [data-act="copy"]');
+        expect(await A.page.isVisible('#conflict-dialog .conflict-copied')).toBe(true);
+        await A.page.click('#conflict-dialog [data-act="reload"]');
+        expect(await A.page.isVisible('#conflict-dialog')).toBe(false);
+        expect(txt(await A.page.innerText('#sync-badge'))).toBe('Đã lưu');
+        expect(await A.page.evaluate(async () => (await import('/js/modules/payment/payment-state.js')).getIPCById('IPC-003').notes)).toBe('B sửa');
+    });
+    await A.context.close(); await B.context.close();
+});
+
+test('T1.06 mất mạng: sửa IPC → huy hiệu "Chờ đồng bộ", có mạng lại → "Đã lưu" và server nhận số mới', async ({ browser }) => {
+    const be = seedV2(new Backend('admin'));
+    const { page, s, context } = await open(browser, be);
+    const badge = async () => txt(await page.innerText('#sync-badge'));
+    await step(test, s, 'O1. Có mạng: huy hiệu "Đã lưu"', async () => { expect(await badge()).toBe('Đã lưu'); });
+    await step(test, s, 'O2. Tắt mạng, sửa IPC-001 → "Chờ đồng bộ", server chưa có số mới', async () => {
+        await page.evaluate(() => { window.__fsOffline = true; window.dispatchEvent(new Event('offline')); });
+        await mod(page, '/js/modules/payment/payment-state.js', 'updateIPC', 'IPC-001', { notes: 'sửa lúc mất mạng' }); await page.waitForTimeout(500);
+        expect(await badge()).toBe('Chờ đồng bộ');
+        expect(be.DB['projects/P001/payments/IPC-001'].notes).toBeUndefined();
+    });
+    await step(test, s, 'O3. Bật mạng → "Đã lưu", server nhận số mới (_v 2) kèm nhật ký', async () => {
+        await page.evaluate(() => { window.__fsOffline = false; window.dispatchEvent(new Event('online')); }); await page.waitForTimeout(1200);
+        expect(await badge()).toBe('Đã lưu');
+        expect(be.DB['projects/P001/payments/IPC-001'].notes).toBe('sửa lúc mất mạng');
+        expect(be.DB['projects/P001/payments/IPC-001']._v).toBe(2);
+        expect(auditOf(be).filter(e => e.action === 'update' && e.entityId === 'IPC-001').length).toBe(1);
+    });
+    await context.close();
 });

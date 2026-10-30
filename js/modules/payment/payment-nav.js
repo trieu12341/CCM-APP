@@ -2,6 +2,7 @@
  * payment-nav.js — Điều hướng giữa các lớp của module Thanh toán
  * (Dashboard ↔ Danh sách ↔ Chi tiết / Form IPC) và thông báo toast.
  */
+import { markOpened } from '../../core/v2-sync.js';
 import { renderPaymentDashboard } from './ui/payment-layer1-ui.js';
 import { renderIPCList } from './ui/payment-layer2-ui.js';
 import { renderIPCDetail, renderIPCForm } from './ui/payment-layer3-ui.js';
@@ -105,6 +106,7 @@ export function openIPCForm(editIpcId = null) {
         workspace.classList.remove('hidden');
         if (editIpcId) {
             workspace.dataset.formEditIpcId = editIpcId;
+            markOpened('payments', editIpcId);
         } else {
             delete workspace.dataset.formEditIpcId;
         }

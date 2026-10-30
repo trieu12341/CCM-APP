@@ -8,7 +8,7 @@
  *    thêm/xóa một dòng ở giữa không làm mọi dòng sau bị coi là "đã sửa".
  *  - Mảng/đối tượng khác: so cả khối, ghi giá trị dạng rút gọn.
  */
-export const IGNORED = new Set(['_v', 'id', 'createdAt', 'createdBy', 'updatedAt', 'updatedBy', 'deleted', 'deletedAt', 'deletedBy']);
+export const IGNORED = new Set(['_v', 'id', 'createdAt', 'createdBy', 'updatedAt', 'updatedBy', 'updatedByName', 'deleted', 'deletedAt', 'deletedBy']);
 const MAX_CHANGES = 200;
 const MAX_TEXT = 300;
 
