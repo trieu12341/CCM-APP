@@ -15,7 +15,7 @@ try {
     process.exit(1);
 }
 const count = all.projects.reduce((s, p) => s + Object.values(p.collections).reduce((n, l) => n + l.length, 0), 0);
-if (!all.projects.length) { console.error('::error title=Sao lưu thất bại::Không có dự án nào để sao lưu — nghi sai môi trường hoặc thiếu quyền đọc'); process.exit(1); }
+if (!all.projects.length && process.env.ALLOW_EMPTY !== '1') { console.error('::error title=Sao lưu thất bại::Không có dự án nào để sao lưu — nghi sai môi trường hoặc thiếu quyền đọc'); process.exit(1); }
 mkdirSync(out, { recursive: true });
 const file = join(out, `ccm-backup-${new Date().toISOString().slice(0, 10)}.json`);
 writeFileSync(file, JSON.stringify(all));

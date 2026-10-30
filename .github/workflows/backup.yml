@@ -29,6 +29,7 @@ jobs:
       - name: Sao lưu
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ env.TARGET == 'staging' && secrets.FIREBASE_SERVICE_ACCOUNT_STAGING || secrets.FIREBASE_SERVICE_ACCOUNT }}
+          ALLOW_EMPTY: ${{ env.TARGET == 'staging' && '1' || '0' }}   # staging có thể chưa có dự án; bản thật trống = báo lỗi
         run: node scripts/backup.mjs backups
       - uses: actions/upload-artifact@v4
         with:
