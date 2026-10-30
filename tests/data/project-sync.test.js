@@ -115,7 +115,7 @@ test('chặn lưu danh sách trống khi đang có nhiều hồ sơ (nghi mất 
 test('T1.06 (phần dữ liệu) lưu thất bại giữa chừng (lỗi mạng/quyền): không ghi gì, báo lỗi, bản gốc không đổi', async () => {
     const pid = await seed(); const a = await open(pid, A);
     const real = a.s; const errors = [];
-    const broken = createProjectSync({ repo: { ...mk(A), saveMany: async () => { throw Object.assign(new Error('unavailable'), { code: 'unavailable' }); } }, pid, onError: (e) => errors.push(e) });
+    const broken = createProjectSync({ repo: { ...mk(A), saveMany: async () => { throw Object.assign(new Error('denied'), { code: 'permission-denied' }); } }, pid, onError: (e) => errors.push(e) });
     broken.start(); await ready(() => broken.baseline('payments').length === 4);
     const r = await broken.commit('payments', edit(broken.baseline('payments'), 'IPC-001', { notes: 'x' }));
     assert.equal(r.ok, false); assert.equal(errors.length, 1);
@@ -142,4 +142,73 @@ test('bước 1.7: đủ 7 loại hồ sơ được đọc; hồ sơ cũ thiếu
     assert.equal((await mk(A).get('budgets', pid, 'BG-1'))._v, 2);
     assert.equal((await mk(A).list('cashflows', pid)).length, 7);
     s.stop();
+});
+
+
+const hold = () => { let release, fail; const p = new Promise((res, rej) => { release = res; fail = rej; }); p.catch(() => {}); return { p, release, fail }; };
+async function openOffline(pid, user, { online }) {
+    const lists = {}, errors = [], statuses = [];
+    const repo = mk(user); const gates = []; const seen = new Set();
+    // mất mạng: không nhận snapshot mới (máy A không thấy thay đổi của người khác)
+    const wrapped = { ...repo, subscribe: (e, p, cb) => repo.subscribe(e, p, (l) => { if (online.v || !seen.has(e)) { seen.add(e); cb(l); } }), // Ghi theo lô lúc offline: áp dụng trong máy ngay; chỉ lên server khi "có mạng" (release), hoặc bị từ chối (fail)
+        writeBatch: (pid2, ops) => { const g = hold(); gates.push(g); return { results: ops.map(o => ({ entity: o.entity, id: o.id, kind: o.kind, _v: o.kind === 'create' ? 1 : o.expectedV + 1 })), committed: g.p.then(() => repo.writeBatch(pid2, ops).committed) }; } };
+    const s = createProjectSync({ repo: wrapped, pid, isOnline: () => online.v, onChange: (e, l) => { lists[e] = l; }, onError: (e, i) => errors.push(i), onStatus: (x) => statuses.push(x) });
+    s.start(); await ready(() => lists.payments && lists.variations);
+    return { s, lists, errors, statuses, gates, repo };
+}
+
+test('T1.06 mất mạng: lưu xếp hàng (Chờ đồng bộ), lưu tiếp không tự xung đột, có mạng lại thì lên server, huy hiệu về Đã lưu', async () => {
+    const pid = await seed(); const online = { v: false };
+    const a = await openOffline(pid, A, { online });
+    const n1 = edit(a.lists.payments, 'IPC-001', { notes: 'offline 1' });
+    const r1 = await a.s.commit('payments', n1);
+    assert.ok(r1.ok); assert.equal(a.s.status(), 'pending');
+    const r2 = await a.s.commit('payments', edit(n1, 'IPC-001', { notes: 'offline 2' }));   // sửa tiếp khi vẫn chưa gửi
+    assert.ok(r2.ok); assert.equal(a.s.baseline('payments').find(p => p.ipc_id === 'IPC-001')._v, 3);
+    online.v = true; a.gates.forEach(g => g.release()); await ready(() => a.s.status() === 'saved');
+    const got = await mk(B).get('payments', pid, 'IPC-001');
+    assert.equal(got.notes, 'offline 2'); assert.equal(got._v, 3); assert.equal(got.updatedByName, 'QS An');
+    assert.deepEqual(a.errors, []);
+    const log = (await listAudit(env.db, pid, { entity: 'payments', entityId: 'IPC-001' })).filter(e => e.action === 'update');
+    assert.equal(log.length, 2, 'mỗi lần lưu có dòng nhật ký');
+    a.s.stop();
+});
+
+test('T1.01+T1.06: lưu offline nhưng người khác đã sửa trước → server từ chối, báo xung đột nêu TÊN người kia và trường khác nhau, tải lại bản server', async () => {
+    const pid = await seed(); const online = { v: false };
+    const a = await openOffline(pid, A, { online }); const b = await open(pid, B);
+    await b.s.commit('payments', edit(b.lists.payments, 'IPC-002', { notes: 'B sửa trước', gross_note: 1 }));
+    await new Promise(r => setTimeout(r, 100));   // máy A vẫn mất mạng nên không thấy thay đổi của B
+    await a.s.commit('payments', edit(a.lists.payments, 'IPC-002', { notes: 'A sửa offline' }));
+    assert.equal(a.s.status(), 'pending');
+    online.v = true; a.gates.forEach(g => g.fail(Object.assign(new Error('Missing or insufficient permissions.'), { code: 'permission-denied' })));
+    await ready(() => a.errors.length === 1);
+    const c = a.errors[0].conflicts[0];
+    assert.equal(a.errors[0].conflict, true); assert.equal(c.by, 'PM Bình'); assert.equal(c.id, 'IPC-002');
+    assert.ok(c.changes.some(x => x.field === 'notes' && x.from === 'B sửa trước' && x.to === 'A sửa offline'));
+    assert.equal(a.s.baseline('payments').find(p => p.ipc_id === 'IPC-002').notes, 'B sửa trước');
+    assert.equal(a.s.status(), 'error');
+    a.s.stop(); b.s.stop();
+});
+
+test('xung đột khi có mạng cũng kèm tên người sửa và trường khác nhau', async () => {
+    const pid = await seed(); const a = await open(pid, A); const b = await open(pid, B);
+    const nextA = edit(a.lists.payments, 'IPC-003', { notes: 'A' }), nextB = edit(b.lists.payments, 'IPC-003', { notes: 'B' });
+    b.s.markOpened('payments', 'IPC-003');   // B mở form sửa IPC-003 ở _v 1
+    await a.s.commit('payments', nextA);
+    await new Promise(r => setTimeout(r, 100));   // bản của A về máy B (realtime) TRƯỚC khi B bấm Lưu
+    assert.equal(b.s.baseline('payments').find(p => p.ipc_id === 'IPC-003')._v, 2);
+    await b.s.commit('payments', nextB);
+    const c = b.errors[0].conflicts[0];
+    assert.equal(c.by, 'QS An'); assert.deepEqual(c.changes.map(x => [x.field, x.from, x.to]), [['notes', 'A', 'B']]);
+    assert.ok(c.at, 'có giờ người kia lưu');
+    a.s.stop(); b.s.stop();
+});
+
+test('xóa mềm cũng có tên người xóa trên hồ sơ (cho Thùng rác)', async () => {
+    const pid = await seed(); const a = await open(pid, A);
+    await a.s.commit('variations', a.lists.variations.filter(v => v.vo_id !== 'VO-002'));
+    const gone = (await a.repo.list('variations', pid, { includeDeleted: true })).find(v => v.vo_id === 'VO-002');
+    assert.equal(gone.deleted, true); assert.equal(gone.deletedBy, 'uA'); assert.equal(gone.updatedByName, 'QS An');
+    a.s.stop();
 });

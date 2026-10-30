@@ -1,4 +1,5 @@
 import { state } from '../../app.js';
+import { markOpened } from '../../core/v2-sync.js';
 import { getVOState, updateVOState, getVOById, createVO, updateVO } from './vo-state.js';
 import { renderVODashboard, renderVOTable, populateVOContractDropdown, updateVOSummaryFields } from './vo-ui.js';
 
@@ -104,6 +105,7 @@ export function setupVOEvents() {
 
 function openVOModal(voId) {
     updateVOState({ activeVOId: voId });
+    if (voId) markOpened('variations', voId);   // ghi nhớ phiên bản lúc mở form để phát hiện người khác lưu trước
     populateVOContractDropdown();
     
     const form = document.getElementById('vo-form');
