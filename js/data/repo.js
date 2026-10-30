@@ -7,7 +7,7 @@
  * đã lưu trước (_v trên server khác) → ném ConflictError, KHÔNG ghi. Firestore rules (bước 1.4)
  * chặn thêm ở phía server: _v mới phải = _v cũ + 1.
  *
- * CHƯA nối vào app (bước 1.6–1.7). Không phụ thuộc DOM hay biến toàn cục: nhận `db` (Firestore
+ * Nối vào app từng phần: IPC và VO từ bước 1.6 (js/core/v2-sync.js), các loại còn lại ở bước 1.7. Không phụ thuộc DOM hay biến toàn cục: nhận `db` (Firestore
  * compat) và `fieldValue` từ ngoài → test được bằng Node trên Firestore giả và Emulator thật.
  */
 import { cleanForFirestore } from '../utils/firestore-clean.js';
@@ -106,8 +106,47 @@ export function createRepo({ db, fieldValue, user, onWrite = () => {} }) {
         });
     }
 
+    /**
+     * Ghi NHIỀU hồ sơ trong MỘT giao dịch: hoặc tất cả cùng vào, hoặc không cái nào (vd tính lại chuỗi IPC).
+     * ops: [{ entity, kind: 'create'|'save'|'delete', id, record?, expectedV? }]. Trả về [{ entity, id, kind, _v }].
+     * Sai _v ở BẤT KỲ hồ sơ nào → ConflictError, không ghi gì. Mỗi hồ sơ có dòng nhật ký riêng (qua onWrite).
+     */
+    async function saveMany(pid, ops, { reason } = {}) {
+        if (!ops.length) return [];
+        if (ops.length > 200) throw new Error('Một lần lưu tối đa 200 hồ sơ');
+        const refs = ops.map(o => col(o.entity, pid).doc(String(o.id)));
+        return db.runTransaction(async (tx) => {
+            const snaps = [];
+            for (const r of refs) snaps.push(await tx.get(r));   // đọc hết trước khi ghi
+            ops.forEach((o, i) => {
+                const cur = snaps[i].exists ? snaps[i].data() : null;
+                if (o.kind === 'create' && cur) throw new ConflictError(`Đã có ${o.entity}/${o.id}`, metaOf(cur));
+                if (o.kind !== 'create' && !cur) throw new ConflictError(`${o.entity}/${o.id} không còn tồn tại`, null);
+                if (o.kind !== 'create' && cur._v !== o.expectedV) throw new ConflictError(`${o.entity}/${o.id} vừa được người khác lưu`, metaOf(cur));
+            });
+            return ops.map((o, i) => {
+                const cur = snaps[i].exists ? snaps[i].data() : null;
+                const base = { entity: o.entity, pid, id: refs[i].id, reason };
+                if (o.kind === 'create') {
+                    const data = { ...cleanForFirestore(stripMeta(o.record)), _v: 1, deleted: false, createdAt: ts(), createdBy: user.uid, updatedAt: ts(), updatedBy: user.uid };
+                    tx.set(refs[i], data); onWrite(tx, { ...base, action: 'create', before: null, after: data });
+                    return { entity: o.entity, id: refs[i].id, kind: o.kind, _v: 1 };
+                }
+                if (o.kind === 'save') {
+                    const data = { ...cleanForFirestore(stripMeta(o.record)), _v: o.expectedV + 1, deleted: !!cur.deleted,
+                        createdAt: cur.createdAt ?? null, createdBy: cur.createdBy ?? null, updatedAt: ts(), updatedBy: user.uid };
+                    tx.set(refs[i], data); onWrite(tx, { ...base, action: 'update', before: cur, after: data });
+                    return { entity: o.entity, id: refs[i].id, kind: o.kind, _v: data._v };
+                }
+                const patch = { _v: o.expectedV + 1, deleted: true, updatedAt: ts(), updatedBy: user.uid, deletedAt: ts(), deletedBy: user.uid };
+                tx.update(refs[i], patch); onWrite(tx, { ...base, action: 'delete', before: cur, after: { ...cur, ...patch } });
+                return { entity: o.entity, id: refs[i].id, kind: o.kind, _v: patch._v };
+            });
+        });
+    }
+
     return {
-        list, get, subscribe, create, save,
+        list, get, subscribe, create, save, saveMany,
         /** Xóa mềm: vào thùng rác, khôi phục được. Không xóa thật. */
         softDelete: (entity, pid, id, expectedV, { reason } = {}) => setDeleted(entity, pid, id, expectedV, true, reason),
         restore: (entity, pid, id, expectedV, { reason } = {}) => setDeleted(entity, pid, id, expectedV, false, reason),

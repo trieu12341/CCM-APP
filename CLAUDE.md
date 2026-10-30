@@ -23,7 +23,7 @@ nằm ở tài liệu kế hoạch của chủ repo; mỗi bước có mã (1.1,
 | --- | --- |
 | `js/core/` | khởi động app, đăng nhập (`app-init.js`, `login-ui.js`), nạp dữ liệu + đồng bộ realtime (`app-data.js`, `realtime-sync.js`, `project-merge.js`), lưu (`data-store.js`) |
 | `js/db-service.js` | đọc/ghi Firestore (hiện: mỗi dự án 1 bản ghi `projects/{id}` chứa các mảng) |
-| `js/data/` | lớp dữ liệu mới của Giai đoạn 1 (`repo.js`, `audit.js`, `audit-diff.js`) — **chưa nối vào app**; công cụ chuyển dữ liệu cũ → mới: `migrate-plan.js` (lập kế hoạch, thuần), `migrate-checks.js` (tổng kiểm), `migrate-run.js` (ghi theo lô + kiểm lại), `migrate-gate.js` (khóa Chạy thật trên bản thật). Trang admin: `js/modules/migrate/` |
+| `js/data/` | lớp dữ liệu mới của Giai đoạn 1 (`repo.js`, `audit.js`, `audit-diff.js`, `entity-diff.js`, `project-sync.js`) — **mới nối cho IPC và VO của dự án `schemaVersion 2`** (qua `js/core/v2-sync.js`); các loại còn lại nối ở bước 1.7; công cụ chuyển dữ liệu cũ → mới: `migrate-plan.js` (lập kế hoạch, thuần), `migrate-checks.js` (tổng kiểm), `migrate-run.js` (ghi theo lô + kiểm lại), `migrate-gate.js` (khóa Chạy thật trên bản thật). Trang admin: `js/modules/migrate/` |
 | `js/budget/`, `js/tender/`, `js/contract/`, `js/cashflow/`, `js/project/` | từng tab |
 | `js/modules/payment/` | IPC: `ipc-engine.js` (16 dòng CERT), `ipc-chain.js` (chuỗi đợt), `ipc-fs-parser.js` (import sheet FS), `payment-metrics.js` (mọi con số tổng hợp) |
 | `js/modules/vo/`, `js/modules/final/`, `js/modules/overview/` | VO, Quyết toán, Tổng quan |

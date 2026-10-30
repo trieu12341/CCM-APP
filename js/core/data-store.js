@@ -10,6 +10,7 @@
  */
 import { state } from '../app.js';
 import { backfillProjectIds } from './project-merge.js';
+import { isV2, commitV2 } from './v2-sync.js';
 import { saveBudgetsToCloud, saveTendersToCloud, saveProjectsToCloud, saveContractsToCloud, saveCashflowToCloud, savePaymentsToCloud, saveVariationsToCloud, saveFinalStatementsToCloud } from '../db-service.js';
 
 // Centralize all localStorage keys
@@ -112,6 +113,8 @@ export function loadCashflowFromLS() {
 }
 
 export function persistPayments(data) {
+    // Dự án đã chuyển (schemaVersion 2): ghi từng IPC qua repo.js, không còn ghi mảng cũ / localStorage
+    if (isV2(state.currentProjectId)) { state.appData.Payments = data; commitV2('payments', data); document.dispatchEvent(new Event('paymentsChanged')); return; }
     // SAFEGUARD: Do not overwrite localStorage with empty array if data exists
     if ((!data || data.length === 0) && state.appData.Payments && state.appData.Payments.length > 0) {
         console.warn('Blocked attempt to persist empty Payments data.');
@@ -141,6 +144,7 @@ export function loadPaymentsFromLS() {
 }
 
 export function persistVariations(data) {
+    if (isV2(state.currentProjectId)) { state.appData.Variations = data; commitV2('variations', data); document.dispatchEvent(new Event('variationsChanged')); return; }
     // VO từ bản cũ thiếu project_id → bổ sung theo hợp đồng để lên được cloud
     data = backfillProjectIds(data, state.appData.Contracts).items;
     if ((!data || data.length === 0) && state.appData.Variations && state.appData.Variations.length > 0) {

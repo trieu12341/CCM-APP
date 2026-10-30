@@ -186,3 +186,11 @@ button, .btn, .menu-item, [role="button"], .btn-icon, tr[data-id], .vo-row { cur
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
+
+/* Dải báo dự án chưa chuyển sang cấu trúc dữ liệu mới (bước 1.6) */
+.legacy-banner {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 9000;
+    padding: 6px 16px; text-align: center; font-size: var(--fs-xs); font-weight: 600;
+    background: var(--accent-amber-soft); color: var(--accent-amber); border-top: 1px solid var(--accent-amber);
+}
+.legacy-banner[hidden] { display: none; }
