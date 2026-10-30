@@ -6,10 +6,16 @@ import { adminDb } from './_admin.mjs';
 import { exportAll } from '../js/data/backup.js';
 
 const out = process.argv[2] || 'backups';
-const db = adminDb();
-const all = await exportAll(db);
+let all;
+try {
+    all = await exportAll(adminDb());
+} catch (e) {
+    // Annotation của GitHub Actions: đọc được ở trang chạy mà không cần mở log
+    console.error(`::error title=Sao lưu thất bại::${String(e.code || '')} ${String(e.message || e).replace(/\s+/g, ' ').slice(0, 300)}`);
+    process.exit(1);
+}
 const count = all.projects.reduce((s, p) => s + Object.values(p.collections).reduce((n, l) => n + l.length, 0), 0);
-if (!all.projects.length) { console.error('Không có dự án nào để sao lưu — dừng (nghi sai môi trường/quyền).'); process.exit(1); }
+if (!all.projects.length) { console.error('::error title=Sao lưu thất bại::Không có dự án nào để sao lưu — nghi sai môi trường hoặc thiếu quyền đọc'); process.exit(1); }
 mkdirSync(out, { recursive: true });
 const file = join(out, `ccm-backup-${new Date().toISOString().slice(0, 10)}.json`);
 writeFileSync(file, JSON.stringify(all));
