@@ -1,5 +1,5 @@
 /**
- * project-sync.js — Đồng bộ IPC và VO của MỘT dự án (schemaVersion 2) qua repo.js. Không dùng DOM/biến toàn cục
+ * project-sync.js — Đồng bộ mọi hồ sơ (ngân sách, gói thầu, HĐ, IPC, VO, dòng tiền, quyết toán) của MỘT dự án (schemaVersion 2) qua repo.js. Không dùng DOM/biến toàn cục
  * → test được bằng Node. Giữ "bản gốc" (records kèm _v) từng loại; commit() so với bản gốc rồi ghi MỘT giao dịch.
  *
  *  - Các lần lưu xếp hàng nối tiếp, nên lưu liên tiếp (sửa IPC rồi tính lại chuỗi) không tự xung đột với chính mình.
@@ -7,15 +7,14 @@
  */
 import { planOps, applyResult } from './entity-diff.js';
 import { ConflictError } from './repo.js';
+import { ID_KEY, LABEL } from './migrate-plan.js';
 
-export const SYNCED = [
-    { entity: 'payments', idKey: 'ipc_id', label: 'IPC' },
-    { entity: 'variations', idKey: 'vo_id', label: 'VO' },
-];
+export const SYNCED = ['budgets', 'tenders', 'contracts', 'payments', 'variations', 'cashflows', 'finals']
+    .map(entity => ({ entity, idKey: ID_KEY[entity], label: LABEL[entity] }));
 
 export function createProjectSync({ repo, pid, onChange = () => {}, onError = () => {}, onStatus = () => {} }) {
     const cfg = Object.fromEntries(SYNCED.map(c => [c.entity, c]));
-    const baseline = { payments: [], variations: [] };
+    const baseline = Object.fromEntries(SYNCED.map(c => [c.entity, []]));
     const unsubs = [];
     let tail = Promise.resolve(), pending = 0, stopped = false;
 
@@ -56,5 +55,8 @@ export function createProjectSync({ repo, pid, onChange = () => {}, onError = ()
     }
     function stop() { stopped = true; unsubs.splice(0).forEach(u => { try { u(); } catch (_) {} }); }
 
-    return { start, stop, commit, baseline: (entity) => baseline[entity], whenIdle: () => tail };
+    /** Hồ sơ này thuộc dự án đang đồng bộ? (theo project_id, hoặc đã nằm sẵn trong bản gốc của dự án — hồ sơ cũ thiếu project_id) */
+    const owns = (entity, item) => !!item && (item.project_id === pid || (!item.project_id && baseline[entity].some(r => String(r[cfg[entity].idKey]) === String(item[cfg[entity].idKey]))));
+
+    return { start, stop, commit, owns, baseline: (entity) => baseline[entity], whenIdle: () => tail };
 }

@@ -122,3 +122,24 @@ test('T1.06 (phần dữ liệu) lưu thất bại giữa chừng (lỗi mạng/
     assert.equal((await a.repo.get('payments', pid, 'IPC-001'))._v, 1);
     broken.stop(); real.stop();
 });
+
+test('bước 1.7: đủ 7 loại hồ sơ được đọc; hồ sơ cũ thiếu project_id không bị xóa nhầm; trùng mã ở dự án khác không bị nhận nhầm', async () => {
+    const pid = await seed();
+    const lists = {};
+    const s = createProjectSync({ repo: mk(A), pid, onChange: (e, l) => { lists[e] = l; } });
+    s.start();
+    await ready(() => ['budgets', 'tenders', 'contracts', 'payments', 'variations', 'cashflows', 'finals'].every(e => lists[e]));
+    assert.deepEqual([lists.budgets.length, lists.tenders.length, lists.contracts.length, lists.cashflows.length, lists.finals.length], [3, 3, 3, 8, 1]);
+    // hồ sơ thiếu project_id (dữ liệu rất cũ): vẫn thuộc dự án này, lưu lại KHÔNG bị xóa mềm
+    const noPid = lists.contracts.map(({ project_id, ...c }) => c);
+    assert.equal((await s.commit('contracts', noPid.filter(c => s.owns('contracts', c)))).ok, true);
+    assert.equal((await mk(A).list('contracts', pid)).length, 3);
+    // hồ sơ cùng mã nhưng thuộc dự án khác: không phải của dự án này
+    assert.equal(s.owns('contracts', { contract_id: 'C001', project_id: 'KHAC' }), false);
+    // sửa ngân sách và dòng tiền: mỗi cái một bản ghi, có nhật ký
+    await s.commit('budgets', lists.budgets.map(b => (b.id === 'BG-1' ? { ...b, budgeted: b.budgeted + 1 } : b)));
+    await s.commit('cashflows', lists.cashflows.filter(c => c.id !== 'cf-1'));
+    assert.equal((await mk(A).get('budgets', pid, 'BG-1'))._v, 2);
+    assert.equal((await mk(A).list('cashflows', pid)).length, 7);
+    s.stop();
+});

@@ -47,7 +47,10 @@ service cloud.firestore {
     // ── Dữ liệu dự án (bản ghi cũ: cả dự án một bản ghi) ──
     match /projects/{projectId} {
       allow read: if canRead();
-      allow create, update: if canEdit();
+      // schemaVersion (cờ "đã chuyển dữ liệu") chỉ admin đổi được; người khác ghi mảng cũ thì phải giữ nguyên cờ
+      allow create: if canEdit() && (isAdmin() || request.resource.data.get('schemaVersion', null) == null);
+      allow update: if canEdit() && (isAdmin()
+                    || request.resource.data.get('schemaVersion', null) == resource.data.get('schemaVersion', null));
       allow delete: if isAdmin();
     }
 

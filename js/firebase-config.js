@@ -21,4 +21,7 @@ if (!firebase.apps.length) {
 export const db = firebase.firestore();
 // Lớp an toàn thứ hai: bỏ qua trường undefined thay vì từ chối cả bản ghi
 try { db.settings({ ignoreUndefinedProperties: true, merge: true }); } catch (e) { console.warn('Firestore settings:', e); }
+// Bộ nhớ đệm offline của Firestore (thay cho bản sao ccm_* trong localStorage): mở lại app vẫn thấy dữ liệu đã tải, nhiều tab dùng chung.
+// Phải gọi trước mọi thao tác Firestore khác. Trình duyệt không hỗ trợ / tab khác đang giữ → bỏ qua, app vẫn chạy bình thường.
+try { db.enablePersistence({ synchronizeTabs: true }).catch(e => console.warn('Bộ nhớ đệm offline không bật được:', e && e.code)); } catch (e) { console.warn('enablePersistence:', e); }
 export const auth = firebase.auth();
