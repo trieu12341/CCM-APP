@@ -104,6 +104,7 @@
                 <div id="modules-2-container"></div>
                 <div id="module-admin-container"></div>
                 <div id="module-migrate-container"></div>
+                <div id="module-trash-container"></div>
 
                 <div id="modals-1-container"></div>
                 <div id="modals-2-container"></div>
@@ -126,7 +127,8 @@
                 loadComponent('modals-1-container', 'components/modals-1.html'),
                 loadComponent('modals-2-container', 'components/modals-2.html'),
                 loadComponent('module-admin-container', 'components/admin.html'),
-                loadComponent('module-migrate-container', 'components/migrate.html')
+                loadComponent('module-migrate-container', 'components/migrate.html'),
+                loadComponent('module-trash-container', 'components/trash.html')
             ]);
             document.dispatchEvent(new Event('componentsLoaded'));
         }

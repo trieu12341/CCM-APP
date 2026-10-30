@@ -1,0 +1,38 @@
+name: Sao lưu hằng ngày
+
+# 02:00 giờ Việt Nam (19:00 UTC) mỗi ngày. Nút chạy tay chỉ hiện sau khi workflow có trên master;
+# trước đó thử bằng cách đẩy nhánh `backup-test` (sao lưu staging).
+on:
+  schedule:
+    - cron: '0 19 * * *'
+  workflow_dispatch:
+    inputs:
+      env:
+        description: 'Môi trường: prod hoặc staging'
+        default: 'prod'
+  push:
+    branches: [backup-test]
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    env:
+      TARGET: ${{ (github.event_name == 'push' || inputs.env == 'staging') && 'staging' || 'prod' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm i --no-save firebase-admin@12
+      - name: Sao lưu
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ env.TARGET == 'staging' && secrets.FIREBASE_SERVICE_ACCOUNT_STAGING || secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: node scripts/backup.mjs backups
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ccm-backup-${{ env.TARGET }}-${{ github.run_id }}
+          path: backups/
+          retention-days: 90
+          if-no-files-found: error
