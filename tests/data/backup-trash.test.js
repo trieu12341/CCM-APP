@@ -42,8 +42,13 @@ test('T1.12 sao lưu hôm qua → khôi phục vào dự án MỚI: tổng kiể
 
 test('sao lưu mọi dự án gồm cả hồ sơ con, nhật ký và danh sách tài khoản', async () => {
     const pid = await seed();
-    const all = await exportAll(env.db);
-    const p = all.projects.find(x => x.projectId === pid);
+    let all, p;
+    for (let i = 0; i < 5 && !p; i++) {   // bộ giả lập dùng chung với các file test chạy song song: cho phép đọc lại, nhưng báo rõ nếu vẫn thiếu
+        all = await exportAll(env.db);
+        p = all.projects.find(x => x.projectId === pid);
+        if (!p) await new Promise(r => setTimeout(r, 200));
+    }
+    assert.ok(p, `exportAll thiếu dự án ${pid}: có ${all.projects.length} dự án, ví dụ ${all.projects.slice(0, 5).map(x => x.projectId).join(', ')}`);
     assert.equal(p.collections.payments.length, 4); assert.ok(p.collections.audit.length >= 1);
     assert.ok(Array.isArray(all.users));
 });
