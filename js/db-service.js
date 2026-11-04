@@ -105,7 +105,8 @@ export async function loadAllProjectsFromCloud() {
                     end_date: data.end_date || '',
                     total_budget: data.total_budget || 0,
                     contingency_budget: data.contingency_budget || 0,
-                    status: data.status || 'Active'
+                    status: data.status || 'Active',
+                    members: data.members && typeof data.members === 'object' ? data.members : null
                 });
             } else if (data.projects) {
                 projects.push(...data.projects);
