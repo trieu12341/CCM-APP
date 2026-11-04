@@ -9,6 +9,7 @@
  *   Layer 2 → Layer 3 : show #payment-detail-workspace (slide-in panel)
  *   Layer 3 → Layer 2 : hide #payment-detail-workspace, ensure scroll unlocked
  */
+import { setupIPCPrint } from './ipc-print-events.js';
 
 import { renderPaymentDashboard } from './ui/payment-layer1-ui.js';
 import { renderIPCList, applyIPCFilters } from './ui/payment-layer2-ui.js';
@@ -154,6 +155,7 @@ export function setupPaymentEvents() {
 
     // ── LAYER 3 — FORM TẠO / SỬA IPC ───────────────────────
     setupIPCFormEvents();
+    setupIPCPrint();
 
     // Initial render of Layer 1
     renderPaymentDashboard();

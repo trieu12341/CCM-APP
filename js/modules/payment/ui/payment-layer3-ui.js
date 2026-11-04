@@ -171,7 +171,7 @@ function renderFinancialBreakdown(ipc) {
 // ─────────────────────────────────────────────────────────────
 
 /** Gắn "đến kỳ trước" cho từng dòng Bill của IPC (lấy từ IPC đứng trước). */
-function withPreviousAmounts(ipc, all) {
+export function withPreviousAmounts(ipc, all) {
     const lines = ipc.lines || [];
     const idx = all.findIndex(p => p.ipc_id === ipc.ipc_id);
     const prev = all.slice(0, idx).reverse().find(p => Array.isArray(p.lines) && p.lines.length);
