@@ -129,6 +129,7 @@ export function setupSidebarEvents() {
                 // Admin dashboard render
                 if (m.mod === 'module-admin') {
                     setTimeout(() => { try { renderUsersTable(); } catch (e) { console.error(e); } }, 50);
+                    import('../modules/members/members-ui.js').then(mod => mod.renderMembersPanel()).catch(err => console.error(err));
                 }
             }
         });

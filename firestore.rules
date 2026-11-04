@@ -27,6 +27,23 @@ service cloud.firestore {
     function canEdit()  { return signedIn() && hasProfile() && myRole() in ['admin', 'user']; }
     function canRead()  { return signedIn() && hasProfile() && myRole() in ['admin', 'user', 'manager']; }
 
+    // ── Thành viên theo dự án (bước 2.1) ──
+    // projects/{pid}.members = {uid: 'qs'|'pm'|'accountant'|'viewer'}. Dự án chưa có members chạy theo vai trò toàn hệ thống.
+    function projectData(pid) { return get(/databases/$(database)/documents/projects/$(pid)).data; }
+    function hasMembers(pid) {
+      return exists(/databases/$(database)/documents/projects/$(pid)) && projectData(pid).get('members', null) != null;
+    }
+    function memberRole(pid) { return projectData(pid).members.get(request.auth.uid, null); }
+    function active() { return signedIn() && hasProfile() && myRole() in ['admin', 'user', 'manager']; }
+    function canReadIn(pid) {
+      return active() && (myRole() == 'admin' || !hasMembers(pid) || memberRole(pid) in ['qs', 'pm', 'accountant', 'viewer']);
+    }
+    function canEditIn(pid) {
+      return active() && (myRole() == 'admin'
+             || (!hasMembers(pid) && myRole() == 'user')
+             || (hasMembers(pid) && memberRole(pid) in ['qs', 'pm', 'accountant']));
+    }
+
     // ── Hồ sơ người dùng ──
     match /users/{userId} {
       // Đọc: chính mình, hoặc admin
@@ -48,9 +65,13 @@ service cloud.firestore {
     match /projects/{projectId} {
       allow read: if canRead();
       // schemaVersion (cờ "đã chuyển dữ liệu") chỉ admin đổi được; người khác ghi mảng cũ thì phải giữ nguyên cờ
-      allow create: if canEdit() && (isAdmin() || request.resource.data.get('schemaVersion', null) == null);
+      // members (thành viên dự án) cũng chỉ admin đổi được
+      allow create: if canEdit() && (isAdmin() || (request.resource.data.get('schemaVersion', null) == null
+                                                    && request.resource.data.get('members', null) == null));
       allow update: if canEdit() && (isAdmin()
-                    || request.resource.data.get('schemaVersion', null) == resource.data.get('schemaVersion', null));
+                    || (request.resource.data.get('schemaVersion', null) == resource.data.get('schemaVersion', null)
+                        && request.resource.data.get('members', null) == resource.data.get('members', null)
+                        && canEditIn(projectId)));
       allow delete: if isAdmin();
     }
 
@@ -65,10 +86,10 @@ service cloud.firestore {
     }
 
     match /projects/{projectId}/{entity}/{docId} {
-      allow read: if entityOk(entity) && canRead();
+      allow read: if entityOk(entity) && canReadIn(projectId);
 
       // Tạo mới: phiên bản 1, chưa xóa, người tạo là chính mình
-      allow create: if entityOk(entity) && canEdit()
+      allow create: if entityOk(entity) && canEditIn(projectId)
                     && nv()._v == 1
                     && nv().deleted == false
                     && nv().createdBy == request.auth.uid
@@ -77,7 +98,7 @@ service cloud.firestore {
 
       // Sửa: _v mới = _v cũ + 1 (chống ghi đè người khác); không đổi người/giờ tạo.
       // Xóa mềm (deleted: false → true) phải ghi rõ ai xóa và khi nào; khôi phục thì không cần.
-      allow update: if entityOk(entity) && canEdit()
+      allow update: if entityOk(entity) && canEditIn(projectId)
                     && nv()._v is int && nv()._v == resource.data._v + 1
                     && stamped()
                     && nv().createdBy == resource.data.createdBy
@@ -108,11 +129,13 @@ service cloud.firestore {
     }
 
     match /projects/{projectId}/audit/{auditId} {
-      allow read: if canRead();
-      allow create: if canEdit() && auditShape()
+      allow read: if canReadIn(projectId);
+      allow create: if canEditIn(projectId) && auditShape()
                     && (auditPairedWithWrite(projectId)
                         // Chuyển dữ liệu (bước 1.5): admin ghi một dòng tổng kết, không gắn với một hồ sơ
-                        || (isAdmin() && nv().action == 'migrate'));
+                        || (isAdmin() && nv().action == 'migrate')
+                        // Đổi thành viên dự án (bước 2.1): admin ghi một dòng nhật ký cùng lần đổi members
+                        || (isAdmin() && nv().action == 'members'));
       allow update, delete: if false;
     }
 
