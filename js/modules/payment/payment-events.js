@@ -10,6 +10,7 @@
  *   Layer 3 → Layer 2 : hide #payment-detail-workspace, ensure scroll unlocked
  */
 import { setupIPCPrint } from './ipc-print-events.js';
+import { setupIPCXlsx } from './ipc-xlsx-events.js';
 import { unlockPatch } from './ipc-lock.js';
 import { askReason } from '../../core/reason-dialog.js';
 
@@ -173,6 +174,7 @@ export function setupPaymentEvents() {
     // ── LAYER 3 — FORM TẠO / SỬA IPC ───────────────────────
     setupIPCFormEvents();
     setupIPCPrint();
+    setupIPCXlsx();
 
     // Initial render of Layer 1
     renderPaymentDashboard();

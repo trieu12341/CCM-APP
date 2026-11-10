@@ -64,6 +64,7 @@ export class Backend {
 }
 
 function vendorFile(url) {
+    if (url.includes('exceljs')) return join(VENDOR, 'exceljs/dist/exceljs.min.js');
     if (url.includes('apexcharts')) return join(VENDOR, 'apexcharts/dist/apexcharts.min.js');
     if (url.includes('cdn.sheetjs.com')) return join(VENDOR, 'xlsx/dist/xlsx.full.min.js');
     const fa = url.match(/font-awesome\/[\d.]+\/(.+?)(\?|$)/);
