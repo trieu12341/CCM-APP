@@ -41,7 +41,8 @@ export function setupSidebarEvents() {
         { menu: 'menu-final', mod: 'module-final' },
         { menu: 'menu-admin', mod: 'module-admin' },
         { menu: 'menu-migrate', mod: 'module-migrate' },
-        { menu: 'menu-trash', mod: 'module-trash' }
+        { menu: 'menu-trash', mod: 'module-trash' },
+        { menu: 'menu-cost-report', mod: 'module-cost-report' }
     ];
 
     modules.forEach(m => {
@@ -122,6 +123,9 @@ export function setupSidebarEvents() {
                     import('../modules/migrate/migrate-events.js').then(mod => mod.initMigratePage()).catch(err => console.error(err));
                 }
 
+                if (m.mod === 'module-cost-report') {
+                    import('../modules/report/cost-report-ui.js').then(mod => mod.initCostReportPage()).catch(err => console.error(err));
+                }
                 if (m.mod === 'module-trash') {
                     import('../modules/trash/trash-events.js').then(mod => mod.initTrashPage()).catch(err => console.error(err));
                 }

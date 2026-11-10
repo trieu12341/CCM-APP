@@ -113,3 +113,21 @@ test('ngày báo cáo: VO trình sau ngày → bỏ; VO duyệt sau ngày → c�
     assert.equal(certifiedOf(p, 'K', '2026-10-31'), 50);
     assert.equal(certifiedOf(p, 'K', null), 120);
 });
+
+test('xuất Excel: 1 sheet Report đúng bố cục (nhóm A/B…, dòng tổng), số là số, chênh lệch âm hiện đỏ', async () => {
+    const { default: ExcelJS } = await import('exceljs');
+    const { writeCostReport } = await import('../js/modules/report/cost-report-xlsx.js');
+    const rep = buildCostReport({ projectId: 'P', budgets: [B('102-01', 1000), B('104', 50, 'Consultancy')], contracts: [C('K1', '102-01', 900), C('K2', '104', 80)] });
+    const wb = new ExcelJS.Workbook();
+    assert.equal(writeCostReport(wb, rep, { projectName: 'Dự án thử', asOf: '2026-10-31' }), 2);
+    const back = new ExcelJS.Workbook(); await back.xlsx.load(await wb.xlsx.writeBuffer());
+    const ws = back.getWorksheet('Report');
+    assert.equal(ws.getCell('A1').value, 'DỰ ÁN THỬ');
+    assert.equal(ws.getCell('D4').value, 'Budget');
+    assert.deepEqual([ws.getCell('A7').value, ws.getCell('C7').value, ws.getCell('D7').value], ['A', 'NHÀ THẦU', 1000]);
+    assert.deepEqual([ws.getCell('A8').value, ws.getCell('B8').value, ws.getCell('E8').value, ws.getCell('M8').value], [1, '102-01', 900, 100]);
+    assert.equal(ws.getCell('M10').value, -30);
+    assert.match(ws.getCell('M10').numFmt, /\[Red\]/);
+    assert.equal(ws.getCell('C11').value, 'TOTAL (EXCL. VAT) — TỔNG TRƯỚC THUẾ');
+    assert.equal(ws.getCell('J11').value, 980);
+});

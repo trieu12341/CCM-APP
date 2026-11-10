@@ -28,6 +28,7 @@ nằm ở tài liệu kế hoạch của chủ repo; mỗi bước có mã (1.1,
 | `js/modules/payment/` | IPC: `ipc-engine.js` (16 dòng CERT), `ipc-chain.js` (chuỗi đợt), `ipc-fs-parser.js` (import sheet FS), `payment-metrics.js` (mọi con số tổng hợp), `ipc-lock.js` (khóa số / mở khóa có lý do / IPC cần xem lại), `ipc-print.js` (trang in A4), `ipc-xlsx.js` + `ipc-xlsx-map.js` (điền file mẫu CERT) |
 | `templates/` | `ipc-cert.xlsx` — file mẫu CERT/Att#0/FS SẠCH (không số, không tên riêng). Sinh lại bằng `python3 tests/fixtures/make-ipc-template.py` từ file thật trong `tests/fixtures/private/` (không đưa file thật lên repo public) |
 | `js/modules/vo/`, `js/modules/final/`, `js/modules/overview/` | VO, Quyết toán, Tổng quan |
+| `js/modules/report/` | Báo cáo chi phí tháng: `cost-report.js` (engine thuần — Budget, Award, VO duyệt/chờ, cam kết, chưa cam kết, AFC, đã trả, còn lại, chênh lệch; khớp cost report tháng 10 làm tay, test `tests/cost-report.test.js` với đáp án riêng `tests/fixtures/private/cost-report-golden.json` sinh bằng `tests/fixtures/extract-cost-report.py`), `cost-report-ui.js` (tab), `cost-report-xlsx.js` (xuất Excel) |
 | `js/modules/trash/`, `js/core/reset-safe.js`, `js/data/backup.js`, `scripts/` | Thùng rác (xóa mềm, khôi phục); Reset an toàn (admin + gõ tên dự án + tự tải sao lưu); xuất/nhập trọn dự án; `scripts/backup.mjs` (workflow `backup.yml` 19:00 UTC hằng ngày, artifact 90 ngày) và `scripts/restore.mjs <file> <mã-gốc> <mã-mới> [--yes]` (khôi phục vào dự án MỚI, không ghi đè) |
 | `js/utils/` | định dạng số, làm sạch dữ liệu trước khi ghi Firestore, thông báo lỗi |
 | `css/theme/` | biến màu (`tokens.css`), bố cục, thành phần — lớp theme nạp sau cùng |
@@ -38,6 +39,7 @@ nằm ở tài liệu kế hoạch của chủ repo; mỗi bước có mã (1.1,
 - Test "IPC mẫu vàng": IPC#1–4 gói Main Works phải khớp file Excel gốc tới từng đồng (dòng 16 IPC4 = 2.391.377.432).
 - `payment-metrics.js`: Đã thực hiện = giá trị gộp đến nay của IPC đã duyệt; `paymentExVat` = tạm ứng + Σ dòng (14). Dashboard & dòng tiền dùng số trước thuế, gồm tạm ứng.
 - **VO đã duyệt KHÔNG cộng vào giá trị hợp đồng**; chỉ vào giá trị quyết toán (Gốc + VO) và dòng (2)/(3) của CERT.
+- Báo cáo chi phí: "Đã thanh toán" = IPC **đã trả** (trước thuế, gồm tạm ứng) tới ngày báo cáo; VO chờ duyệt lấy số QS đánh giá (thiếu thì số nhà thầu + cảnh báo); Chưa cam kết = ngân sách của mục chưa có cam kết.
 - Tiền làm tròn đến đồng; phần trăm hiển thị 2 số lẻ.
 
 ## 5. Quy ước code & giao diện
