@@ -180,7 +180,7 @@
                 <button id="close-reset-modal" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div style="background-color: var(--accent-red-soft); padding: 15px; border-radius: 6px; margin-bottom: 20px; font-size: 0.9rem; color: var(--accent-red);">
-                Hành động này sẽ xóa sạch dữ liệu thực thi đã chọn để phục vụ kiểm thử workflow. <b>Hệ thống sẽ tự động xuất một bản Backup JSON trước khi xóa.</b>
+                Chỉ admin. Áp dụng cho <b>dự án đang mở</b>. <b>Hệ thống tải bản sao lưu JSON trước khi xóa</b> (không tải được thì không xóa). Dự án đã chuyển dữ liệu: hồ sơ vào Thùng rác, khôi phục được.
             </div>
             <form id="system-reset-form">
                 <div class="form-group" style="margin-bottom: 20px;">
@@ -207,8 +207,8 @@
                 </div>
 
                 <div class="form-group" style="margin-bottom: 20px;">
-                    <label for="reset-confirm-input" style="color: #ef4444; font-weight: bold;">Nhập chữ "RESET" để xác nhận <span style="color:#ef4444;">*</span></label>
-                    <input type="text" id="reset-confirm-input" placeholder="Gõ RESET viết hoa..." required style="border-color: #ef4444; font-weight: bold; color: #ef4444; outline-color: #ef4444;">
+                    <label for="reset-confirm-input" style="color: #ef4444; font-weight: bold;">Gõ đúng tên dự án "<span id="reset-project-name"></span>" để xác nhận <span style="color:#ef4444;">*</span></label>
+                    <input type="text" id="reset-confirm-input" placeholder="Gõ tên dự án..." required autocomplete="off" style="border-color: #ef4444; font-weight: bold; color: #ef4444; outline-color: #ef4444;">
                 </div>
 
                 <div class="form-actions" style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 15px; justify-content: space-between;">

@@ -39,7 +39,10 @@ export function setupSidebarEvents() {
         { menu: 'menu-payment', mod: 'module-payment' },
         { menu: 'menu-vo', mod: 'module-vo' },
         { menu: 'menu-final', mod: 'module-final' },
-        { menu: 'menu-admin', mod: 'module-admin' }
+        { menu: 'menu-admin', mod: 'module-admin' },
+        { menu: 'menu-migrate', mod: 'module-migrate' },
+        { menu: 'menu-trash', mod: 'module-trash' },
+        { menu: 'menu-cost-report', mod: 'module-cost-report' }
     ];
 
     modules.forEach(m => {
@@ -115,9 +118,22 @@ export function setupSidebarEvents() {
                     setTimeout(() => { try { renderFinalDashboard(); } catch (e) { console.error(e); } }, 50);
                 }
 
+                // Trang chuyển dữ liệu (admin)
+                if (m.mod === 'module-migrate') {
+                    import('../modules/migrate/migrate-events.js').then(mod => mod.initMigratePage()).catch(err => console.error(err));
+                }
+
+                if (m.mod === 'module-cost-report') {
+                    import('../modules/report/cost-report-ui.js').then(mod => mod.initCostReportPage()).catch(err => console.error(err));
+                }
+                if (m.mod === 'module-trash') {
+                    import('../modules/trash/trash-events.js').then(mod => mod.initTrashPage()).catch(err => console.error(err));
+                }
+
                 // Admin dashboard render
                 if (m.mod === 'module-admin') {
                     setTimeout(() => { try { renderUsersTable(); } catch (e) { console.error(e); } }, 50);
+                    import('../config/features.js').then(f => f.featureOn('projectMembers') && import('../modules/members/members-ui.js').then(mod => mod.renderMembersPanel())).catch(err => console.error(err));
                 }
             }
         });

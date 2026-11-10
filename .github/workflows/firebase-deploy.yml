@@ -1,15 +1,11 @@
-# Tự động kiểm thử và deploy lên Firebase mỗi khi có commit mới trên nhánh master.
+# Deploy Firebase Hosting khi master có commit mới — CHỈ khi bộ kiểm thử đầy đủ đạt.
 # Cần secret FIREBASE_SERVICE_ACCOUNT (JSON khóa service account) trong
 # GitHub → Settings → Secrets and variables → Actions.
-#   1. test   : chạy unit test công thức (npm test). Test hỏng → KHÔNG deploy.
-#   2. deploy : Hosting (giao diện).
 # Firestore rules deploy ở workflow riêng: firestore-rules.yml
 name: Deploy Firebase Hosting
 
 on:
   push:
-    branches: [master]
-  pull_request:
     branches: [master]
   workflow_dispatch:   # cho phép bấm chạy tay trong tab Actions
 
@@ -19,17 +15,10 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: npm test
+    uses: ./.github/workflows/test-full.yml
 
   deploy:
     needs: test
-    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

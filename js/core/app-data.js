@@ -4,6 +4,9 @@
  */
 import { normalizeContracts } from './contract-fields.js';
 import { state } from '../app.js';
+import { installExportButtons } from '../modules/export/export-buttons.js';
+import { applyFeatureFlags } from '../config/features.js';
+import { visibleProjects } from '../data/members.js';
 import { loadAllProjectsFromCloud, subscribeToProject, saveProjectsToCloud } from '../db-service.js';
 
 import { setupBudgetEvents, renderProjectTabs, renderDashboard } from '../budget.js';
@@ -29,6 +32,7 @@ let projectSwitchBound = false;
 // LOAD APP DATA — fetch all data, then wire events, then render
 // ─────────────────────────────────────────────────────────────
 export async function loadAppData() {
+    try { installExportButtons(); applyFeatureFlags(); } catch (e) { console.error('installExportButtons:', e); }
     try {
         const isCleared = localStorage.getItem('ccm_user_reset_cleared') === 'true';
 
@@ -128,10 +132,12 @@ export async function loadAppData() {
             
             await pendingMigrations.catch(() => {});
             // Fetch the list of all projects
-            const projects = await loadAllProjectsFromCloud();
+            const projects = visibleProjects(await loadAllProjectsFromCloud(), state.user);   // chỉ dự án mình là thành viên (bước 2.1)
             if (projects && projects.length > 0) {
                 // Gộp với bản cục bộ: giữ tên thật nếu cloud thiếu (dữ liệu bản cũ), rồi tự vá lên cloud
-                const { merged, needsCloudSave } = mergeProjectLists(projects, state.appData.Projects);
+                const mergedAll = mergeProjectLists(projects, state.appData.Projects);
+                const merged = visibleProjects(mergedAll.merged, state.user).map(p => ({ ...p }));
+                const needsCloudSave = mergedAll.needsCloudSave;
                 state.appData.Projects = merged;
                 localStorage.setItem('ccm_projects', JSON.stringify(merged));
                 if (needsCloudSave) saveProjectsToCloud(merged).catch(console.error);

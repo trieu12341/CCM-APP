@@ -21,6 +21,7 @@
         <button id="theme-toggle-btn" title="Đổi chế độ sáng / tối" aria-label="Đổi chế độ sáng / tối" style="background: none; border: none; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; transition: background 0.2s;" onmouseover="this.style.background='var(--border-color)'" onmouseout="this.style.background='none'">
             <i class="fa-solid fa-moon" style="font-size: 20px;"></i>
         </button>
+        <span id="sync-badge" class="sync-badge" hidden role="status" aria-live="polite"></span>
         <div id="user-info" style="display: flex; align-items: center; gap: 10px;">
             <div class="admin-tools manager-only" style="display: none; align-items: center; gap: 8px; border-left: 1px solid var(--border-color); padding-left: 10px; margin-left: 5px;">
                 <button id="btn-admin-restore" class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem; " title="Khôi phục bản sao lưu">

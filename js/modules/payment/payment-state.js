@@ -7,6 +7,7 @@
 import { state } from '../../app.js';
 import { persistPayments, loadPaymentsFromLS } from '../../core/data-store.js';
 import { newIPCId } from './ipc-chain.js';
+import { isV2 } from '../../core/v2-sync.js';
 
 // ─────────────────────────────────────────────────────────────
 // READ
@@ -132,6 +133,7 @@ export function deleteIPC(ipcId) {
 // ─────────────────────────────────────────────────────────────
 
 export function initPaymentsFromLS() {
+    if (isV2(state.currentProjectId)) return;   // dự án đã chuyển: nguồn là Firestore, không khôi phục từ bản sao cũ
     if (!state.appData.Payments || state.appData.Payments.length === 0) {
         const ls = loadPaymentsFromLS();
         if (ls && ls.length > 0) {

@@ -16,7 +16,10 @@
       "New folder/**",
       "tests/**",
       "README*.md",
-      "CLAUDE.md"
+      "CLAUDE.md",
+      "playwright.config.js",
+      "test-results/**",
+      "playwright-report/**"
     ],
     "rewrites": [
       {

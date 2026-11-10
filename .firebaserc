@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "cost-contract-management"
+    "default": "cost-contract-management",
+    "staging": "ccm-staging-15ddd"
   }
 }

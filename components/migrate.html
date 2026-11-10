@@ -1,0 +1,43 @@
+<div id="module-migrate" class="module-content hidden">
+    <div class="card" style="padding: 1.5rem; display: grid; gap: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+            <h2 style="font-size: 1.25rem; font-weight: 600; color: var(--text-color);">Chuyển dữ liệu sang cấu trúc mới</h2>
+            <span id="mg-env" class="pill-badge pill-slate"></span>
+        </div>
+        <p class="text-sm" style="color: var(--text-muted);">
+            Mỗi hợp đồng, IPC, VO… thành một bản ghi riêng. Dữ liệu cũ <strong>không bị xóa</strong>. Làm theo thứ tự:
+            <strong>1. Chạy thử</strong> (không ghi gì) → <strong>2. Chạy thật</strong> → app tự <strong>3. kiểm lại</strong> từng số.
+            Chạy lại nhiều lần không tạo bản ghi trùng.
+        </p>
+
+        <div style="display: flex; gap: .75rem; align-items: end; flex-wrap: wrap;">
+            <label style="display: grid; gap: .25rem;">
+                <span class="text-sm">Dự án</span>
+                <select id="mg-project" class="form-control" style="min-width: 260px;"></select>
+            </label>
+            <button id="mg-dry" class="btn btn-outline" type="button"><i class="fa-solid fa-magnifying-glass"></i> Chạy thử</button>
+        </div>
+
+        <div id="mg-dry-out" class="hidden" style="display: grid; gap: 1rem;">
+            <div class="table-container" id="mg-counts"></div>
+            <div id="mg-issues"></div>
+            <div class="table-container" id="mg-checks-before"></div>
+        </div>
+
+        <div id="mg-run-box" class="hidden" style="display: grid; gap: .75rem;">
+            <label style="display: grid; gap: .25rem; max-width: 420px;">
+                <span class="text-sm">Gõ mã dự án để xác nhận chạy thật: <strong id="mg-pid-hint"></strong></span>
+                <input id="mg-confirm" class="form-control" type="text" autocomplete="off">
+            </label>
+            <div style="display: flex; gap: .75rem; align-items: center; flex-wrap: wrap;">
+                <button id="mg-run" class="btn btn-primary" type="button" disabled><i class="fa-solid fa-play"></i> Chạy thật</button>
+                <span id="mg-gate" class="text-sm" style="color: var(--text-muted);"></span>
+            </div>
+            <progress id="mg-progress" class="hidden" max="100" value="0" style="width: 100%; max-width: 420px;"></progress>
+            <div id="mg-progress-text" class="text-sm" style="color: var(--text-muted);"></div>
+        </div>
+
+        <div id="mg-result" aria-live="polite"></div>
+        <div class="table-container" id="mg-checks-after"></div>
+    </div>
+</div>

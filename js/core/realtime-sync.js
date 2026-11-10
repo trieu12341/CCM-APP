@@ -7,9 +7,13 @@ import { normalizeContracts } from './contract-fields.js';
 import { renderProjectTabs, renderDashboard } from '../budget.js';
 import { refreshActiveView } from './sidebar-nav.js';
 import { mergeProjectField } from './project-merge.js';
+import { ensureV2, stopV2, isV2, showLegacyBanner } from './v2-sync.js';
 
 export async function handleProjectSnapshot(projectId, docData) {
     if (docData) {
+        // Dự án đã chuyển: IPC và VO đến từ subcollection (v2-sync), KHÔNG gộp/đẩy mảng cũ nữa
+        if (docData.schemaVersion >= 2 && state.currentProjectId === projectId) { ensureV2(projectId); showLegacyBanner(false); }
+        else if (state.currentProjectId === projectId) { stopV2(); showLegacyBanner(true); }
         // Gộp từng loại dữ liệu. Trường chưa từng có trên cloud (hồ sơ tạo từ bản cũ,
         // vd final_statements) → giữ bản trong máy và tự đẩy lên, không xóa mất.
         const FIELDS = [
@@ -23,11 +27,12 @@ export async function handleProjectSnapshot(projectId, docData) {
         ];
         const toPush = [];
         for (const [stateKey, cloudKey, saver] of FIELDS) {
+            if (isV2(projectId)) continue;   // dự án v2: dữ liệu đến từ subcollection
             const { merged, pushLocal } = mergeProjectField(state.appData[stateKey], docData[cloudKey], projectId);
             state.appData[stateKey] = merged;
             if (pushLocal) toPush.push(saver);
         }
-        state.appData.Contracts = normalizeContracts(state.appData.Contracts);
+        if (!isV2(projectId)) state.appData.Contracts = normalizeContracts(state.appData.Contracts);
         if (toPush.length) {
             const db = await import('../db-service.js');
             // save*ToCloud chỉ ghi phần của dự án đang mở (state.currentProjectId)
@@ -36,14 +41,16 @@ export async function handleProjectSnapshot(projectId, docData) {
             }
         }
 
-        // Persist to local storage as backup
-        localStorage.setItem('ccm_budgets', JSON.stringify(state.appData.Budgets));
-        localStorage.setItem('ccm_tenders', JSON.stringify(state.appData.Tenders));
-        localStorage.setItem('ccm_contracts', JSON.stringify(state.appData.Contracts));
-        localStorage.setItem('ccm_cashflow', JSON.stringify(state.appData.Cashflow));
-        localStorage.setItem('ccm_payments', JSON.stringify(state.appData.Payments));
-        localStorage.setItem('ccm_variations', JSON.stringify(state.appData.Variations));
-        localStorage.setItem('ccm_final', JSON.stringify(state.appData.Final_Statements));
+        // Dự án v2: nguồn duy nhất là Firestore (có bộ nhớ đệm offline), không lưu bản sao ccm_*
+        if (!isV2(projectId)) {
+            localStorage.setItem('ccm_budgets', JSON.stringify(state.appData.Budgets));
+            localStorage.setItem('ccm_tenders', JSON.stringify(state.appData.Tenders));
+            localStorage.setItem('ccm_contracts', JSON.stringify(state.appData.Contracts));
+            localStorage.setItem('ccm_cashflow', JSON.stringify(state.appData.Cashflow));
+            localStorage.setItem('ccm_payments', JSON.stringify(state.appData.Payments));
+            localStorage.setItem('ccm_variations', JSON.stringify(state.appData.Variations));
+            localStorage.setItem('ccm_final', JSON.stringify(state.appData.Final_Statements));
+        }
 
         console.log(`⚡ Realtime Update received for project ${projectId}, triggering UI re-render...`);
 

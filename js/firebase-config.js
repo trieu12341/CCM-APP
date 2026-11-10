@@ -1,20 +1,16 @@
 /**
  * firebase-config.js
- * Cấu hình Firebase Web SDK - Cập nhật với đầy đủ config object.
- *
- * ⚠️  HƯỚNG DẪN: Vào Firebase Console → Project Settings → Your apps
- * Sao chép toàn bộ firebaseConfig object và thay thế vào đây.
- * Hiện tại đang dùng cấu hình mẫu cho project "cost-contract-management".
+ * Cấu hình Firebase Web SDK. Cấu hình từng môi trường nằm ở firebase-env.js (mặc định = bản thật;
+ * staging chỉ khi chạy trên tên miền staging hoặc mở với ?env=staging).
  */
-const firebaseConfig = {
-    apiKey: "AIzaSyD_1Pjcg3wyhJWG8Wy3AtQxwHV7taPPKpc",
-    authDomain: "cost-contract-management.firebaseapp.com",
-    projectId: "cost-contract-management",
-    storageBucket: "cost-contract-management.firebasestorage.app",
-    messagingSenderId: "182752560401",
-    appId: "1:182752560401:web:ceaf1ec620d3798b2438b0",
-    measurementId: "G-8EDSHT5WF4"
-};
+import { pickFirebaseEnv } from './firebase-env.js';
+
+const { env, config: firebaseConfig } = pickFirebaseEnv(location.hostname, location.search);
+export const FIREBASE_ENV = env;
+if (env === 'staging') {
+    document.documentElement.classList.add('env-staging');
+    document.title = `[STAGING] ${document.title}`;
+}
 
 // Khởi tạo Firebase App nếu chưa có
 if (!firebase.apps.length) {
@@ -25,4 +21,7 @@ if (!firebase.apps.length) {
 export const db = firebase.firestore();
 // Lớp an toàn thứ hai: bỏ qua trường undefined thay vì từ chối cả bản ghi
 try { db.settings({ ignoreUndefinedProperties: true, merge: true }); } catch (e) { console.warn('Firestore settings:', e); }
+// Bộ nhớ đệm offline của Firestore (thay cho bản sao ccm_* trong localStorage): mở lại app vẫn thấy dữ liệu đã tải, nhiều tab dùng chung.
+// Phải gọi trước mọi thao tác Firestore khác. Trình duyệt không hỗ trợ / tab khác đang giữ → bỏ qua, app vẫn chạy bình thường.
+try { db.enablePersistence({ synchronizeTabs: true }).catch(e => console.warn('Bộ nhớ đệm offline không bật được:', e && e.code)); } catch (e) { console.warn('enablePersistence:', e); }
 export const auth = firebase.auth();

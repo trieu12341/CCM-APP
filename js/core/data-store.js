@@ -10,6 +10,7 @@
  */
 import { state } from '../app.js';
 import { backfillProjectIds } from './project-merge.js';
+import { isV2, commitV2 } from './v2-sync.js';
 import { saveBudgetsToCloud, saveTendersToCloud, saveProjectsToCloud, saveContractsToCloud, saveCashflowToCloud, savePaymentsToCloud, saveVariationsToCloud, saveFinalStatementsToCloud } from '../db-service.js';
 
 // Centralize all localStorage keys
@@ -42,6 +43,7 @@ export function persistProjects(data) {
 }
 
 export function persistBudgets(data) {
+    if (isV2(state.currentProjectId)) { state.appData.Budgets = data; commitV2('budgets', data); document.dispatchEvent(new Event('budgetsChanged')); return; }
     clearResetFlag();
     state.appData.Budgets = data;
     localStorage.setItem(STORAGE_KEYS.BUDGETS, JSON.stringify(data));
@@ -50,6 +52,7 @@ export function persistBudgets(data) {
 }
 
 export function persistTenders(data) {
+    if (isV2(state.currentProjectId)) { state.appData.Tenders = data; commitV2('tenders', data); document.dispatchEvent(new Event('tendersChanged')); return; }
     clearResetFlag();
     state.appData.Tenders = data;
     localStorage.setItem(STORAGE_KEYS.TENDERS, JSON.stringify(data));
@@ -58,6 +61,7 @@ export function persistTenders(data) {
 }
 
 export function persistContracts(data) {
+    if (isV2(state.currentProjectId)) { state.appData.Contracts = data; commitV2('contracts', data); document.dispatchEvent(new Event('contractsChanged')); return; }
     clearResetFlag();
     state.appData.Contracts = data;
     localStorage.setItem(STORAGE_KEYS.CONTRACTS, JSON.stringify(data));
@@ -66,6 +70,7 @@ export function persistContracts(data) {
 }
 
 export function persistCashflow(data) {
+    if (isV2(state.currentProjectId)) { state.appData.Cashflow = data; commitV2('cashflows', data); document.dispatchEvent(new Event('cashflowChanged')); return; }
     // SAFEGUARD: Do not overwrite localStorage with empty array if data exists
     if ((!data || data.length === 0) && state.appData.Cashflow && state.appData.Cashflow.length > 0) {
         console.warn('Blocked attempt to persist empty Cashflow data.');
@@ -112,6 +117,7 @@ export function loadCashflowFromLS() {
 }
 
 export function persistPayments(data) {
+    if (isV2(state.currentProjectId)) { state.appData.Payments = data; commitV2('payments', data); document.dispatchEvent(new Event('paymentsChanged')); return; }
     // SAFEGUARD: Do not overwrite localStorage with empty array if data exists
     if ((!data || data.length === 0) && state.appData.Payments && state.appData.Payments.length > 0) {
         console.warn('Blocked attempt to persist empty Payments data.');
@@ -126,6 +132,7 @@ export function persistPayments(data) {
 }
 
 export function persistFinalStatements(data) {
+    if (isV2(state.currentProjectId)) { state.appData.Final_Statements = data; commitV2('finals', data); document.dispatchEvent(new Event('finalChanged')); return; }
     clearResetFlag();
     state.appData.Final_Statements = data;
     localStorage.setItem(STORAGE_KEYS.FINAL, JSON.stringify(data));
@@ -141,6 +148,7 @@ export function loadPaymentsFromLS() {
 }
 
 export function persistVariations(data) {
+    if (isV2(state.currentProjectId)) { state.appData.Variations = data; commitV2('variations', data); document.dispatchEvent(new Event('variationsChanged')); return; }
     // VO từ bản cũ thiếu project_id → bổ sung theo hợp đồng để lên được cloud
     data = backfillProjectIds(data, state.appData.Contracts).items;
     if ((!data || data.length === 0) && state.appData.Variations && state.appData.Variations.length > 0) {

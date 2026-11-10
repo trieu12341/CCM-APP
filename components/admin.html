@@ -26,4 +26,18 @@
             </table>
         </div>
     </div>
+    <div class="card" id="members-card" style="padding: 1.5rem; margin-top: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 1rem; flex-wrap: wrap;">
+            <h2 style="font-size: 1.25rem; font-weight: 600;">Thành viên dự án</h2>
+            <select id="members-project" aria-label="Chọn dự án"></select>
+        </div>
+        <p id="members-note" class="text-sm" style="color: var(--text-muted); margin-bottom: 1rem;"></p>
+        <div class="table-container">
+            <table class="data-table">
+                <thead><tr><th>Tên</th><th>Email</th><th>Vai trò trong dự án</th></tr></thead>
+                <tbody id="members-tbody"></tbody>
+            </table>
+        </div>
+        <div id="members-msg" class="text-sm" role="status" style="margin-top: .75rem;"></div>
+    </div>
 </div>
