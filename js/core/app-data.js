@@ -5,6 +5,7 @@
 import { normalizeContracts } from './contract-fields.js';
 import { state } from '../app.js';
 import { installExportButtons } from '../modules/export/export-buttons.js';
+import { applyFeatureFlags } from '../config/features.js';
 import { visibleProjects } from '../data/members.js';
 import { loadAllProjectsFromCloud, subscribeToProject, saveProjectsToCloud } from '../db-service.js';
 
@@ -31,7 +32,7 @@ let projectSwitchBound = false;
 // LOAD APP DATA — fetch all data, then wire events, then render
 // ─────────────────────────────────────────────────────────────
 export async function loadAppData() {
-    try { installExportButtons(); } catch (e) { console.error('installExportButtons:', e); }
+    try { installExportButtons(); applyFeatureFlags(); } catch (e) { console.error('installExportButtons:', e); }
     try {
         const isCleared = localStorage.getItem('ccm_user_reset_cleared') === 'true';
 

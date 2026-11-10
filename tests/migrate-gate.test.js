@@ -6,10 +6,10 @@ import { countsHtml, issuesHtml, checksHtml, resultHtml } from '../js/modules/mi
 
 const ok = { env: 'staging', isAdmin: true, dryRan: true, blocking: false, typed: 'P001', pid: 'P001' };
 
-test('bản thật đang khóa mặc định (mở khóa ở bước 1.6–1.7)', () => {
-    assert.equal(ALLOW_PROD_MIGRATE, false);
-    assert.match(runGate({ ...ok, env: 'prod' }).reason, /Bản thật đang khóa/);
-    assert.equal(runGate({ ...ok, env: 'prod', allowProd: true }).ok, true);
+test('bản thật đã mở khóa; tắt cờ thì khóa lại', () => {
+    assert.equal(ALLOW_PROD_MIGRATE, true);
+    assert.equal(runGate({ ...ok, env: 'prod' }).ok, true);
+    assert.match(runGate({ ...ok, env: 'prod', allowProd: false }).reason, /Bản thật đang khóa/);
 });
 
 test('chỉ admin, phải chạy thử trước, không còn lỗi chặn, gõ đúng mã dự án', () => {

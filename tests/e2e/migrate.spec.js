@@ -1,4 +1,4 @@
-// Trang admin "Chuyển dữ liệu": chạy thử → chạy thật → kiểm lại KHỚP (staging); bản thật bị khóa.
+// Trang admin "Chuyển dữ liệu": chạy thử → (tự tải sao lưu) chạy thật → kiểm lại KHỚP; bản thật mở nhưng vẫn phải chạy thử + gõ mã.
 import { test, expect } from '@playwright/test';
 import { Backend } from './support/backend.js';
 import { Session, step, txt } from './support/harness.js';
@@ -39,8 +39,10 @@ test('Staging: chạy thử → chạy thật → mọi tổng kiểm KHỚP, d�
         await page.fill('#mg-confirm', 'sai'); expect(await page.isDisabled('#mg-run')).toBe(true);
         await page.fill('#mg-confirm', 'P001'); expect(await page.isDisabled('#mg-run')).toBe(false);
     });
-    await step(test, s, 'M4. Chạy thật: KHỚP hết, có bản ghi mới, mảng cũ còn nguyên, nhật ký "migrate"', async () => {
-        await page.click('#mg-run'); await page.waitForTimeout(1500);
+    await step(test, s, 'M4. Chạy thật: tự tải sao lưu trước; KHỚP hết, có bản ghi mới, mảng cũ còn nguyên, nhật ký "migrate"', async () => {
+        const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#mg-run')]);
+        expect(dl.suggestedFilename()).toMatch(/^ccm-truoc-chuyen_P001_\d{4}-\d{2}-\d{2}\.json$/);
+        await page.waitForTimeout(1500);
         expect(txt(await page.innerText('#mg-result'))).toContain('Xong.');
         const checks = txt(await page.innerText('#mg-checks-after'));
         expect(checks).not.toContain('LỆCH'); expect((checks.match(/KHỚP/g) || []).length).toBe(13);
@@ -54,15 +56,15 @@ test('Staging: chạy thử → chạy thật → mọi tổng kiểm KHỚP, d�
     await context.close();
 });
 
-test('Bản thật: nút Chạy thật bị khóa dù đã chạy thử và gõ đúng mã dự án', async ({ browser }) => {
+test('Bản thật: Chạy thật chỉ mở sau khi chạy thử và gõ đúng mã dự án; chưa bấm thì chưa ghi gì', async ({ browser }) => {
     const be = seed();
     const { page, s, context } = await open(browser, be, '/index.html');
-    await step(test, s, 'M5. Nhãn BẢN THẬT; chạy thử được nhưng chạy thật bị khóa kèm lý do', async () => {
+    await step(test, s, 'M5. Nhãn BẢN THẬT; chạy thử rồi gõ đúng mã mới mở nút Chạy thật', async () => {
         expect(txt(await page.innerText('#mg-env'))).toBe('BẢN THẬT');
         await page.click('#mg-dry'); await page.waitForTimeout(800);
+        await page.fill('#mg-confirm', 'sai'); expect(await page.isDisabled('#mg-run')).toBe(true);
         await page.fill('#mg-confirm', 'P001');
-        expect(await page.isDisabled('#mg-run')).toBe(true);
-        expect(txt(await page.innerText('#mg-gate'))).toContain('Bản thật đang khóa');
+        expect(await page.isDisabled('#mg-run')).toBe(false);
         expect(Object.keys(be.DB).some(k => k.startsWith('projects/P001/'))).toBe(false);
     });
     await context.close();
