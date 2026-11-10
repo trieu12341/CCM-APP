@@ -42,7 +42,8 @@ export function setupSidebarEvents() {
         { menu: 'menu-admin', mod: 'module-admin' },
         { menu: 'menu-migrate', mod: 'module-migrate' },
         { menu: 'menu-trash', mod: 'module-trash' },
-        { menu: 'menu-cost-report', mod: 'module-cost-report' }
+        { menu: 'menu-cost-report', mod: 'module-cost-report' },
+        { menu: 'menu-guide', mod: 'module-guide' }
     ];
 
     modules.forEach(m => {
@@ -123,6 +124,9 @@ export function setupSidebarEvents() {
                     import('../modules/migrate/migrate-events.js').then(mod => mod.initMigratePage()).catch(err => console.error(err));
                 }
 
+                if (m.mod === 'module-guide') {
+                    import('../modules/guide/guide-ui.js').then(mod => mod.initGuidePage()).catch(err => console.error(err));
+                }
                 if (m.mod === 'module-cost-report') {
                     import('../modules/report/cost-report-ui.js').then(mod => mod.initCostReportPage()).catch(err => console.error(err));
                 }
