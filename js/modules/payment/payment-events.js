@@ -10,6 +10,8 @@
  *   Layer 3 → Layer 2 : hide #payment-detail-workspace, ensure scroll unlocked
  */
 import { setupIPCPrint } from './ipc-print-events.js';
+import { unlockPatch } from './ipc-lock.js';
+import { askReason } from '../../core/reason-dialog.js';
 
 import { renderPaymentDashboard } from './ui/payment-layer1-ui.js';
 import { renderIPCList, applyIPCFilters } from './ui/payment-layer2-ui.js';
@@ -117,6 +119,20 @@ export function setupPaymentEvents() {
         });
     }
 
+    // "Mở khóa" IPC đã chốt — bắt buộc lý do; về Nháp, các IPC sau chỉ được đánh dấu "cần xem lại"
+    document.getElementById('btn-unlock-ipc')?.addEventListener('click', async () => {
+        const ipcId = getCurrentDetailIpcId();
+        const ipc = ipcId && getIPCById(ipcId);
+        if (!ipc || !isLockedIPC(ipc)) return;
+        const reason = await askReason({ title: `Mở khóa ${ipc.ipc_id}`, okText: 'Mở khóa',
+            message: 'IPC sẽ về Nháp để sửa. Lý do được ghi vào IPC và nhật ký. Các IPC đã chốt phía sau giữ nguyên số và được đánh dấu "cần xem lại" nếu bị lệch.',
+            placeholder: 'Ví dụ: sửa khối lượng cọc theo biên bản nghiệm thu bổ sung' });
+        if (!reason) return;
+        let patch;
+        try { patch = unlockPatch(ipc, reason, state.user?.name || state.user?.email || ''); } catch (e) { showToast(e.message, 'error'); return; }
+        if (updateIPC(ipcId, patch)) { renderIPCDetail(ipcId); renderIPCList(); showToast('🔓 Đã mở khóa — IPC về Nháp.', 'success'); }
+    });
+
     // "Xác nhận Đã Chuyển Tiền" button
     const btnPaid = document.getElementById('btn-confirm-paid');
     if (btnPaid) {
@@ -143,6 +159,7 @@ export function setupPaymentEvents() {
         btnDeleteIPC.addEventListener('click', () => {
             const ipcId = getCurrentDetailIpcId();
             if (!ipcId) return;
+            if (isLockedIPC(getIPCById(ipcId))) { showToast('IPC đã chốt — mở khóa (ghi lý do) trước khi xóa.', 'info'); return; }
             if (!confirm('Bạn có chắc chắn muốn xóa Hồ sơ Thanh toán này?')) return;
             deleteIPC(ipcId);
             closeIPCDetail();

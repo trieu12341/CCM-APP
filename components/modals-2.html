@@ -666,6 +666,9 @@
                 <button id="btn-print-ipc" class="btn btn-secondary" title="In chứng chỉ IPC khổ A4 / Lưu PDF">
                     <i class="fa-solid fa-print"></i> In / PDF
                 </button>
+                <button id="btn-unlock-ipc" class="btn btn-secondary hidden" title="Mở khóa IPC đã chốt để sửa (bắt buộc ghi lý do)">
+                    <i class="fa-solid fa-lock-open"></i> Mở khóa
+                </button>
                 <button id="btn-edit-ipc" class="btn btn-secondary" title="Sửa IPC (chỉ khi chưa duyệt)">
                     <i class="fa-solid fa-pen"></i> Sửa
                 </button>
@@ -678,6 +681,7 @@
 
         <!-- Body -->
         <div class="detail-workspace-body">
+            <div id="ipc-lock-banner" class="ipc-lock-banner" role="status" hidden></div>
 
             <!-- IPC Info Grid -->
             <div class="ipc-info-grid">
