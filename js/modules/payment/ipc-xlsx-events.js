@@ -10,7 +10,7 @@ const EXCELJS_URL = 'https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min
 const TEMPLATE_URL = 'templates/ipc-cert.xlsx';
 
 let loading = null;
-function loadExcelJS() {
+export function loadExcelJS() {
     if (window.ExcelJS) return Promise.resolve(window.ExcelJS);
     loading ||= new Promise((resolve, reject) => {
         const s = document.createElement('script');

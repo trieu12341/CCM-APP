@@ -1,0 +1,26 @@
+<div id="module-cost-report" class="module-content hidden">
+    <div class="card" style="padding: 1.5rem; display: grid; gap: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+            <div>
+                <h2 style="font-size: 1.25rem; font-weight: 600; color: var(--text-color);">Báo cáo chi phí</h2>
+                <p class="text-sm" style="color: var(--text-muted);">Theo từng gói / hợp đồng, số trước thuế. Đã thanh toán = IPC đã trả (gồm tạm ứng) tới ngày báo cáo.</p>
+            </div>
+            <div style="display: flex; gap: .5rem; align-items: center; flex-wrap: wrap;">
+                <label for="cr-asof" class="text-sm">Ngày báo cáo</label>
+                <input type="date" id="cr-asof" class="form-control" style="width: auto;">
+                <button type="button" id="cr-export" class="btn btn-primary"><i class="fa-solid fa-file-excel"></i> Xuất Excel</button>
+            </div>
+        </div>
+        <div id="cr-warnings" class="cr-warnings" role="status" hidden></div>
+        <div class="table-container cr-wrap">
+            <table class="data-table cr-table" id="cr-table">
+                <thead><tr>
+                    <th>No.</th><th>Mã</th><th>Hạng mục</th><th>Ngân sách</th><th>Giá trị HĐ</th><th>VO đã duyệt</th><th>VO chờ duyệt</th>
+                    <th>Tổng cam kết</th><th>Chưa cam kết</th><th>Dự kiến đến khi xong</th><th>Đã thanh toán</th><th>Còn phải trả</th><th>Chênh lệch ngân sách</th>
+                </tr></thead>
+                <tbody id="cr-body"></tbody>
+            </table>
+        </div>
+        <div id="cr-detail" class="cr-detail" hidden></div>
+    </div>
+</div>
