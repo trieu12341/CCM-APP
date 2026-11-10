@@ -2,6 +2,7 @@
  * payment-approval-ui.js — Nút Phê duyệt / Xác nhận đã chuyển tiền / Sửa của IPC.
  */
 import { isLockedIPC } from '../ipc-chain.js';
+import { renderLockState } from './ipc-lock-ui.js';
 
 const formatDateShort = (d) => {
     if (!d) return '—';
@@ -20,6 +21,7 @@ export function renderApprovalActions(ipc) {
 
     const btnEdit = document.getElementById('btn-edit-ipc');
     if (btnEdit) btnEdit.classList.toggle('hidden', isLockedIPC(ipc));
+    try { renderLockState(ipc); } catch (e) { console.error('renderLockState:', e); }
     if (!btnApprove || !btnPaid) return;
 
     // Reset
