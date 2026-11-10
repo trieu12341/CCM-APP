@@ -13,3 +13,12 @@ test('khôi phục từ chối file sai, mã trùng dự án gốc', async () =>
     await assert.rejects(restoreProject({}, { version: 9 }, 'X'), /không hợp lệ/);
     await assert.rejects(restoreProject({}, { version: 1, projectId: 'P1', doc: {} }, 'P1'), /MỚI/);
 });
+
+test('backupSummary: dự án kiểu cũ đếm dòng mảng, dự án đã chuyển đếm hồ sơ mới', async () => {
+    const { backupSummary } = await import('../js/data/backup.js');
+    const s = backupSummary({ projects: [
+        { projectId: 'P1', doc: { contracts: [1, 2], payments: [1], budgets: [], variations: [1, 2, 3] }, collections: {} },
+        { projectId: 'P2', doc: { schemaVersion: 2 }, collections: { contracts: [{}, {}], payments: [{}] } },
+    ] });
+    assert.equal(s, 'P1 (kiểu cũ: budgets 0, contracts 2, payments 1, variations 3) · P2 (mới: 3 hồ sơ)');
+});

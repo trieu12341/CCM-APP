@@ -46,6 +46,16 @@ export async function exportAll(db) {
     return { version: BACKUP_VERSION, exportedAt: new Date().toISOString(), projects, users };
 }
 
+/** Một dòng tóm tắt bản sao lưu: mỗi dự án — số hồ sơ cấu trúc mới, hoặc số dòng mảng kiểu cũ. */
+export function backupSummary(all) {
+    const KINDS = ['budgets', 'contracts', 'payments', 'variations'];
+    return all.projects.map(p => {
+        const sub = Object.values(p.collections || {}).reduce((n, l) => n + l.length, 0);
+        const legacy = KINDS.map(k => `${k} ${Array.isArray(p.doc?.[k]) ? p.doc[k].length : 0}`).join(', ');
+        return `${p.projectId}${p.doc?.schemaVersion >= 2 ? ` (mới: ${sub} hồ sơ)` : ` (kiểu cũ: ${legacy})`}`;
+    }).join(' · ');
+}
+
 /** Đổi project_id cũ → mới trong mọi hồ sơ (nếu không, app lọc theo project_id sẽ không thấy dữ liệu). */
 function reId(v, from, to) {
     if (Array.isArray(v)) return v.map(x => reId(x, from, to));

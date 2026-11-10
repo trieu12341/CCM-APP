@@ -3,7 +3,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { adminDb } from './_admin.mjs';
-import { exportAll } from '../js/data/backup.js';
+import { exportAll, backupSummary } from '../js/data/backup.js';
 
 const out = process.argv[2] || 'backups';
 let all;
@@ -20,3 +20,5 @@ mkdirSync(out, { recursive: true });
 const file = join(out, `ccm-backup-${new Date().toISOString().slice(0, 10)}.json`);
 writeFileSync(file, JSON.stringify(all));
 console.log(`Đã sao lưu ${all.projects.length} dự án, ${count} hồ sơ con, ${all.users.length} tài khoản → ${file}`);
+// Tóm tắt hiện ngay trên trang Actions (không cần tải file về)
+console.log(`::notice title=Sao lưu xong — ${all.projects.length} dự án, ${all.users.length} tài khoản::${backupSummary(all).slice(0, 900)}`);
