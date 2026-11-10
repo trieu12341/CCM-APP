@@ -1,8 +1,9 @@
 /**
  * migrate-gate.js — Khi nào được bấm "Chạy thật". Thuần → test được.
- * Bản thật bị KHÓA cho tới khi ứng dụng đã đọc/ghi theo cấu trúc mới (bước 1.6–1.7); đổi cờ này trong PR của các bước đó.
+ * Bản thật đã MỞ (app đọc/ghi được cấu trúc mới từ bước 1.6–1.7). Chuyển dữ liệu không xóa mảng kiểu cũ và tự tải
+ * bản sao lưu dự án về máy trước khi ghi; vẫn phải là admin, chạy thử trước, không lỗi chặn, gõ đúng mã dự án.
  */
-export const ALLOW_PROD_MIGRATE = false;
+export const ALLOW_PROD_MIGRATE = true;
 
 /**
  * @param {{env:'prod'|'staging', isAdmin:boolean, dryRan:boolean, blocking:boolean, typed:string, pid:string, allowProd?:boolean}} s

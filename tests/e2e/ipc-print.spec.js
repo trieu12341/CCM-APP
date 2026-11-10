@@ -17,7 +17,7 @@ test('T2.13 In IPC đã duyệt và IPC nháp: số dòng 16, bằng chữ, dấ
     const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
     await be.attach(context);
     const page = await context.newPage(); const s = new Session(page);
-    await page.goto('/index.html?env=staging'); await page.waitForTimeout(2500);
+    await page.goto('/index.html?env=staging&features=all'); await page.waitForTimeout(2500);
     await page.click('#menu-payment'); await page.waitForTimeout(400);
 
     await step(test, s, 'P1. IPC-001 (đã duyệt): dòng 16 khớp số đã tính, có bằng chữ, không có BẢN NHÁP', async () => {

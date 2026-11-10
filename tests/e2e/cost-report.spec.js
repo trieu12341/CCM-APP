@@ -10,7 +10,7 @@ test('Báo cáo chi phí: 3 gói, tổng AFC đúng, bấm dòng xem chi tiết,
     const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, acceptDownloads: true });
     await be.attach(context);
     const page = await context.newPage(); const s = new Session(page);
-    await page.goto('/index.html?env=staging'); await page.waitForTimeout(2500);
+    await page.goto('/index.html?env=staging&features=all'); await page.waitForTimeout(2500);
 
     const rep = async () => page.evaluate(async () => (await import('/js/modules/report/cost-report-ui.js')).currentReport());
     await step(test, s, 'R1. Mở tab → mỗi gói 1 dòng, dòng tổng = engine', async () => {

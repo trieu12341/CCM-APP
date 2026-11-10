@@ -12,7 +12,7 @@ test('T2.12 Xuất CERT: tải file theo mẫu, 3 sheet, dòng (16) và (14) kh�
     const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, acceptDownloads: true });
     await be.attach(context);
     const page = await context.newPage(); const s = new Session(page);
-    await page.goto('/index.html?env=staging'); await page.waitForTimeout(2500);
+    await page.goto('/index.html?env=staging&features=all'); await page.waitForTimeout(2500);
     await page.click('#menu-payment'); await page.waitForTimeout(400);
     await mod(page, '/js/modules/payment/payment-nav.js', 'openIPCDetail', 'IPC-002'); await page.waitForTimeout(400);
 

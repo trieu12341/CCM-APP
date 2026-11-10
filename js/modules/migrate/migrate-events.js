@@ -7,6 +7,7 @@ import { state } from '../../app.js';
 import { dryRun, runMigration } from '../../data/migrate-run.js';
 import { compareChecksums } from '../../data/migrate-checks.js';
 import { runGate } from '../../data/migrate-gate.js';
+import { exportProject } from '../../data/backup.js';
 import { escapeHtml } from '../../utils/formatters.js';
 import { countsHtml, issuesHtml, checksHtml, resultHtml } from './migrate-view.js';
 
@@ -45,10 +46,23 @@ async function onDry() {
     } finally { setBusy(false); }
 }
 
+/** Tải bản sao lưu trọn dự án (gồm mảng kiểu cũ) về máy TRƯỚC khi chuyển. Lỗi → không chuyển. */
+async function backupFirst(id) {
+    const data = await exportProject(db, id);
+    const url = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: 'application/json' }));
+    const a = document.createElement('a');
+    a.href = url; a.download = `ccm-truoc-chuyen_${id}_${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 500);
+}
+
 async function onRun() {
     setBusy(true);
     const bar = $('mg-progress'); bar.classList.remove('hidden');
     try {
+        $('mg-progress-text').textContent = 'Đang tải bản sao lưu dự án về máy…';
+        try { await backupFirst(pid()); }
+        catch (e) { throw new Error(`không tải được bản sao lưu (${e.message || e}) — chưa chuyển gì`); }
         const user = { uid: state.user.uid, name: state.user.name };
         const r = await runMigration({
             db, fieldValue: firebase.firestore.FieldValue, user, pid: pid(),
